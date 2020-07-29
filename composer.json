@@ -1,10 +1,14 @@
 {
-    "name": "laravel/laravel",
+    "name": "thebachtiarz/backend-simpkis",
     "type": "project",
-    "description": "The Laravel Framework.",
+    "description": "Presence Management Information System for Student Worship Activities.",
     "keywords": [
         "framework",
-        "laravel"
+        "laravel",
+        "thebachtiarz",
+        "simpkis",
+        "presence",
+        "worship"
     ],
     "license": "MIT",
     "require": {
@@ -40,6 +44,12 @@
         "classmap": [
             "database/seeds",
             "database/factories"
+        ],
+        "files": [
+            "app/Helpers/Apps/AppsHandler.php",
+            "app/Helpers/Apps/CarbonTimeHandler.php",
+            "app/Helpers/Apps/ResponseHandler.php",
+            "app/Helpers/Auth/UserHandler.php"
         ]
     },
     "autoload-dev": {
