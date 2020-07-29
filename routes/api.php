@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +13,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+/**
+ * jwt auth default route
+ * access : /api/auth/---
+ */
+Route::group(['prefix' => 'auth'], function () {
+    Route::post('/login', 'APIs\Auth\AuthController@login');
+    Route::post('/logout', 'APIs\Auth\AuthController@logout');
+    Route::get('/creds', 'APIs\Auth\AuthController@credential');
 });
