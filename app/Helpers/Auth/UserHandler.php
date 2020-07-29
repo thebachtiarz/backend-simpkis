@@ -4,6 +4,8 @@
  * use libraries
  */
 
+use Illuminate\Support\Facades\Hash;
+
 /**
  * use models
  */
@@ -181,4 +183,15 @@ function User_getStatusForHuman($status)
 function User_createNewCode()
 {
     return randString(64);
+}
+
+/**
+ * create bcrypt password
+ *
+ * @param string $password
+ * @return void
+ */
+function User_encPass($password)
+{
+    return Hash::make($password);
 }
