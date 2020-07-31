@@ -29,6 +29,28 @@ class User extends Authenticatable
         'username', 'password',
     ];
 
+    # map
+    public function userSimpleListMap()
+    {
+        return [
+            'code' => $this->code,
+            'name' => $this->userbio->name,
+            'status' => User_getStatusForHuman($this->userstat->status)
+        ];
+    }
+
+    public function userInfoMap()
+    {
+        return [
+            'id' => strval($this->id),
+            'code' => $this->code,
+            'name' => $this->userbio->name,
+            'status' => User_getStatusForHuman($this->userstat->status),
+            'active' => User_getActiveStatus($this->active),
+            'created_at' => Carbon_HumanDateTime($this->created_at)
+        ];
+    }
+
     # scope
     public function scopeGetUsersByStatus($query, $status)
     {

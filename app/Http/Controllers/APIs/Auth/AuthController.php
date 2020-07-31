@@ -55,8 +55,7 @@ class AuthController extends Controller
         return response()->json(dataResponse([
             'account_name' => Auth::user()->userbio->name,
             'status' => User_getStatusForHuman(Auth::user()->userstat->status),
-            'access_token' => $token,
-            'token_type' => 'bearer'
+            'access_token' => $token
         ], '', 'Authorization'));
     }
 }

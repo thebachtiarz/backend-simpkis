@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 /**
- * jwt auth default route
+ * authentication api route
  * access : /api/auth/---
  */
 Route::group(['prefix' => 'auth'], function () {
@@ -23,6 +23,11 @@ Route::group(['prefix' => 'auth'], function () {
     Route::get('/creds', 'APIs\Auth\AuthController@credential');
 });
 
+/**
+ * access resources
+ * middleware : have token, status active
+ * access : /api/access/---
+ */
 Route::group(['middleware' => ['auth:sanctum', 'useractive:active'], 'prefix' => 'access'], function () {
     Route::resource('/user/management', 'APIs\Access\UserManagementController');
     Route::resource('/user/recover-password', 'APIs\Access\ForgetPasswordController');

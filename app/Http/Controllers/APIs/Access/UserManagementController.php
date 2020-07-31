@@ -4,7 +4,6 @@ namespace App\Http\Controllers\APIs\Access;
 
 use App\Http\Controllers\Controller;
 use App\Models\Auth\User;
-use Illuminate\Http\Request;
 
 class UserManagementController extends Controller
 {
@@ -23,7 +22,7 @@ class UserManagementController extends Controller
     public function index()
     {
         if (in_array(request('_getUsers'), $this->canAllow[User_getStatus(User_checkStatus())])) {
-            return response()->json(dataResponse($this->getUsersByStatus(request('_getUsers'))), 200);
+            return response()->json(dataResponse($this->getUsersByStatus(request('_getUsers'))->map->userSimpleListMap()), 200);
         }
         return _throwErrorResponse();
     }
@@ -47,11 +46,12 @@ class UserManagementController extends Controller
             try {
                 \Illuminate\Support\Facades\DB::transaction(function () {
                     $newCode = User_createNewCode();
+                    $name = request('idSiswa') ? '\App\Models\Actor\Siswa::findOrFail(idSiswa)->name' : request('name');
                     \Illuminate\Support\Facades\DB::table('users')->insert([
                         'username' => request('username'), 'password' => User_encPass(request('password')), 'code' => $newCode, 'active' => User_setActiveStatus('active')
                     ]);
                     \Illuminate\Support\Facades\DB::table('user_biodatas')->insert([
-                        'code' => $newCode, 'name' => ucwords(request('name'))
+                        'code' => $newCode, 'name' => ucwords($name)
                     ]);
                     \Illuminate\Support\Facades\DB::table('user_statuses')->insert([
                         'code' => $newCode, 'status' => User_setStatus(request('status'))
@@ -73,7 +73,12 @@ class UserManagementController extends Controller
      */
     public function show($id)
     {
-        //
+        $user = User::find($id);
+        $userStatus = (bool) $user ? $user->userstat->status : '';
+        if (in_array(User_getStatus($userStatus), $this->canAllow[User_getStatus(User_checkStatus())])) {
+            return response()->json(dataResponse(User::where('id', $id)->get()->map->userInfoMap()), 200);
+        }
+        return response()->json(errorResponse('You are not authorized to view this user'), 202);
     }
 
     /**

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use Faker\Generator as Faker;
 use App\Models\Auth\User;
 use App\Models\Auth\UserBiodata;
 use App\Models\Auth\UserStatus;
@@ -12,13 +13,13 @@ class UserSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(Faker $faker)
     {
         $users = collect([
-            ['status' => User_setStatus('admin'), 'name' => 'Admin', 'username' => 'admin', 'password' => User_encPass('admin'), 'code' => User_createNewCode(), 'created_at' => Carbon_DBtimeNow(), 'updated_at' => Carbon_DBtimeNow(), 'active' => User_setActiveStatus('active')],
-            ['status' => User_setStatus('kurikulum'), 'name' => 'Kurikulum', 'username' => 'kurikulum', 'password' => User_encPass('kurikulum'), 'code' => User_createNewCode(), 'created_at' => Carbon_DBtimeNow(), 'updated_at' => Carbon_DBtimeNow(), 'active' => User_setActiveStatus('active')],
-            ['status' => User_setStatus('guru'), 'name' => 'Guru', 'username' => 'guru', 'password' => User_encPass('guru'), 'code' => User_createNewCode(), 'created_at' => Carbon_DBtimeNow(), 'updated_at' => Carbon_DBtimeNow(), 'active' => User_setActiveStatus('active')],
-            ['status' => User_setStatus('siswa'), 'name' => 'Ketua Kelas', 'username' => 'siswa', 'password' => User_encPass('siswa'), 'code' => User_createNewCode(), 'created_at' => Carbon_DBtimeNow(), 'updated_at' => Carbon_DBtimeNow(), 'active' => User_setActiveStatus('active')]
+            ['status' => User_setStatus('admin'), 'name' => $faker->name, 'username' => 'admin', 'password' => User_encPass('admin'), 'code' => User_createNewCode(), 'created_at' => Carbon_DBtimeNow(), 'updated_at' => Carbon_DBtimeNow(), 'active' => User_setActiveStatus('active')],
+            ['status' => User_setStatus('kurikulum'), 'name' => $faker->name, 'username' => 'kurikulum', 'password' => User_encPass('kurikulum'), 'code' => User_createNewCode(), 'created_at' => Carbon_DBtimeNow(), 'updated_at' => Carbon_DBtimeNow(), 'active' => User_setActiveStatus('active')],
+            ['status' => User_setStatus('guru'), 'name' => $faker->name, 'username' => 'guru', 'password' => User_encPass('guru'), 'code' => User_createNewCode(), 'created_at' => Carbon_DBtimeNow(), 'updated_at' => Carbon_DBtimeNow(), 'active' => User_setActiveStatus('active')],
+            ['status' => User_setStatus('siswa'), 'name' => $faker->name, 'username' => 'siswa', 'password' => User_encPass('siswa'), 'code' => User_createNewCode(), 'created_at' => Carbon_DBtimeNow(), 'updated_at' => Carbon_DBtimeNow(), 'active' => User_setActiveStatus('active')]
         ]);
 
         $user = $users->map(function ($data) {
