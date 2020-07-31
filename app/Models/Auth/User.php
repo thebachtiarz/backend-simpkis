@@ -23,11 +23,16 @@ class User extends Authenticatable
     # relation
     public function userbio()
     {
-        return $this->hasOne(\App\Models\Auth\UserBiodata::class, 'code', 'code')->withDefault(['info' => 'User not found']);
+        return $this->hasOne(\App\Models\Auth\UserBiodata::class, 'code', 'code');
     }
 
     public function userstat()
     {
-        return $this->hasOne(\App\Models\Auth\UserStatus::class, 'code', 'code')->withDefault(['info' => 'User not found']);
+        return $this->hasOne(\App\Models\Auth\UserStatus::class, 'code', 'code');
+    }
+
+    public function lostpassword()
+    {
+        return $this->hasMany(\App\Models\Access\ForgetPassword::class, 'code', 'code');
     }
 }
