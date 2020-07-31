@@ -20,6 +20,21 @@ class User extends Authenticatable
         'username', 'password', 'code', 'active'
     ];
 
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'username', 'password',
+    ];
+
+    # scope
+    public function scopeGetUsersByStatus($query, $status)
+    {
+        $query->select('users.*')->join('user_statuses', 'users.code', '=', 'user_statuses.code')->where('status', User_setStatus($status));
+    }
+
     # relation
     public function userbio()
     {

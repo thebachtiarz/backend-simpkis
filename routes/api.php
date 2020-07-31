@@ -23,6 +23,7 @@ Route::group(['prefix' => 'auth'], function () {
     Route::get('/creds', 'APIs\Auth\AuthController@credential');
 });
 
-Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'access'], function () {
+Route::group(['middleware' => ['auth:sanctum', 'useractive:active'], 'prefix' => 'access'], function () {
+    Route::resource('/user/management', 'APIs\Access\UserManagementController');
     Route::resource('/user/recover-password', 'APIs\Access\ForgetPasswordController');
 });
