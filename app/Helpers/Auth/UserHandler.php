@@ -95,6 +95,16 @@ function User_getNameByCode($code)
 }
 
 /**
+ * check status user
+ *
+ * @return void
+ */
+function User_checkStatus()
+{
+    return auth()->user()->userstat->status;
+}
+
+/**
  * get user status by code
  *
  * @param string $code

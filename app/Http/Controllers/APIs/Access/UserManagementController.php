@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class UserManagementController extends Controller
 {
-    private $canAllow = ['admin' => ['kurikulum', 'guru', 'siswa'], 'guru' => ['siswa']];
+    protected $canAllow = ['admin' => ['kurikulum', 'guru', 'siswa'], 'guru' => ['siswa']];
 
     public function __construct()
     {
@@ -22,7 +22,7 @@ class UserManagementController extends Controller
      */
     public function index()
     {
-        if (in_array(request('_getUsers'), $this->canAllow[User_getStatus(auth()->user()->userstat->status)])) {
+        if (in_array(request('_getUsers'), $this->canAllow[User_getStatus(User_checkStatus())])) {
             return response()->json(dataResponse($this->getUsersByStatus(request('_getUsers'))), 200);
         }
         return _throwErrorResponse();
@@ -31,12 +31,38 @@ class UserManagementController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store()
     {
-        //
+        $validator = Validator(request()->all(), [
+            'username' => 'required|string|min:8|alpha_num|unique:users,username',
+            'password' => 'required|string|regex:/^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9])(?=.*[!@#$&*()]).{8,})\S$/',
+            'name' => ['nullable', 'string', 'min:3', 'regex:/^[a-zA-Z_.\s]+$/', \Illuminate\Validation\Rule::requiredIf(!request('idSiswa'))],
+            'status' => 'required|string|',
+            'idSiswa' => 'nullable|string|numeric'
+        ]);
+        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
+        if (in_array(request('status'), $this->canAllow[User_getStatus(User_checkStatus())])) {
+            try {
+                \Illuminate\Support\Facades\DB::transaction(function () {
+                    $newCode = User_createNewCode();
+                    \Illuminate\Support\Facades\DB::table('users')->insert([
+                        'username' => request('username'), 'password' => User_encPass(request('password')), 'code' => $newCode, 'active' => User_setActiveStatus('active')
+                    ]);
+                    \Illuminate\Support\Facades\DB::table('user_biodatas')->insert([
+                        'code' => $newCode, 'name' => ucwords(request('name'))
+                    ]);
+                    \Illuminate\Support\Facades\DB::table('user_statuses')->insert([
+                        'code' => $newCode, 'status' => User_setStatus(request('status'))
+                    ]);
+                }, 5);
+                return response()->json(successResponse('Successfully create new user'), 201);
+            } catch (\Exception $e) {
+                return response()->json(errorResponse('Failed create new user, please try again'), 202);
+            }
+        }
+        return response()->json(errorResponse('You are not authorized to create this user'), 202);
     }
 
     /**
@@ -53,13 +79,18 @@ class UserManagementController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update($id)
     {
-        //
+        $validator = Validator(request()->all(), [
+            'idSiswa' => 'required|string|numeric',
+            'username' => 'required|string|min:8|alpha_num|unique:users,username',
+            'password' => 'required|required|string|regex:/^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9])(?=.*[!@#$&*()]).{8,})\S$/'
+        ]);
+        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
+        return response()->json(successResponse(User::findOrFail($id)->userbio->name), 200);
     }
 
     /**

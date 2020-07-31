@@ -15,8 +15,8 @@ class AuthController extends Controller
     public function login()
     {
         $validator = Validator(request()->all(), [
-            'username' => 'required|string|alpha_num',
-            'password' => 'required|string'
+            'username' => 'required|string|min:3|alpha_num',
+            'password' => 'required|string|min:3'
         ]);
         if ($validator->fails()) {
             return response()->json(errorResponse($validator->errors()), 202);
