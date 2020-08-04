@@ -15,7 +15,11 @@ class CreateSiswasTable extends Migration
     {
         Schema::create('siswas', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->string('nisn');
+            $table->string('nama');
+            $table->foreignId('id_kelas')->constrained('kelas');
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent();
         });
     }
 

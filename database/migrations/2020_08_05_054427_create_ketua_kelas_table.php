@@ -15,7 +15,10 @@ class CreateKetuaKelasTable extends Migration
     {
         Schema::create('ketua_kelas', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->foreignId('id_siswa')->constrained('siswas');
+            $table->foreignId('id_kelas')->constrained('kelas');
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent();
         });
     }
 
