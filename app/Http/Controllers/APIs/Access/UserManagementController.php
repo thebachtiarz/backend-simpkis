@@ -78,7 +78,11 @@ class UserManagementController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $userStatus = (bool) User::find($id) ? User::find($id)->userstat->status : '';
+        if (in_array(User_getStatus($userStatus), $this->canAllow[User_getStatus(User_checkStatus())])) {
+            return response()->json(dataResponse(User::where('id', $id)->get()->map->userInfoMap()), 200);
+        }
+        return response()->json(errorResponse('You are not authorized to delete this user'), 202);
     }
 
     # private -> move to services
