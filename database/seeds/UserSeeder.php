@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
             ['status' => User_setStatus('admin'), 'name' => $faker->name, 'username' => 'admin', 'password' => User_encPass('admin'), 'code' => User_createNewCode(), 'created_at' => Carbon_DBtimeNow(), 'updated_at' => Carbon_DBtimeNow(), 'active' => User_setActiveStatus('active')],
             ['status' => User_setStatus('kurikulum'), 'name' => $faker->name, 'username' => 'kurikulum', 'password' => User_encPass('kurikulum'), 'code' => User_createNewCode(), 'created_at' => Carbon_DBtimeNow(), 'updated_at' => Carbon_DBtimeNow(), 'active' => User_setActiveStatus('active')],
             ['status' => User_setStatus('guru'), 'name' => $faker->name, 'username' => 'guru', 'password' => User_encPass('guru'), 'code' => User_createNewCode(), 'created_at' => Carbon_DBtimeNow(), 'updated_at' => Carbon_DBtimeNow(), 'active' => User_setActiveStatus('active')],
-            ['status' => User_setStatus('siswa'), 'name' => $faker->name, 'username' => 'siswa', 'password' => User_encPass('siswa'), 'code' => User_createNewCode(), 'created_at' => Carbon_DBtimeNow(), 'updated_at' => Carbon_DBtimeNow(), 'active' => User_setActiveStatus('active')]
+            ['status' => User_setStatus('ketuakelas'), 'name' => $faker->name, 'username' => 'ketuakelas', 'password' => User_encPass('ketuakelas'), 'code' => User_createNewCode(), 'created_at' => Carbon_DBtimeNow(), 'updated_at' => Carbon_DBtimeNow(), 'active' => User_setActiveStatus('active')]
         ]);
 
         $user = $users->map(function ($data) {

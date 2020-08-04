@@ -24,7 +24,7 @@ class UserFakerSeeder extends Seeder
                 'name' => $faker->name,
                 'tagname' => strtolower(randString(7)),
                 'active' => User_setActiveStatus('active'),
-                'status' => User_setStatus('siswa')
+                'status' => User_setStatus('ketuakelas')
             ];
             $newUser[] = [
                 'username' => 'u' . $moreUser['tagname'],

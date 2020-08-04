@@ -134,8 +134,8 @@ function User_setStatus($status)
     if ($status == 'guru') {
         return 'bestteacher';
     }
-    if ($status == 'siswa') {
-        return 'smartstudent';
+    if ($status == 'ketuakelas') {
+        return 'goodleader';
     }
 }
 
@@ -157,8 +157,8 @@ function User_getStatus($status)
     if ($status == 'bestteacher') {
         return 'guru';
     }
-    if ($status == 'smartstudent') {
-        return 'siswa';
+    if ($status == 'goodleader') {
+        return 'ketuakelas';
     }
 }
 
@@ -180,7 +180,7 @@ function User_getStatusForHuman($status)
     if ($status == 'bestteacher') {
         return 'Guru';
     }
-    if ($status == 'smartstudent') {
+    if ($status == 'goodleader') {
         return 'Ketua Kelas';
     }
 }

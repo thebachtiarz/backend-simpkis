@@ -7,7 +7,7 @@ use App\Models\Auth\User;
 
 class UserManagementController extends Controller
 {
-    protected $canAllow = ['admin' => ['kurikulum', 'guru', 'siswa'], 'guru' => ['siswa']];
+    protected $canAllow = ['admin' => ['kurikulum', 'guru', 'ketuakelas'], 'guru' => ['ketuakelas']];
 
     public function __construct()
     {
@@ -22,7 +22,7 @@ class UserManagementController extends Controller
     public function index()
     {
         if (in_array(request('_getUsers'), $this->canAllow[User_getStatus(User_checkStatus())])) {
-            return response()->json(dataResponse($this->getUsersByStatus(request('_getUsers'))->map->userSimpleListMap()), 200);
+            return response()->json(dataResponse(User::getUsersByStatus(request('_getUsers'))->get()->map->userSimpleListMap()), 200);
         }
         return _throwErrorResponse();
     }
@@ -34,33 +34,10 @@ class UserManagementController extends Controller
      */
     public function store()
     {
-        $validator = Validator(request()->all(), [
-            'username' => 'required|string|min:8|alpha_num|unique:users,username',
-            'password' => 'required|string|regex:/^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9])(?=.*[!@#$&*()]).{8,})\S$/',
-            'name' => ['nullable', 'string', 'min:3', 'regex:/^[a-zA-Z_.\s]+$/', \Illuminate\Validation\Rule::requiredIf(!request('idSiswa'))],
-            'status' => 'required|string|',
-            'idSiswa' => 'nullable|string|numeric'
-        ]);
+        $validator = $this->storeValidator(request()->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
         if (in_array(request('status'), $this->canAllow[User_getStatus(User_checkStatus())])) {
-            try {
-                \Illuminate\Support\Facades\DB::transaction(function () {
-                    $newCode = User_createNewCode();
-                    $name = request('idSiswa') ? '\App\Models\Actor\Siswa::findOrFail(idSiswa)->name' : request('name');
-                    \Illuminate\Support\Facades\DB::table('users')->insert([
-                        'username' => request('username'), 'password' => User_encPass(request('password')), 'code' => $newCode, 'active' => User_setActiveStatus('active')
-                    ]);
-                    \Illuminate\Support\Facades\DB::table('user_biodatas')->insert([
-                        'code' => $newCode, 'name' => ucwords($name)
-                    ]);
-                    \Illuminate\Support\Facades\DB::table('user_statuses')->insert([
-                        'code' => $newCode, 'status' => User_setStatus(request('status'))
-                    ]);
-                }, 5);
-                return response()->json(successResponse('Successfully create new user'), 201);
-            } catch (\Exception $e) {
-                return response()->json(errorResponse('Failed create new user, please try again'), 202);
-            }
+            return $this->storeNewUser(request());
         }
         return response()->json(errorResponse('You are not authorized to create this user'), 202);
     }
@@ -73,8 +50,7 @@ class UserManagementController extends Controller
      */
     public function show($id)
     {
-        $user = User::find($id);
-        $userStatus = (bool) $user ? $user->userstat->status : '';
+        $userStatus = (bool) User::find($id) ? User::find($id)->userstat->status : '';
         if (in_array(User_getStatus($userStatus), $this->canAllow[User_getStatus(User_checkStatus())])) {
             return response()->json(dataResponse(User::where('id', $id)->get()->map->userInfoMap()), 200);
         }
@@ -89,11 +65,7 @@ class UserManagementController extends Controller
      */
     public function update($id)
     {
-        $validator = Validator(request()->all(), [
-            'idSiswa' => 'required|string|numeric',
-            'username' => 'required|string|min:8|alpha_num|unique:users,username',
-            'password' => 'required|required|string|regex:/^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9])(?=.*[!@#$&*()]).{8,})\S$/'
-        ]);
+        $validator = $this->updateValidator(request()->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
         return response()->json(successResponse(User::findOrFail($id)->userbio->name), 200);
     }
@@ -110,11 +82,45 @@ class UserManagementController extends Controller
     }
 
     # private -> move to services
-    private function getUsersByStatus($status)
+    private function storeNewUser($user)
     {
-        if (in_array($status, $this->canAllow['admin'])) {
-            return User::getUsersByStatus($status)->get();
+        try {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($user) {
+                $newCode = User_createNewCode();
+                $name = $user->idSiswa ? '\App\Models\Actor\Siswa::findOrFail(idSiswa)->name' : $user->name;
+                \Illuminate\Support\Facades\DB::table('users')->insert([
+                    'username' => $user->username, 'password' => User_encPass($user->password), 'code' => $newCode, 'active' => User_setActiveStatus('active')
+                ]);
+                \Illuminate\Support\Facades\DB::table('user_biodatas')->insert([
+                    'code' => $newCode, 'name' => ucwords($name)
+                ]);
+                \Illuminate\Support\Facades\DB::table('user_statuses')->insert([
+                    'code' => $newCode, 'status' => User_setStatus($user->status)
+                ]);
+            }, 5);
+            return response()->json(successResponse('Successfully create new user'), 201);
+        } catch (\Exception $e) {
+            return response()->json(errorResponse('Failed create new user, please try again'), 202);
         }
-        return 'cannot get user list';
+    }
+
+    private function storeValidator($request)
+    {
+        return Validator($request, [
+            'username' => 'required|string|min:8|alpha_num|unique:users,username',
+            'password' => 'required|string|regex:/^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9])(?=.*[!@#$&*()]).{8,})\S$/',
+            'name' => ['nullable', 'string', 'min:3', 'regex:/^[a-zA-Z_,.\s]+$/', \Illuminate\Validation\Rule::requiredIf(!request('idSiswa'))],
+            'status' => 'required|string|',
+            'idSiswa' => 'nullable|string|numeric'
+        ]);
+    }
+
+    private function updateValidator($request)
+    {
+        return Validator($request, [
+            'idSiswa' => 'required|string|numeric',
+            'username' => 'required|string|min:8|alpha_num|unique:users,username',
+            'password' => 'required|required|string|regex:/^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9])(?=.*[!@#$&*()]).{8,})\S$/'
+        ]);
     }
 }
