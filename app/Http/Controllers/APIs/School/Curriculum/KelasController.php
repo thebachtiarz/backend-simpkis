@@ -4,7 +4,6 @@ namespace App\Http\Controllers\APIs\School\Curriculum;
 
 use App\Http\Controllers\Controller;
 use App\Models\School\Curriculum\Kelas;
-use Illuminate\Http\Request;
 
 class KelasController extends Controller
 {
@@ -46,11 +45,9 @@ class KelasController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\School\Curriculum\Kelas  $kelas
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Kelas $kelas)
+    public function update()
     {
         //
     }
@@ -58,10 +55,9 @@ class KelasController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\School\Curriculum\Kelas  $kelas
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Kelas $kelas)
+    public function destroy()
     {
         //
     }

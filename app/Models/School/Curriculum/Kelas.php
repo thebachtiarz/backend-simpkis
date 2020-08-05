@@ -24,7 +24,7 @@ class Kelas extends Model
             'id' => strval($this->id),
             'tingkat' => $this->kelasgroup->tingkat,
             'nama' => $this->nama,
-            'ketua' => [],
+            'ketua' => $this->ketuakelas ? $this->ketuakelas->id : null,
             'dibuat' => Carbon_HumanDateTime($this->created_at),
         ];
     }
@@ -40,5 +40,10 @@ class Kelas extends Model
     public function kelasgroup()
     {
         return $this->belongsTo(KelasGroup::class, 'id_group', 'id');
+    }
+
+    public function ketuakelas()
+    {
+        return $this->hasOne(\App\Models\School\Actor\KetuaKelas::class, 'id_kelas', 'id');
     }
 }
