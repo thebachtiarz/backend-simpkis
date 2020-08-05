@@ -24,7 +24,7 @@ class Kelas extends Model
             'id' => strval($this->id),
             'tingkat' => $this->kelasgroup->tingkat,
             'nama' => $this->nama,
-            'ketua' => $this->ketuakelas ? $this->ketuakelas->id : null,
+            'ketua' => (bool) $this->ketuakelas ? Act_getSiswaNameByID($this->ketuakelas->id_siswa) : '-',
             'dibuat' => Carbon_HumanDateTime($this->created_at),
         ];
     }
@@ -45,5 +45,10 @@ class Kelas extends Model
     public function ketuakelas()
     {
         return $this->hasOne(\App\Models\School\Actor\KetuaKelas::class, 'id_kelas', 'id');
+    }
+
+    public function siswa()
+    {
+        return $this->hasMany(\App\Models\School\Actor\Siswa::class, 'ketua_kelas', 'id_kelas', 'id');
     }
 }

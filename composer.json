@@ -49,7 +49,9 @@
             "app/Helpers/Apps/AppsHandler.php",
             "app/Helpers/Apps/CarbonTimeHandler.php",
             "app/Helpers/Apps/ResponseHandler.php",
-            "app/Helpers/Auth/UserHandler.php"
+            "app/Helpers/Auth/UserHandler.php",
+            "app/Helpers/School/ActorHandler.php",
+            "app/Helpers/School/CurriculumHandler.php"
         ]
     },
     "autoload-dev": {
