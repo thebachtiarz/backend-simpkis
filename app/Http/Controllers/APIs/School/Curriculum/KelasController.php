@@ -7,6 +7,11 @@ use App\Models\School\Curriculum\Kelas;
 
 class KelasController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['checkrole:kurikulum'])->except(['index', 'show']);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +19,7 @@ class KelasController extends Controller
      */
     public function index()
     {
-        return response()->json(dataResponse(Kelas::all()->map->kelasSimpleListMap()), 200);
+        return $this->listKelas(request());
     }
 
     /**
@@ -24,8 +29,6 @@ class KelasController extends Controller
      */
     public function store()
     {
-        $validator = $this->storeValidator(request()->all());
-        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
         return $this->storeNewKelas(request());
     }
 
@@ -36,10 +39,7 @@ class KelasController extends Controller
      */
     public function show($id)
     {
-        $getKelas = Kelas::where('id', $id);
-        return $getKelas->count()
-            ? response()->json(dataResponse($getKelas->get()->map->kelasFullInfoMap()), 200)
-            : response()->json(errorResponse('Kelas tidak ditemukan'), 202);
+        return $this->showKelas($id);
     }
 
     /**
@@ -49,8 +49,6 @@ class KelasController extends Controller
      */
     public function update($id)
     {
-        $validator = $this->updateValidator(request()->all());
-        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
         return $this->updateKelas($id, request());
     }
 
@@ -61,21 +59,47 @@ class KelasController extends Controller
      */
     public function destroy($id)
     {
-        //
+        return $this->destroyKelas($id, request());
     }
 
     # private -> move to services
-    private function storeNewKelas($kelas)
+    public function listKelas($request)
     {
-        $checkAvailabel = Kelas::getAvailableKelas($kelas->tingkat, $kelas->nama)->count();
+        $validator = $this->softDeleteValidator($request->all());
+        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
+        $getKelas = Kelas::query();
+        if ($request->method == 'all') {
+            return response()->json(dataResponse($getKelas->withTrashed()->get()->map->kelasSimpleListMap()), 200);
+        } elseif ($request->method == 'deleted') {
+            return response()->json(dataResponse($getKelas->onlyTrashed()->get()->map->kelasSimpleListMap()), 200);
+        }
+        return response()->json(dataResponse($getKelas->get()->map->kelasSimpleListMap()), 200);
+    }
+
+    private function storeNewKelas($request)
+    {
+        $validator = $this->storeValidator($request->all());
+        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
+        $checkAvailabel = Kelas::getAvailableKelas($request->tingkat, $request->nama)->count();
         if (!$checkAvailabel) {
             return response()->json(successResponse('Kelas berhasil dibuat'), 201);
         }
         return response()->json(errorResponse('Kelas sudah ada'), 202);
+        // return preg_replace("/[^A-Za-z?![:space:]]/", '', 'Teknik Komputer Jaringan 2');
+    }
+
+    private function showKelas($id)
+    {
+        $getKelas = Kelas::find($id);
+        return (bool) $getKelas
+            ? response()->json(dataResponse($getKelas->kelasFullInfoMap()), 200)
+            : response()->json(errorResponse('Kelas tidak ditemukan'), 202);
     }
 
     private function updateKelas($id, $request)
     {
+        $validator = $this->updateValidator($request->all());
+        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
         $getKelas = Kelas::find($id);
         if ((bool) $getKelas) {
             $tingkatNow = $getKelas->kelasgroup->tingkat;
@@ -97,6 +121,22 @@ class KelasController extends Controller
         return response()->json(errorResponse('Kelas tidak ditemukan'), 202);
     }
 
+    private function destroyKelas($id, $request)
+    {
+        $validator = $this->softDeleteValidator($request->all());
+        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
+        $getKelas = Kelas::with('ketuakelas')->where('id', $id);
+        if ($request->method == 'force') $getKelas->onlyTrashed();
+        if ($getKelas->count()) {
+            if ($request->method == 'force') {
+                return response()->json(successResponse('Berhasil menghapus kelas secara permanen'), 200);
+            } else {
+                return response()->json(successResponse('Berhasil menghapus kelas'), 200);
+            }
+        }
+        return response()->json(errorResponse('Kelas tidak ditemukan'), 202);
+    }
+
     private function storeValidator($request)
     {
         return Validator($request, [
@@ -106,13 +146,19 @@ class KelasController extends Controller
             'tingkat.min' => 'Tingkat kelas yang benar antara 10 - 12',
             'tingkat.max' => 'Tingkat kelas yang benar antara 10 - 12'
         ]);
-        // return preg_replace("/[^A-Za-z?![:space:]]/", '', 'Teknik Komputer Jaringan 2');
     }
 
     private function updateValidator($request)
     {
         return Validator($request, [
             'updateTingkat' => 'required|string|alpha'
+        ]);
+    }
+
+    private function softDeleteValidator($request)
+    {
+        return Validator($request, [
+            'method' => 'nullable|string|alpha'
         ]);
     }
 }

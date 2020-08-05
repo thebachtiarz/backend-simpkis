@@ -17,7 +17,7 @@ class CreateSiswasTable extends Migration
             $table->id();
             $table->string('nisn');
             $table->string('nama');
-            $table->foreignId('id_kelas')->constrained('kelas');
+            $table->string('id_kelas');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
         });
