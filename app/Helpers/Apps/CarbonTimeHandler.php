@@ -86,7 +86,7 @@ function Carbon_HumanDateTime($datetime)
 }
 
 /**
- * convert  date time to date only
+ * convert date time to date only
  * for DB
  *
  * @param date $datetime
@@ -95,6 +95,18 @@ function Carbon_HumanDateTime($datetime)
 function Carbon_DBDateParse($datetime)
 {
     return Carbon::parse($datetime)->format('Y-m-d');
+}
+
+/**
+ * convert date time to date only
+ * for Any
+ *
+ * @param date $datetime
+ * @return void
+ */
+function Carbon_AnyDateParse($datetime)
+{
+    return Carbon::parse($datetime)->format('Ymd');
 }
 
 /**
@@ -123,13 +135,25 @@ function Carbon_HumanDateSimpleDisplayParse($datetime = '')
 
 /**
  * convert date time to interval time
+ * for Human
  *
  * @param date $datetime
  * @return void
  */
-function Carbon_diffForHumans($datetime)
+function Carbon_HumanIntervalDateTime($datetime)
 {
     return Carbon::parse($datetime)->diffForHumans();
+}
+
+/**
+ * convert date time to timestamp
+ *
+ * @param date $datetime
+ * @return void
+ */
+function Carbon_AnyConvDateToTimestamp($datetime)
+{
+    return Carbon::parse($datetime)->timestamp;
 }
 
 /**

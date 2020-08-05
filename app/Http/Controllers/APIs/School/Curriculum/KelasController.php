@@ -38,8 +38,8 @@ class KelasController extends Controller
     {
         $getKelas = Kelas::where('id', $id);
         return $getKelas->count()
-            ? response()->json(dataResponse($getKelas->get()->map->kelasFullInfoMap(), 200))
-            : response()->json(errorResponse('Kelas tidak ditemukan', 202));
+            ? response()->json(dataResponse($getKelas->get()->map->kelasFullInfoMap()), 200)
+            : response()->json(errorResponse('Kelas tidak ditemukan'), 202);
     }
 
     /**
@@ -47,9 +47,11 @@ class KelasController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function update()
+    public function update($id)
     {
-        //
+        $validator = $this->updateValidator(request()->all());
+        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
+        return $this->updateKelas($id, request());
     }
 
     /**
@@ -57,7 +59,7 @@ class KelasController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function destroy()
+    public function destroy($id)
     {
         //
     }
@@ -72,9 +74,32 @@ class KelasController extends Controller
         return response()->json(errorResponse('Kelas sudah ada'), 202);
     }
 
+    private function updateKelas($id, $request)
+    {
+        $getKelas = Kelas::find($id);
+        if ((bool) $getKelas) {
+            $tingkatNow = $getKelas->kelasgroup->tingkat;
+            if (($request->updateTingkat == 'naik') && ($tingkatNow < '12')) {
+                $response = [
+                    'sebelumnya' => "{$tingkatNow} - {$getKelas->nama}",
+                    'sekarang' => strval(intval($tingkatNow + 1)) . " - {$getKelas->nama}"
+                ];
+                return response()->json(dataResponse($response, '', 'Berhasil menaikkan kelas'), 200);
+            } elseif (($request->updateTingkat == 'lulus') && ($tingkatNow >= '12')) {
+                $statLulus = '(L-' . Carbon_AnyDateParse(Carbon_DBtimeToday()) . ')';
+                $response = [
+                    'sebelumnya' => "{$tingkatNow} - {$getKelas->nama}",
+                    'sekarang' => "{$statLulus} - {$getKelas->nama}"
+                ];
+                return response()->json(dataResponse($response, '', 'Berhasil meluluskan kelas'), 200);
+            }
+        }
+        return response()->json(errorResponse('Kelas tidak ditemukan'), 202);
+    }
+
     private function storeValidator($request)
     {
-        return validator($request, [
+        return Validator($request, [
             'tingkat' => 'required|string|numeric|min:10|max:12',
             'nama' => 'required|string|regex:/^[a-z0-9A-Z_\s]+$/'
         ], [
@@ -82,5 +107,12 @@ class KelasController extends Controller
             'tingkat.max' => 'Tingkat kelas yang benar antara 10 - 12'
         ]);
         // return preg_replace("/[^A-Za-z?![:space:]]/", '', 'Teknik Komputer Jaringan 2');
+    }
+
+    private function updateValidator($request)
+    {
+        return Validator($request, [
+            'updateTingkat' => 'required|string|alpha'
+        ]);
     }
 }

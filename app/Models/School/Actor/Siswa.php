@@ -20,10 +20,6 @@ class Siswa extends Model
     }
 
     # scope
-    public function scopeGetSiswaNameByID($query, $id_siswa)
-    {
-        $query->select('nama')->where('id', $id_siswa);
-    }
 
     # relation
     public function ketuakelas()

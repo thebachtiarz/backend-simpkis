@@ -26,6 +26,9 @@ class Kelas extends Model
             'nama' => $this->nama,
             'ketua' => (bool) $this->ketuakelas ? Act_getSiswaNameByID($this->ketuakelas->id_siswa) : '-',
             'dibuat' => Carbon_HumanDateTime($this->created_at),
+            'diubah' => Carbon_AnyConvDateToTimestamp($this->kelasgroup->updated_at) > Carbon_AnyConvDateToTimestamp($this->updated_at)
+                ? Carbon_HumanIntervalDateTime($this->kelasgroup->updated_at)
+                : Carbon_HumanIntervalDateTime($this->updated_at)
         ];
     }
 
@@ -34,6 +37,11 @@ class Kelas extends Model
     {
         $query->join('kelas_groups', 'kelas.id_group', '=', 'kelas_groups.id')
             ->where([['kelas_groups.tingkat', $tingkat], ['nama', $nama]]);
+    }
+
+    public function scopeGetKelasByID($query, $id)
+    {
+        $query->where('id', $id);
     }
 
     # relation

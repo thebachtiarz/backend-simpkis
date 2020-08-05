@@ -21,6 +21,6 @@ use App\Models\School\Actor\Siswa;
  */
 function Act_getSiswaNameByID($id_siswa)
 {
-    $getSiswa = Siswa::getSiswaNameByID($id_siswa);
-    return $getSiswa->count() ? $getSiswa->get('nama')[0]['nama'] : '';
+    $getSiswa = Siswa::find($id_siswa);
+    return (bool) $getSiswa ? $getSiswa->nama : '';
 }
