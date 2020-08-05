@@ -32,3 +32,13 @@ Route::group(['middleware' => ['auth:sanctum', 'useractive:active'], 'prefix' =>
     Route::resource('/user/management', 'APIs\Access\UserManagementController');
     Route::resource('/user/recover-password', 'APIs\Access\ForgetPasswordController');
 });
+
+/**
+ * project resources
+ * version 1
+ * middleware : have token, status active
+ * access : /api/v1/---
+ */
+Route::group(['middleware' => ['auth:sanctum', 'useractive:active'], 'prefix' => 'v1'], function () {
+    Route::resource('/kelas', 'APIs\School\Curriculum\KelasController');
+});

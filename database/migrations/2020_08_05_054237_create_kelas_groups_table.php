@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateKelasTable extends Migration
+class CreateKelasGroupsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class CreateKelasTable extends Migration
      */
     public function up()
     {
-        Schema::create('kelas', function (Blueprint $table) {
+        Schema::create('kelas_groups', function (Blueprint $table) {
             $table->id();
-            $table->string('nama');
-            $table->foreignId('id_group')->constrained('kelas_groups');
+            $table->string('tingkat');
+            $table->string('nama_group');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
         });
@@ -29,6 +29,6 @@ class CreateKelasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('kelas');
+        Schema::dropIfExists('kelas_groups');
     }
 }

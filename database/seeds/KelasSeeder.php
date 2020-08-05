@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use App\Models\School\Curriculum\Kelas;
+use App\Models\School\Curriculum\KelasGroup;
 
 class KelasSeeder extends Seeder
 {
@@ -13,21 +14,14 @@ class KelasSeeder extends Seeder
     public function run()
     {
         $newKelas = [];
-        for ($i = 0; $i < 12; $i++) {
-            $newKelas[] = [
-                'tingkat_kelas' => randArray(['10', '11', '12']),
-                'nama_kelas' => randArray([
-                    'Teknik Komputer Jaringan 1',
-                    'Teknik Komputer Jaringan 2',
-                    'Teknik Komputer Jaringan 3',
-                    'Administrasi 1',
-                    'Administrasi 2',
-                    'Administrasi 3',
-                    'Multimedia 1',
-                    'Multimedia 2',
-                    'Multimedia 3'
-                ])
-            ];
+        $kelasGroup = KelasGroup::get();
+        for ($i = 0; $i < count($kelasGroup); $i++) {
+            for ($j = 1; $j <= 3; $j++) {
+                $newKelas[] = [
+                    'nama' => $kelasGroup[$i]['nama_group'] . ' ' . $j,
+                    'id_group' => $kelasGroup[$i]['id']
+                ];
+            }
         }
         Kelas::insert($newKelas);
     }
