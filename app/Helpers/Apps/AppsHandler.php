@@ -92,3 +92,15 @@ function randArray($array_data)
 {
     return Arr::random($array_data);
 }
+
+/**
+ * get only the specified key from array data
+ *
+ * @param array $array_data
+ * @param string $key
+ * @return void
+ */
+function pluckArray($array_data, $key)
+{
+    return Arr::pluck($array_data, $key);
+}
