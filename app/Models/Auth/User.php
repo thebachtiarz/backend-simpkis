@@ -72,4 +72,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\Access\ForgetPassword::class, 'code', 'code');
     }
+
+    public function ketuakelas()
+    {
+        return $this->hasOne(\App\Models\School\Actor\KetuaKelas::class, 'id', 'id_user');
+    }
 }
