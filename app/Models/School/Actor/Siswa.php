@@ -3,12 +3,20 @@
 namespace App\Models\School\Actor;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Siswa extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = ['nisn', 'nama', 'id_kelas'];
 
     # map
+    public function siswaSimpleListMap()
+    {
+        # code...
+    }
+
     public function siswaSimpleInfoMap()
     {
         return [

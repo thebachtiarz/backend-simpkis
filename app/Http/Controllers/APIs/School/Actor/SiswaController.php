@@ -3,9 +3,15 @@
 namespace App\Http\Controllers\APIs\School\Actor;
 
 use App\Http\Controllers\Controller;
+use App\Models\School\Actor\Siswa;
 
 class SiswaController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['checkrole:kurikulum'])->except(['index', 'show']);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -13,7 +19,7 @@ class SiswaController extends Controller
      */
     public function index()
     {
-        //
+        return $this->listSiswa(request());
     }
 
     /**
@@ -23,7 +29,7 @@ class SiswaController extends Controller
      */
     public function store()
     {
-        //
+        return $this->storeSiswa(request());
     }
 
     /**
@@ -34,7 +40,7 @@ class SiswaController extends Controller
      */
     public function show($id)
     {
-        //
+        return $this->showSiswa($id);
     }
 
     /**
@@ -45,7 +51,7 @@ class SiswaController extends Controller
      */
     public function update($id)
     {
-        //
+        return $this->updateSiswa($id, request());
     }
 
     /**
@@ -56,6 +62,53 @@ class SiswaController extends Controller
      */
     public function destroy($id)
     {
+        return $this->destroySiswa($id, request());
+    }
+
+    # private -> move to services
+    private function listSiswa($request)
+    {
+        return auth()->user();
+        $validator = $this->listValidator($request->all());
+        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
+        $getSiswa = Siswa::query();
+        if ($request->method == 'all') {
+            $getSiswa->where('id_kelas', $request->kelas)->withTrashed();
+        } elseif ($request->method == 'deleted') {
+            $getSiswa->where('id_kelas', $request->kelas)->onlyTrashed();
+        } else {
+            $kelas = $request->kelas;
+            if (auth()->user()->userstat->status == User_setStatus('ketuakelas')) $kelas = '';
+            $getSiswa->where('id_kelas', $kelas);
+        }
+        return response()->json(dataResponse($getSiswa->get()), 200);
+    }
+
+    private function storeSiswa($request)
+    {
         //
+    }
+
+    private function showSiswa($id)
+    {
+        //
+    }
+
+    private function updateSiswa($id, $request)
+    {
+        //
+    }
+
+    private function destroySiswa($id, $request)
+    {
+        //
+    }
+
+    private function listValidator($request)
+    {
+        return Validator($request, [
+            'kelas' => ['nullable', 'string', 'numeric', \Illuminate\Validation\Rule::requiredIf(auth()->user()->userstat->status != User_setStatus('ketuakelas'))],
+            'method' => 'nullable|string|alpha'
+        ]);
     }
 }

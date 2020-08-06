@@ -17,7 +17,7 @@ class SiswaSeeder extends Seeder
         $newSiswa = [];
         $getKelas = pluckArray(Kelas::all(), 'id');
         $nisn = time();
-        for ($i = 0; $i < 50; $i++) {
+        for ($i = 0; $i < 2000; $i++) {
             $newSiswa[] = [
                 'nisn' => $nisn,
                 'nama' => $faker->name,

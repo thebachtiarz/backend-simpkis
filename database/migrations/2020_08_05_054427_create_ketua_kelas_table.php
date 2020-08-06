@@ -17,6 +17,7 @@ class CreateKetuaKelasTable extends Migration
             $table->id();
             $table->string('id_siswa');
             $table->string('id_kelas');
+            $table->string('id_user');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
         });

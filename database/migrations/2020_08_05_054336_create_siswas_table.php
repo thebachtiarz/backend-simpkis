@@ -20,6 +20,7 @@ class CreateSiswasTable extends Migration
             $table->string('id_kelas');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
+            $table->softDeletes();
         });
     }
 
