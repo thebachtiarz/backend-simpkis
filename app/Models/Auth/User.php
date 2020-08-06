@@ -75,6 +75,6 @@ class User extends Authenticatable
 
     public function ketuakelas()
     {
-        return $this->hasOne(\App\Models\School\Actor\KetuaKelas::class, 'id', 'id_user');
+        return $this->hasOne(\App\Models\School\Actor\KetuaKelas::class, 'id_user', 'id');
     }
 }
