@@ -21,6 +21,6 @@ class KetuaKelas extends Model
 
     public function user()
     {
-        return $this->belongsTo(\App\Models\Auth\User::class, 'id_user', 'id');
+        return $this->belongsTo(\App\Models\Auth\User::class, 'id', 'id_user');
     }
 }

@@ -23,7 +23,7 @@ class KetuaKelasSeeder extends Seeder
         $getLastIdUser = User::orderByDesc('id')->first('id')->id;
         $getSiswa = Siswa::select(['id', 'id_kelas', 'nisn', 'nama'])->where('id', '>', 500)->groupBy('id_kelas')->get();
         $getKelasOnly = pluckArray($getSiswa, 'id_kelas');
-        $getSiswaOnly = pluckArray($getSiswa, 'id_siswa');
+        $getSiswaOnly = pluckArray($getSiswa, 'id');
         $getNisnOnly = pluckArray($getSiswa, 'nisn');
         $getNamaOnly = pluckArray($getSiswa, 'nama');
 

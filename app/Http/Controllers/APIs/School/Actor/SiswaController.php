@@ -71,12 +71,12 @@ class SiswaController extends Controller
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
         $getSiswa = \App\Models\School\Actor\Siswa::query();
         if ($request->method == 'all') {
-            $getSiswa->where('id_kelas', $request->kelas)->withTrashed();
+            $getSiswa->where('id_kelas', $request->kelasID)->withTrashed();
         } elseif ($request->method == 'deleted') {
-            $getSiswa->where('id_kelas', $request->kelas)->onlyTrashed();
+            $getSiswa->where('id_kelas', $request->kelasID)->onlyTrashed();
         } else {
-            $kelas = $request->kelas;
-            if (auth()->user()->userstat->status == User_setStatus('ketuakelas')) $kelas = '';
+            $kelas = $request->kelasID;
+            if (auth()->user()->userstat->status == User_setStatus('ketuakelas')) $kelas = auth()->user()->ketuakelas->id_kelas;
             $getSiswa->where('id_kelas', $kelas);
         }
         return response()->json(dataResponse($getSiswa->get()), 200);
@@ -105,8 +105,10 @@ class SiswaController extends Controller
     private function listValidator($request)
     {
         return Validator($request, [
-            'kelas' => ['nullable', 'string', 'numeric', \Illuminate\Validation\Rule::requiredIf(auth()->user()->userstat->status != User_setStatus('ketuakelas'))],
+            'kelasID' => ['nullable', 'string', 'numeric', \Illuminate\Validation\Rule::requiredIf(auth()->user()->userstat->status != User_setStatus('ketuakelas'))],
             'method' => 'nullable|string|alpha'
+        ], [
+            'kelasID.required' => 'Kelas ID field is required.'
         ]);
     }
 }
