@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\APIs\School\Actor;
 
 use App\Http\Controllers\Controller;
-use App\Models\School\Actor\Siswa;
 
 class SiswaController extends Controller
 {
@@ -68,10 +67,9 @@ class SiswaController extends Controller
     # private -> move to services
     private function listSiswa($request)
     {
-        return auth()->user();
         $validator = $this->listValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        $getSiswa = Siswa::query();
+        $getSiswa = \App\Models\School\Actor\Siswa::query();
         if ($request->method == 'all') {
             $getSiswa->where('id_kelas', $request->kelas)->withTrashed();
         } elseif ($request->method == 'deleted') {
