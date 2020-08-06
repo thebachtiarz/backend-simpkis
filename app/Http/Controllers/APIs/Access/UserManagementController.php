@@ -7,8 +7,6 @@ use App\Models\Auth\User;
 
 class UserManagementController extends Controller
 {
-    protected $canAllow = ['admin' => ['kurikulum', 'guru', 'ketuakelas'], 'guru' => ['ketuakelas']];
-
     public function __construct()
     {
         $this->middleware(['checkrole:admin,guru']);
@@ -21,10 +19,7 @@ class UserManagementController extends Controller
      */
     public function index()
     {
-        if (in_array(request('_getUsers'), $this->canAllow[User_getStatus(User_checkStatus())])) {
-            return response()->json(dataResponse(User::getUsersByStatus(request('_getUsers'))->get()->map->userSimpleListMap()), 200);
-        }
-        return _throwErrorResponse();
+        return $this->listUser(request());
     }
 
     /**
@@ -34,12 +29,7 @@ class UserManagementController extends Controller
      */
     public function store()
     {
-        $validator = $this->storeValidator(request()->all());
-        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        if (in_array(request('status'), $this->canAllow[User_getStatus(User_checkStatus())])) {
-            return $this->storeNewUser(request());
-        }
-        return response()->json(errorResponse('You are not authorized to create this user'), 202);
+        return $this->storeNewUser(request());
     }
 
     /**
@@ -50,11 +40,7 @@ class UserManagementController extends Controller
      */
     public function show($id)
     {
-        $userStatus = (bool) User::find($id) ? User::find($id)->userstat->status : '';
-        if (in_array(User_getStatus($userStatus), $this->canAllow[User_getStatus(User_checkStatus())])) {
-            return response()->json(dataResponse(User::where('id', $id)->get()->map->userInfoMap()), 200);
-        }
-        return response()->json(errorResponse('You are not authorized to view this user'), 202);
+        return $this->showUser($id);
     }
 
     /**
@@ -65,9 +51,7 @@ class UserManagementController extends Controller
      */
     public function update($id)
     {
-        $validator = $this->updateValidator(request()->all());
-        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        return response()->json(successResponse(User::findOrFail($id)->userbio->name), 200);
+        return $this->updateUser($id, request());
     }
 
     /**
@@ -78,34 +62,94 @@ class UserManagementController extends Controller
      */
     public function destroy($id)
     {
-        $userStatus = (bool) User::find($id) ? User::find($id)->userstat->status : '';
+        return $this->destroyUser($id, request());
+    }
+
+    # private -> move to services
+    protected $canAllow = ['admin' => ['kurikulum', 'guru', 'ketuakelas'], 'guru' => ['ketuakelas']];
+
+    private function listUser($request)
+    {
+        $validator = $this->listValidator($request->all());
+        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
+        if (in_array($request->_getUsers, $this->canAllow[User_getStatus(User_checkStatus())])) {
+            return response()->json(dataResponse(User::getUsersByStatus($request->_getUsers)->get()->map->userSimpleListMap()), 200);
+        }
+        return _throwErrorResponse();
+    }
+
+    private function storeNewUser($request)
+    {
+        $validator = $this->storeValidator($request->all());
+        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
+        if (in_array($request->status, $this->canAllow[User_getStatus(User_checkStatus())])) {
+            try {
+                \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
+                    $newCode = User_createNewCode();
+                    $name = $request->idSiswa ? '\App\Models\Actor\Siswa::findOrFail(idSiswa)->name' : $request->name;
+                    \Illuminate\Support\Facades\DB::table('users')->insert([
+                        'username' => $request->username, 'password' => User_encPass($request->password), 'code' => $newCode, 'active' => User_setActiveStatus('active')
+                    ]);
+                    \Illuminate\Support\Facades\DB::table('user_biodatas')->insert([
+                        'code' => $newCode, 'name' => ucwords($name)
+                    ]);
+                    \Illuminate\Support\Facades\DB::table('user_statuses')->insert([
+                        'code' => $newCode, 'status' => User_setStatus($request->status)
+                    ]);
+                    if ($request->status == 'ketuakelas') {
+                        // set data to ketuakelas table
+                    }
+                }, 5);
+                return response()->json(successResponse('Successfully create new user'), 201);
+            } catch (\Exception $e) {
+                return response()->json(errorResponse('Failed create new user, please try again'), 202);
+            }
+        }
+        return response()->json(errorResponse('You are not authorized to create this user'), 202);
+    }
+
+    private function showUser($id)
+    {
+        $getUser = User::withTrashed()->find($id);
+        $userStatus = (bool) $getUser ? $getUser->userstat->status : '';
         if (in_array(User_getStatus($userStatus), $this->canAllow[User_getStatus(User_checkStatus())])) {
-            return response()->json(dataResponse(User::where('id', $id)->get()->map->userInfoMap()), 200);
+            return response()->json(dataResponse($getUser->userInfoMap()), 200);
+        }
+        return response()->json(errorResponse('You are not authorized to view this user'), 202);
+    }
+
+    private function updateUser($id, $request)
+    {
+        $validator = $this->updateValidator($request->all());
+        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
+        $getUser = User::withTrashed()->find($id);
+        $userStatus = (bool) $getUser ? $getUser->userstat->status : '';
+        if (in_array(User_getStatus($userStatus), $this->canAllow[User_getStatus(User_checkStatus())])) {
+            return response()->json(dataResponse($getUser->userInfoMap()), 200);
+        }
+        return response()->json(errorResponse('You are not authorized to update this user'), 202);
+    }
+
+    private function destroyUser($id, $request)
+    {
+        $validator = $this->softDeleteValidator($request->all());
+        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
+        $getUser = User::withTrashed()->find($id);
+        $userStatus = (bool) $getUser ? $getUser->userstat->status : '';
+        if (in_array(User_getStatus($userStatus), $this->canAllow[User_getStatus(User_checkStatus())])) {
+            if ($request->method == 'force') {
+                return response()->json(successResponse('Successfully delete user permanently'), 200);
+            }
+            return response()->json(successResponse('Successfully delete user'), 200);
         }
         return response()->json(errorResponse('You are not authorized to delete this user'), 202);
     }
 
-    # private -> move to services
-    private function storeNewUser($user)
+    private function listValidator($request)
     {
-        try {
-            \Illuminate\Support\Facades\DB::transaction(function () use ($user) {
-                $newCode = User_createNewCode();
-                $name = $user->idSiswa ? '\App\Models\Actor\Siswa::findOrFail(idSiswa)->name' : $user->name;
-                \Illuminate\Support\Facades\DB::table('users')->insert([
-                    'username' => $user->username, 'password' => User_encPass($user->password), 'code' => $newCode, 'active' => User_setActiveStatus('active')
-                ]);
-                \Illuminate\Support\Facades\DB::table('user_biodatas')->insert([
-                    'code' => $newCode, 'name' => ucwords($name)
-                ]);
-                \Illuminate\Support\Facades\DB::table('user_statuses')->insert([
-                    'code' => $newCode, 'status' => User_setStatus($user->status)
-                ]);
-            }, 5);
-            return response()->json(successResponse('Successfully create new user'), 201);
-        } catch (\Exception $e) {
-            return response()->json(errorResponse('Failed create new user, please try again'), 202);
-        }
+        return Validator($request, [
+            '_getUsers' => 'required|string|alpha'
+        ]);
     }
 
     private function storeValidator($request)
@@ -113,7 +157,7 @@ class UserManagementController extends Controller
         return Validator($request, [
             'username' => 'required|string|min:8|alpha_num|unique:users,username',
             'password' => 'required|string|regex:/^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9])(?=.*[!@#$&*()]).{8,})\S$/',
-            'name' => ['nullable', 'string', 'min:3', 'regex:/^[a-zA-Z_,.\s]+$/', \Illuminate\Validation\Rule::requiredIf(!request('idSiswa'))],
+            'name' => ['nullable', 'string', 'min:3', 'regex:/^[a-zA-Z_,.\s]+$/', \Illuminate\Validation\Rule::requiredIf(!isset($request->idSiswa))],
             'status' => 'required|string|',
             'idSiswa' => 'nullable|string|numeric'
         ]);
@@ -122,9 +166,15 @@ class UserManagementController extends Controller
     private function updateValidator($request)
     {
         return Validator($request, [
-            'idSiswa' => 'required|string|numeric',
             'username' => 'required|string|min:8|alpha_num|unique:users,username',
             'password' => 'required|required|string|regex:/^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9])(?=.*[!@#$&*()]).{8,})\S$/'
+        ]);
+    }
+
+    private function softDeleteValidator($request)
+    {
+        return Validator($request, [
+            'method' => 'nullable|string|alpha'
         ]);
     }
 }
