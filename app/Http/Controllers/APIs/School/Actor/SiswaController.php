@@ -79,17 +79,30 @@ class SiswaController extends Controller
             if (auth()->user()->userstat->status == User_setStatus('ketuakelas')) $kelas = auth()->user()->ketuakelas->id_kelas;
             $getSiswa->where('id_kelas', $kelas);
         }
-        return response()->json(dataResponse($getSiswa->get()), 200);
+        return response()->json(dataResponse($getSiswa->get()->map->siswaSimpleListMap()), 200);
     }
 
     private function storeSiswa($request)
     {
-        //
+        /**
+         * insert data siswa berdasarkan file(csv) yang sudah di upload pada tabel csv_inserts(Model:: CsvInsert)
+         * request berisikan kode file yang menuju lokasi file yang telah tersedia
+         * file(csv) akan diubah menjadi array untuk dikelola
+         * lalu insert ke tabel siswas(Model::Siswa)
+         */
     }
 
     private function showSiswa($id)
     {
-        //
+        $getSiswa = \App\Models\School\Actor\Siswa::withTrashed()->find($id);
+        if ((bool) $getSiswa) {
+            $getMe = auth()->user();
+            $getMyStatus = User_getStatus($getMe->userstat->status);
+            // jika (saya == ketuakelas dan siswa ada pada kelas saya) atau (saya bukan ketuakelas) maka benar
+            if ((($getMyStatus == 'ketuakelas') && ($getSiswa->id_kelas == $getMe->ketuakelas->id_kelas)) || ($getMyStatus != 'ketuakelas'))
+                return response()->json(dataResponse($getSiswa->siswaSimpleInfoMap()), 200);
+        }
+        return response()->json(errorResponse('Siswa tidak ditemukan'), 202);
     }
 
     private function updateSiswa($id, $request)
@@ -109,6 +122,20 @@ class SiswaController extends Controller
             'method' => 'nullable|string|alpha'
         ], [
             'kelasID.required' => 'Kelas ID field is required.'
+        ]);
+    }
+
+    private function storeValidator($request)
+    {
+        //
+    }
+
+    private function updateValidator($request)
+    {
+        return Validator($request, [
+            'nisn' => 'nullable|string|numeric',
+            'nama' => 'nullable|string|regex:/^[a-zA-Z_,.\s]+$/',
+            'id_kelas' => 'nullable|string|numeric'
         ]);
     }
 }

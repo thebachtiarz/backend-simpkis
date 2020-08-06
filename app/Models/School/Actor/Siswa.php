@@ -14,7 +14,11 @@ class Siswa extends Model
     # map
     public function siswaSimpleListMap()
     {
-        # code...
+        return [
+            'id' => strval($this->id),
+            'nama' => $this->nama,
+            'kelas' => Cur_getKelasNameByID($this->id_kelas)
+        ];
     }
 
     public function siswaSimpleInfoMap()
