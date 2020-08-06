@@ -85,12 +85,12 @@ class KelasController extends Controller
             return response()->json(successResponse('Kelas berhasil dibuat'), 201);
         }
         return response()->json(errorResponse('Kelas sudah ada'), 202);
-        // return preg_replace("/[^A-Za-z?![:space:]]/", '', 'Teknik Komputer Jaringan 2');
+        // return preg_replace("/[^A-Za-z?![:space:]]/", '', 'Teknik Komputer Jaringan 2'); // for checking group kelas
     }
 
     private function showKelas($id)
     {
-        $getKelas = Kelas::find($id);
+        $getKelas = Kelas::withTrashed()->find($id);
         return (bool) $getKelas
             ? response()->json(dataResponse($getKelas->kelasFullInfoMap()), 200)
             : response()->json(errorResponse('Kelas tidak ditemukan'), 202);
