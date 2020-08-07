@@ -86,7 +86,7 @@ class UserManagementController extends Controller
             try {
                 \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
                     $newCode = User_createNewCode();
-                    $name = $request->idSiswa ? '\App\Models\Actor\Siswa::findOrFail(idSiswa)->name' : $request->name;
+                    $name = $request->siswaid ? \App\Models\School\Actor\Siswa::find($request->siswaid)->nama : $request->name;
                     \Illuminate\Support\Facades\DB::table('users')->insert([
                         'username' => $request->username, 'password' => User_encPass($request->password), 'code' => $newCode, 'active' => User_setActiveStatus('active')
                     ]);
@@ -97,15 +97,18 @@ class UserManagementController extends Controller
                         'code' => $newCode, 'status' => User_setStatus($request->status)
                     ]);
                     if ($request->status == 'ketuakelas') {
-                        // set data to ketuakelas table
+                        /**
+                         * gunakan(Services:: KetuaKelasManagement)
+                         * input : id_user, id_siswa
+                         */
                     }
                 }, 5);
-                return response()->json(successResponse('Successfully create new user'), 201);
+                return response()->json(successResponse('Berhasil membuat pengguna baru'), 201);
             } catch (\Exception $e) {
-                return response()->json(errorResponse('Failed create new user, please try again'), 202);
+                return response()->json(errorResponse('Gagal membuat pengguna baru, silahkan coba kembali'), 202);
             }
         }
-        return response()->json(errorResponse('You are not authorized to create this user'), 202);
+        return response()->json(errorResponse('Anda tidak diperkenankan untuk membuat pengguna ini'), 202);
     }
 
     private function showUser($id)
@@ -115,7 +118,7 @@ class UserManagementController extends Controller
         if (in_array(User_getStatus($userStatus), $this->canAllow[User_getStatus(User_checkStatus())])) {
             return response()->json(dataResponse($getUser->userInfoMap()), 200);
         }
-        return response()->json(errorResponse('You are not authorized to view this user'), 202);
+        return response()->json(errorResponse('Anda tidak diperkenankan untuk melihat pengguna ini'), 202);
     }
 
     private function updateUser($id, $request)
@@ -125,9 +128,26 @@ class UserManagementController extends Controller
         $getUser = User::withTrashed()->find($id);
         $userStatus = (bool) $getUser ? $getUser->userstat->status : '';
         if (in_array(User_getStatus($userStatus), $this->canAllow[User_getStatus(User_checkStatus())])) {
-            return response()->json(dataResponse($getUser->userInfoMap()), 200);
+            $getChange = array_filter($request->all());
+            if ((bool) $getChange) {
+                try {
+                    $getChangeKey = array_keys($getChange); // get key from request
+                    $oldData = [];
+                    for ($i = 0; $i < count($getChangeKey); $i++) array_push($oldData, $getUser[$getChangeKey[$i]]);
+                    /**
+                     * ubah data(name) pada user_biodatas(Model:: UserBiodata) dengan input($request->name)
+                     * ubah data(status) pada user_statuses(Model: UserStatus) dengan input($request->status)
+                     * todo: gunakan if secara terpisah untuk melihat kondisi apakah terdapat value pada input
+                     */
+                    $response = ['oldData' => array_combine($getChangeKey, $oldData), 'newData' => $getChange];
+                    return response()->json(dataResponse($response, '', 'Berhasil memperbarui data pengguna'), 200);
+                } catch (\Exception $e) {
+                    return response()->json(errorResponse('Gagal memperbarui data pengguna, silahkan coba kembali'), 202);
+                }
+            }
+            return response()->json(errorResponse('Silahkan sebutkan apa yang ingin diubah'), 202);
         }
-        return response()->json(errorResponse('You are not authorized to update this user'), 202);
+        return response()->json(errorResponse('Anda tidak diperkenankan untuk mengubah pengguna ini'), 202);
     }
 
     private function destroyUser($id, $request)
@@ -138,11 +158,11 @@ class UserManagementController extends Controller
         $userStatus = (bool) $getUser ? $getUser->userstat->status : '';
         if (in_array(User_getStatus($userStatus), $this->canAllow[User_getStatus(User_checkStatus())])) {
             if ($request->method == 'force') {
-                return response()->json(successResponse('Successfully delete user permanently'), 200);
+                return response()->json(successResponse('Berhasil menghapus pengguna secara permanen'), 200);
             }
-            return response()->json(successResponse('Successfully delete user'), 200);
+            return response()->json(successResponse('Berhasil menghapus pengguna'), 200);
         }
-        return response()->json(errorResponse('You are not authorized to delete this user'), 202);
+        return response()->json(errorResponse('Anda tidak diperkenankan untuk menghapus pengguna ini'), 202);
     }
 
     private function listValidator($request)
@@ -157,17 +177,17 @@ class UserManagementController extends Controller
         return Validator($request, [
             'username' => 'required|string|min:8|alpha_num|unique:users,username',
             'password' => 'required|string|regex:/^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9])(?=.*[!@#$&*()]).{8,})\S$/',
-            'name' => ['nullable', 'string', 'min:3', 'regex:/^[a-zA-Z_,.\s]+$/', \Illuminate\Validation\Rule::requiredIf(!isset($request->idSiswa))],
-            'status' => 'required|string|',
-            'idSiswa' => 'nullable|string|numeric'
+            'name' => ['nullable', 'string', 'min:3', 'regex:/^[a-zA-Z_,.\s]+$/', \Illuminate\Validation\Rule::requiredIf(!isset($request->siswaid))],
+            'status' => 'required|string',
+            'siswaid' => 'nullable|string|numeric'
         ]);
     }
 
     private function updateValidator($request)
     {
         return Validator($request, [
-            'username' => 'required|string|min:8|alpha_num|unique:users,username',
-            'password' => 'required|required|string|regex:/^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9])(?=.*[!@#$&*()]).{8,})\S$/'
+            'name' => 'nullable|string|min:3|regex:/^[a-zA-Z_,.\s]+$/',
+            'status' => 'nullable|string'
         ]);
     }
 
