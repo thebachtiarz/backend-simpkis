@@ -42,4 +42,5 @@ Route::group(['middleware' => ['auth:sanctum', 'useractive:active'], 'prefix' =>
 Route::group(['middleware' => ['auth:sanctum', 'useractive:active'], 'prefix' => 'v1'], function () {
     Route::resource('/kelas', 'APIs\School\Curriculum\KelasController');
     Route::resource('/siswa', 'APIs\School\Actor\SiswaController');
+    Route::resource('/ketua-kelas', 'APIs\School\Actor\KetuaKelasController');
 });
