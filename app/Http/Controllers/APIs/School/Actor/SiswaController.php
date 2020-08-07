@@ -121,7 +121,10 @@ class SiswaController extends Controller
                     $getChangeKey = array_keys($getChange); // get key from request
                     $oldData = [];
                     for ($i = 0; $i < count($getChangeKey); $i++) array_push($oldData, $getSiswa[$getChangeKey[$i]]);
-                    // ubah siswa
+                    /**
+                     * ubah data(nisn, nama, id_kelas) pada siswas(Model:: Siswa) dengan input($request->all())
+                     * todo: gunakan method update dengan input($getChange)
+                     */
                     if ((bool) $getSiswa->ketuakelas) {
                         // ubah data pada user_biodatas(Model:: UserBiodata) berdasarkan id_user yang terdapat pada ketua_kelas(Model:: KetuaKelas)
                     }
