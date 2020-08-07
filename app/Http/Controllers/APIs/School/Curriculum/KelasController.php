@@ -125,7 +125,7 @@ class KelasController extends Controller
     {
         $validator = $this->softDeleteValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        $getKelas = Kelas::with('ketuakelas')->where('id', $id);
+        $getKelas = Kelas::where('id', $id);
         if ($request->method == 'force') $getKelas->onlyTrashed();
         if ($getKelas->count()) {
             if ($request->method == 'force') {
