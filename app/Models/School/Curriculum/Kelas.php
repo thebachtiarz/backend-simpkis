@@ -27,7 +27,7 @@ class Kelas extends Model
             'id' => strval($this->id),
             'tingkat' => $this->kelasgroup->tingkat,
             'nama' => $this->nama,
-            'ketua' => (bool) $this->ketuakelas ? Act_getSiswaNameByID($this->ketuakelas->id_siswa) : '-',
+            'ketua' => (bool) $this->ketuakelas ? $this->ketuakelas->siswa->nama : '-',
             'dibuat' => Carbon_HumanDateTime($this->created_at),
             'diubah' => Carbon_AnyConvDateToTimestamp($this->kelasgroup->updated_at) > Carbon_AnyConvDateToTimestamp($this->updated_at)
                 ? Carbon_HumanIntervalDateTime($this->kelasgroup->updated_at)

@@ -52,7 +52,7 @@ class KetuaKelasSeeder extends Seeder
             $newKetua[] = [
                 'id_siswa' => strval($getSiswaOnly[$i]),
                 'id_kelas' => strval($getKelasOnly[$i]),
-                'id_user' => strval($getLastIdUser)
+                'id_user' => strval($getLastIdUser + 1)
             ];
             $getLastIdUser++;
         }

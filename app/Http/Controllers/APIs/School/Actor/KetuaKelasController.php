@@ -30,7 +30,9 @@ class KetuaKelasController extends Controller
      */
     public function store()
     {
-        return $this->storeKetuaKelas(request());
+        // todo: menggunakan (Services:: UserManagement)
+        // kemungkinan route ini tidak digunakan
+        return $this->storeKetuaKelas('', '');
     }
 
     /**
@@ -41,7 +43,7 @@ class KetuaKelasController extends Controller
      */
     public function show($id)
     {
-        return $this->showKetuaKelas($id);
+        return $this->showKetuaKelas($id, request());
     }
 
     /**
@@ -71,26 +73,64 @@ class KetuaKelasController extends Controller
     {
         $validator = $this->listValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        //
+        $getKetua = \App\Models\School\Actor\KetuaKelas::all();
+        return response()->json(dataResponse($getKetua->map->ketuaSimpleListMap()), 200);
     }
 
-    private function storeKetuaKelas($request)
+    private function storeKetuaKelas($new_uid, $id_siswa)
     {
-        $validator = $this->storeValidator($request->all());
+        // lanjutan dari (Services:: UserManagement)
+        // setelah input data ke user selesai
+        // apabila status == ketuakelas
+        $getSiswa = \App\Models\School\Actor\Siswa::find($id_siswa);
+        if ((bool) $getSiswa) {
+            \Illuminate\Support\Facades\DB::table('ketua_kelas')->insert([
+                'id_siswa' => $id_siswa,
+                'id_kelas' => $getSiswa->id_kelas,
+                'id_user' => $new_uid
+            ]);
+        }
+        // lanjut ke transaction
+    }
+
+    private function showKetuaKelas($id, $request)
+    {
+        $validator = $this->showValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        //
-    }
-
-    private function showKetuaKelas($id)
-    {
-        //
+        $getKetua = \App\Models\School\Actor\KetuaKelas::query();
+        if ($request->_getby == 'kelas') {
+            $getKetua = $getKetua->where('id_kelas', $id);
+        } elseif ($request->_getby == 'siswa') {
+            $getKetua = $getKetua->where('id_siswa', $id);
+        }
+        if ($getKetua->count()) {
+            return response()->json(dataResponse($getKetua->get()->map->ketuaSimpleInfoMap()), 200);
+        }
+        return response()->json(errorResponse('Ketua kelas tidak ditemukan'), 202);
     }
 
     private function updateKetuaKelas($id, $request)
     {
         $validator = $this->updateValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        //
+        $getKetua = \App\Models\School\Actor\KetuaKelas::where('id_kelas', $id);
+        if ($getKetua->count()) {
+            $getSiswa = \App\Models\School\Actor\Siswa::find($request->idSiswa);
+            // jika siswa yang dicari ada dan siswa juga dari kelas tersebut maka benar
+            if (((bool) $getSiswa) && ($getKetua->get()[0]->id_kelas == $getSiswa->id_kelas)) {
+                $result = [
+                    'old_ketua' => $getKetua->get()[0]->siswa->nama,
+                    'new_ketua' => $getSiswa->nama
+                ];
+                // ubah data(id_siswa) pada ketua_kelas(Model:: KetuaKelas) dengan data input($request->id_siswa) berdasarkan(id_kelas)
+                // ubah data(name) pada user_biodatas(Model:: UserBiodata)dengan data yang diambil dari (Model:: Siswa[nama])
+                // ubah data(username, password) pada users(Model:: User) dengan data(Model:: Siswa[nisn]) dengan rincian:
+                // :::: [username => ('u'.nisn), password => ('p'.nisn)]
+                return response()->json(dataResponse($result, '', 'Berhasil mengubah ketua kelas'), 200);
+            }
+            return response()->json(errorResponse('Siswa tidak ditemukan'), 202);
+        }
+        return response()->json(errorResponse('Ketua kelas tidak ditemukan'), 202);
     }
 
     private function destroyKetuaKelas($id, $request)
@@ -105,14 +145,18 @@ class KetuaKelasController extends Controller
         return Validator($request, []);
     }
 
-    private function storeValidator($request)
+    private function showValidator($request)
     {
-        return Validator($request, []);
+        return Validator($request, [
+            '_getby' => 'required|string|alpha'
+        ]);
     }
 
     private function updateValidator($request)
     {
-        return Validator($request, []);
+        return Validator($request, [
+            'idSiswa' => 'required|string|numeric'
+        ]);
     }
 
     private function softDeleteValidator($request)

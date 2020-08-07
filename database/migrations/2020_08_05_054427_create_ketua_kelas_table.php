@@ -15,7 +15,7 @@ class CreateKetuaKelasTable extends Migration
     {
         Schema::create('ketua_kelas', function (Blueprint $table) {
             $table->id();
-            $table->string('id_siswa');
+            $table->string('id_siswa')->unique();
             $table->string('id_kelas');
             $table->string('id_user');
             $table->timestamp('created_at')->useCurrent();
