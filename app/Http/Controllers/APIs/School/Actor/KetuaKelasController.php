@@ -98,10 +98,10 @@ class KetuaKelasController extends Controller
         $validator = $this->showValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
         $getKetua = \App\Models\School\Actor\KetuaKelas::query();
-        if ($request->_getby == 'kelas') {
-            $getKetua = $getKetua->where('id_kelas', $id);
-        } elseif ($request->_getby == 'siswa') {
+        if ($request->_getby == 'siswa') {
             $getKetua = $getKetua->where('id_siswa', $id);
+        } else {
+            $getKetua = $getKetua->where('id_kelas', $id);
         }
         if ($getKetua->count()) {
             return response()->json(dataResponse($getKetua->get()->map->ketuaSimpleInfoMap()), 200);
@@ -135,9 +135,20 @@ class KetuaKelasController extends Controller
 
     private function destroyKetuaKelas($id, $request)
     {
-        $validator = $this->softDeleteValidator($request->all());
+        $validator = $this->destroyValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        //
+        $getKetua = \App\Models\School\Actor\KetuaKelas::where('id_kelas', $id);
+        if ($getKetua->count()) {
+            $dataKetua = $getKetua->get()[0];
+            $response = ['deleted' => ['nama' => $dataKetua->siswa->nama, 'kelas' => Cur_getKelasNameByID($dataKetua->id_kelas)]];
+            /**
+             * hapus data pada users(Model:: User) berdasarkan data pada(Model:: KetuaKelas[id_user])
+             * hapus data pada ketua_kelas(Model:: KetuaKelas) berdasarkan input($id)
+             * todo: gunakan try catch!!
+             */
+            return response()->json(dataResponse($response, '', 'Berhasil menghapus ketua kelas'), 200);
+        }
+        return response()->json(errorResponse('Ketua kelas tidak ditemukan'), 202);
     }
 
     private function listValidator($request)
@@ -148,7 +159,7 @@ class KetuaKelasController extends Controller
     private function showValidator($request)
     {
         return Validator($request, [
-            '_getby' => 'required|string|alpha'
+            '_getby' => 'nullable|string|alpha'
         ]);
     }
 
@@ -159,7 +170,7 @@ class KetuaKelasController extends Controller
         ]);
     }
 
-    private function softDeleteValidator($request)
+    private function destroyValidator($request)
     {
         return Validator($request, []);
     }
