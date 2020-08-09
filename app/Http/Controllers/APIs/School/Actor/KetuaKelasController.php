@@ -7,7 +7,6 @@ use Illuminate\Contracts\Validation\Validator;
 
 class KetuaKelasController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware(['checkrole:guru'])->except(['index', 'show']);
