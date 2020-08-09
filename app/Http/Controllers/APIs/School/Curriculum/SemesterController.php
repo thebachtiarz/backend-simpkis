@@ -18,7 +18,7 @@ class SemesterController extends Controller
      */
     public function index()
     {
-        return $this->listSemester();
+        return $this->listSemester(request());
     }
 
     /**
@@ -39,7 +39,7 @@ class SemesterController extends Controller
      */
     public function show($id)
     {
-        //
+        return $this->showSemester($id);
     }
 
     /**
@@ -65,37 +65,83 @@ class SemesterController extends Controller
     }
 
     # private -> move to services
-    private function listSemester()
+    private function listSemester($request)
     {
-        //
+        $validator = $this->listValidator($request->all());
+        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
+        $getSemester = \App\Models\School\Curriculum\Semester::query();
+        if ($request->get == 'now') {
+            $getSemester = $getSemester->limit(1)->orderByDesc('id')->get();
+        } else {
+            $getSemester = $getSemester->get();
+        }
+        return response()->json(dataResponse($getSemester->map->semesterSimpleListMap()), 200);
     }
 
     private function storeNewSemester($request)
     {
-        $validator = $this->storeValidator($request->all());
+        $validator = $this->semesterValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        //
+        $tahun = (isset($request->tahun)) ? $request->tahun : date('Y');
+        $semester = (isset($request->semester)) ? Cur_convSemesterByCode($request->semester) : Cur_getSemesterNow();
+        $getSemester = \App\Models\School\Curriculum\Semester::getAvailableSemester($tahun, $semester);
+        if (!$getSemester->count()) {
+            \App\Models\School\Curriculum\Semester::create(['semester' => "$tahun/$semester"]);
+            return response()->json(dataResponse(['new_semester' => "$tahun/$semester"], '', 'Berhasil menambahkan semester baru'), 201);
+        }
+        return response()->json(errorResponse('Semester sudah ada'), 202);
+    }
+
+    private function showSemester($id)
+    {
+        $getSemester = \App\Models\School\Curriculum\Semester::find($id);
+        if ((bool) $getSemester) {
+            return response()->json(dataResponse($getSemester->semesterSimpleInfoMap()), 200);
+        }
+        return response()->json(errorResponse('Semester tidak ditemukan'), 202);
     }
 
     private function updateSemester($id, $request)
     {
-        $validator = $this->updateValidator($request->all());
+        $validator = $this->semesterValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        //
+        $getSemester = \App\Models\School\Curriculum\Semester::find($id);
+        if ((bool) $getSemester) {
+            $tahun = (isset($request->tahun)) ? $request->tahun : date('Y');
+            $semester = (isset($request->semester)) ? Cur_convSemesterByCode($request->semester) : Cur_getSemesterNow();
+            $oldSemester = $getSemester->semester;
+            $newSemester = "{$tahun}/{$semester}";
+            $getSemester->update(['semester' => $newSemester]);
+            return response()->json(dataResponse(['old' => $oldSemester, 'new' => $newSemester], '', 'Berhasil memperbarui semester'), 201);
+        }
+        return response()->json(errorResponse('Semester tidak ditemukan'), 202);
     }
 
     private function destroySemester($id)
     {
-        //
+        $getSemester = \App\Models\School\Curriculum\Semester::find($id);
+        if ((bool) $getSemester) {
+            $getSemester->delete();
+            return response()->json(successResponse('Berhasil menghapus semester'), 201);
+        }
+        return response()->json(errorResponse('Semester tidak ditemukan'), 202);
     }
 
-    private function storeValidator($request)
+    private function listValidator($request)
     {
-        return Validator($request, []);
+        return Validator($request, [
+            'get' => 'nullable|string|alpha'
+        ]);
     }
 
-    private function updateValidator($request)
+    private function semesterValidator($request)
     {
-        return Validator($request, []);
+        return Validator($request, [
+            'tahun' => ['nullable', 'string', 'numeric', 'digits_between:4,4', 'required_with:semester,tahun'],
+            'semester' => ['nullable', 'string', 'numeric', 'between:1,2', 'required_with:tahun,semester']
+        ], [
+            'tahun.digits_between' => 'Isikan tahun yang benar (4 digit)',
+            'semester.between' => 'Kode semester yang benar (1 => Ganjil, 2 => Genap)'
+        ]);
     }
 }

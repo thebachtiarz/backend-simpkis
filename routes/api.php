@@ -43,4 +43,5 @@ Route::group(['middleware' => ['auth:sanctum', 'useractive:active'], 'prefix' =>
     Route::resource('/kelas', 'APIs\School\Curriculum\KelasController');
     Route::resource('/siswa', 'APIs\School\Actor\SiswaController');
     Route::resource('/ketua-kelas', 'APIs\School\Actor\KetuaKelasController');
+    Route::resource('/semester', 'APIs\School\Curriculum\SemesterController');
 });

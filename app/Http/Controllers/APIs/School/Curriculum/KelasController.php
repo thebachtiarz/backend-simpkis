@@ -140,11 +140,10 @@ class KelasController extends Controller
     private function storeValidator($request)
     {
         return Validator($request, [
-            'tingkat' => 'required|string|numeric|min:10|max:12',
+            'tingkat' => 'required|string|numeric|between:10,12',
             'nama' => 'required|string|regex:/^[a-z0-9A-Z_\s]+$/'
         ], [
-            'tingkat.min' => 'Tingkat kelas yang benar antara 10 - 12',
-            'tingkat.max' => 'Tingkat kelas yang benar antara 10 - 12'
+            'tingkat.between' => 'Tingkat kelas yang benar antara 10 - 12'
         ]);
     }
 
