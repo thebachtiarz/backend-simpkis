@@ -17,6 +17,7 @@ class CreateKegiatansTable extends Migration
             $table->id();
             $table->string('nama');
             $table->text('nilai');
+            $table->string('akses');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
         });
