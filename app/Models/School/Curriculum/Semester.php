@@ -27,9 +27,9 @@ class Semester extends Model
     }
 
     # scope
-    public function scopeGetAvailableSemester($query, $tahun, $semester)
+    public function scopeGetAvailableSemester($query, $thnsmt)
     {
-        $query->where('semester', $tahun . '/' . $semester);
+        $query->where('semester', $thnsmt);
     }
 
     # relation

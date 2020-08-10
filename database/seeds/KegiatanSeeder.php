@@ -43,6 +43,33 @@ class KegiatanSeeder extends Seeder
                     randString(6) => ['name' => 'Alpha', 'poin' => '-1']
                 ]),
                 'akses' => '5'
+            ],
+            [
+                'nama' => 'Membersihkan Musholla',
+                'nilai' => serialize([
+                    randString(6) => ['name' => 'Tinggi', 'poin' => '6'],
+                    randString(6) => ['name' => 'Sedang', 'poin' => '4'],
+                    randString(6) => ['name' => 'Rendah', 'poin' => '2']
+                ]),
+                'akses' => '7'
+            ],
+            [
+                'nama' => 'Jumat Mengaji',
+                'nilai' => serialize([
+                    randString(6) => ['name' => 'Tinggi', 'poin' => '12'],
+                    randString(6) => ['name' => 'Sedang', 'poin' => '10'],
+                    randString(6) => ['name' => 'Rendah', 'poin' => '6']
+                ]),
+                'akses' => '7'
+            ],
+            [
+                'nama' => 'Khotbah Jumat',
+                'nilai' => serialize([
+                    randString(6) => ['name' => 'Tinggi', 'poin' => '15'],
+                    randString(6) => ['name' => 'Sedang', 'poin' => '12'],
+                    randString(6) => ['name' => 'Rendah', 'poin' => '10']
+                ]),
+                'akses' => '7'
             ]
         ];
         Kegiatan::insert($newKegiatan);

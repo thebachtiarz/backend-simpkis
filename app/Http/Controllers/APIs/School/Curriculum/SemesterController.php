@@ -82,12 +82,10 @@ class SemesterController extends Controller
     {
         $validator = $this->semesterValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        $tahun = (isset($request->tahun)) ? $request->tahun : date('Y');
-        $semester = (isset($request->semester)) ? Cur_convSemesterByCode($request->semester) : Cur_getSemesterNow();
-        $getSemester = \App\Models\School\Curriculum\Semester::getAvailableSemester($tahun, $semester);
+        $getSemester = \App\Models\School\Curriculum\Semester::getAvailableSemester(Cur_setNewSemesterFormat($request->tahun, $request->semester));
         if (!$getSemester->count()) {
-            \App\Models\School\Curriculum\Semester::create(['semester' => "$tahun/$semester"]);
-            return response()->json(dataResponse(['new_semester' => "$tahun/$semester"], '', 'Berhasil menambahkan semester baru'), 201);
+            \App\Models\School\Curriculum\Semester::create(['semester' => Cur_setNewSemesterFormat($request->tahun, $request->semester)]);
+            return response()->json(dataResponse(['new_semester' => Cur_setNewSemesterFormat($request->tahun, $request->semester)], '', 'Berhasil menambahkan semester baru'), 201);
         }
         return response()->json(errorResponse('Semester sudah ada'), 202);
     }

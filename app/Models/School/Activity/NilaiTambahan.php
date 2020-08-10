@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class NilaiTambahan extends Model
 {
-    protected $fillable = ['id_siswa', 'id_kegiatan', 'nilai'];
+    protected $fillable = ['id_semester', 'id_siswa', 'id_kegiatan', 'nilai'];
 
     # map
 

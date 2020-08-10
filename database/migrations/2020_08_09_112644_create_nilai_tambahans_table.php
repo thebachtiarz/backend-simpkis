@@ -15,6 +15,7 @@ class CreateNilaiTambahansTable extends Migration
     {
         Schema::create('nilai_tambahans', function (Blueprint $table) {
             $table->id();
+            $table->string('id_semester');
             $table->string('id_siswa');
             $table->string('id_kegiatan');
             $table->string('nilai');

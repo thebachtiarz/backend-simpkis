@@ -14,8 +14,8 @@ class SemesterSeeder extends Seeder
     {
         $newSemester = [];
         for ($i = 2015; $i <= date("Y"); $i++) {
-            $newSemester[] = ['semester' => ($i - 1) . '/Genap'];
-            $newSemester[] = ['semester' => ($i) . '/Ganjil'];
+            $newSemester[] = ['semester' => Cur_setNewSemesterFormat(($i - 1), '2')];
+            $newSemester[] = ['semester' => Cur_setNewSemesterFormat($i, '1')];
         }
         Semester::insert($newSemester);
     }

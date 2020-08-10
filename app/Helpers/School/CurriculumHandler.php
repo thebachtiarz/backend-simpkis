@@ -25,6 +25,21 @@ function Cur_getKelasNameByID($id_kelas)
 }
 
 /**
+ * create new semester format
+ *
+ * @param string $year
+ * @param string $code_semester
+ * @return void
+ */
+function Cur_setNewSemesterFormat($year = '', $code_semester = '')
+{
+    $tahun = isset($year) ? $year : date('Y');
+    $semester = isset($code_semester) ? Cur_convSemesterByCode($code_semester) : Cur_getSemesterNow();
+    if ((!isset($year)) && ($semester == Cur_convSemesterByCode('2'))) $tahun--;
+    return "{$tahun}/$semester";
+}
+
+/**
  * convert semester code to string
  *
  * @param string $code_semester
@@ -44,5 +59,5 @@ function Cur_convSemesterByCode($code_semester)
 function Cur_getSemesterNow()
 {
     $monthNow = date('n');
-    return (($monthNow >= 1) && ($monthNow <= 7)) ? 'Genap' : 'Ganjil';
+    return (($monthNow >= 1) && ($monthNow <= 7)) ? Cur_convSemesterByCode('2') : Cur_convSemesterByCode('1');
 }
