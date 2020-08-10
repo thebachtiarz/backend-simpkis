@@ -69,28 +69,43 @@ class KegiatanController extends Controller
 
     private function listKegiatan()
     {
-        $getKegiatan = \App\Models\School\Activity\Kegiatan::query();
         if (in_array(User_getStatus(User_checkStatus()), array_keys($this->canAllow))) {
-            if (User_checkStatus() == User_setStatus('guru')) {
-                $getKegiatan = $getKegiatan;
-            } else {
-                $getKegiatan = $getKegiatan->whereIn('akses', $this->canAllow['ketuakelas']);
+            $getKegiatan = \App\Models\School\Activity\Kegiatan::whereIn('akses', $this->canAllow[User_getStatus(User_checkStatus())]);
+            if ($getKegiatan->count()) {
+                $getKegiatan = $getKegiatan->get()->map->kegiatanSimpleListMap();
+                return response()->json(dataResponse($getKegiatan), 200);
             }
-            return response()->json(dataResponse($getKegiatan->get()->map->kegiatanSimpleListMap()), 200);
         }
-        return response()->json(errorResponse('Anda tidak memiliki izin untuk melihat kegiatan'), 202);
+        return response()->json(errorResponse('Kegiatan tidak ditemukan'), 202);
     }
 
     private function storeKegiatan($request)
     {
         $validator = $this->storeValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        //
+        $getAvailableKegiatan = \App\Models\School\Activity\Kegiatan::getAvailableKegiatan($request->nama);
+        if (!$getAvailableKegiatan->count()) {
+            $dataRequest = unserialize($request->nilai);
+            $newCode = [];
+            $newNilai = [];
+            foreach ($dataRequest as $key => $value) {
+                $newCode[] = randString(6);
+                $newNilai[] = $value;
+            }
+            $newKegiatan = serialize(array_combine($newCode, $newNilai));
+            // \App\Models\School\Activity\Kegiatan::create(['nama' => $request->nama, 'nilai' => $newKegiatan, 'akses' => $request->akses]);
+            return response()->json(successResponse('Berhasil membuat kegiatan baru'), 201);
+        }
+        return response()->json(errorResponse('Jenis kegiatan sudah ada'), 202);
     }
 
     private function showKegiatan($id)
     {
-        //
+        $getKegiatan = \App\Models\School\Activity\Kegiatan::find($id);
+        if (((bool) $getKegiatan) && (in_array(User_getStatus(User_checkStatus()), array_keys($this->canAllow)))) {
+            return response()->json(dataResponse($getKegiatan->kegiatanSimpleInfoMap()), 200);
+        }
+        return response()->json(errorResponse('Kegiatan tidak ditemukan'), 202);
     }
 
     private function updateKegiatan($id, $request)
@@ -107,7 +122,12 @@ class KegiatanController extends Controller
 
     private function storeValidator($request)
     {
-        return Validator($request, []);
+        return Validator($request, [
+            'nama' => 'required|string|regex:/^[a-zA-Z_,.\s]+$/',
+            'nilai' => 'required|string',
+            'akses' => 'required|string|numeric|regex:/^[57]+$/'
+        ]);
+        // return serialize([['name' => 'Imam', 'poin' => '6'],['name' => 'Muadzin', 'poin' => '4'],['name' => 'Hadir', 'poin' => '3'],['name' => 'Alpha', 'poin' => '-1']]);
     }
 
     private function updateValidator($request)

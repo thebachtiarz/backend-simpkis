@@ -18,6 +18,17 @@ class Kegiatan extends Model
         ];
     }
 
+    public function kegiatanSimpleInfoMap()
+    {
+        return [
+            'id' => strval($this->id),
+            'nama' => $this->nama,
+            'nilai' => $this->getNilai($this->nilai),
+            'dibuat' => Carbon_HumanDateTime($this->created_at),
+            'diubah' => Carbon_HumanIntervalDateTime($this->updated_at)
+        ];
+    }
+
     # private
     private function getNilai($data)
     {
@@ -36,6 +47,10 @@ class Kegiatan extends Model
     }
 
     # scope
+    public function scopeGetAvailableKegiatan($query, $name)
+    {
+        $query->where('nama', $name);
+    }
 
     # relation
 }
