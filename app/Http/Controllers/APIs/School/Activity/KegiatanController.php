@@ -132,7 +132,7 @@ class KegiatanController extends Controller
             $getKegiatan->delete();
             return response()->json(successResponse('Berhasil menghapus kegiatan'), 201);
         }
-        return response()->json(errorResponse('Jenis kegiatan tidak ditemukan'), 202);
+        return response()->json(errorResponse('Kegiatan tidak ditemukan'), 202);
     }
 
     private function kegiatanValidator($request)
