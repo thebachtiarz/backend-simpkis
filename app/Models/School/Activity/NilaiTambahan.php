@@ -14,8 +14,35 @@ class NilaiTambahan extends Model
         return [
             'semester' => $this->semester->semester,
             'siswa' => $this->siswa->nama,
-            'kegiatan' => $this->kegiatan->nama
+            'kegiatan' => $this->kegiatan->nama,
+            'dilakukan' => Carbon_HumanDateTime($this->created_at)
         ];
+    }
+
+    public function nilaitambahanInfoSimpleMap()
+    {
+        return [
+            'id' => strval($this->id),
+            'semester' => $this->semester->semester,
+            'siswa' => $this->siswa->nama,
+            'kegiatan' => $this->kegiatan->nama,
+            'nilai' => $this->getNilaiPoin($this->kegiatan->nilai, $this->nilai),
+            'dilakukan' => Carbon_HumanDateTime($this->created_at)
+        ];
+    }
+
+    # private
+    public function getNilai($data)
+    {
+        $getNilai = unserialize($data);
+        $result = [];
+        if ((is_array($getNilai)) && (count($getNilai) > 0)) $result = $getNilai;
+        return $result;
+    }
+
+    public function getNilaiPoin($data, $key)
+    {
+        return count($this->getNilai($data)) ? $this->getNilai($data)[$key]['poin'] : '';
     }
 
     # scope

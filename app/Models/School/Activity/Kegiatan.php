@@ -46,11 +46,8 @@ class Kegiatan extends Model
         $result = [];
         if ((is_array($getNilai)) && (count($getNilai) > 0)) {
             foreach ($getNilai as $keyCode => $nilai) {
-                if ($getAuth == User_setStatus('guru')) {
-                    $result[] = ['code' => $keyCode, 'name' => $nilai['name'], 'poin' => $nilai['poin']];
-                } else {
-                    $result[] = ['code' => $keyCode, 'name' => $nilai['name']];
-                }
+                if ($getAuth == User_setStatus('guru')) $result[] = ['code' => $keyCode, 'name' => $nilai['name'], 'poin' => $nilai['poin']];
+                else $result[] = ['code' => $keyCode, 'name' => $nilai['name']];
             }
         }
         return $result;
