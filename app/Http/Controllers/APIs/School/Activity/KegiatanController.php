@@ -65,9 +65,20 @@ class KegiatanController extends Controller
     }
 
     # private -> move to services
+    protected $canAllow = ['guru' => ['7', '5'], 'ketuakelas' => ['5']];
+
     private function listKegiatan()
     {
-        //
+        $getKegiatan = \App\Models\School\Activity\Kegiatan::query();
+        if (in_array(User_getStatus(User_checkStatus()), array_keys($this->canAllow))) {
+            if (User_checkStatus() == User_setStatus('guru')) {
+                $getKegiatan = $getKegiatan;
+            } else {
+                $getKegiatan = $getKegiatan->whereIn('akses', $this->canAllow['ketuakelas']);
+            }
+            return response()->json(dataResponse($getKegiatan->get()->map->kegiatanSimpleListMap()), 200);
+        }
+        return response()->json(errorResponse('Anda tidak memiliki izin untuk melihat kegiatan'), 202);
     }
 
     private function storeKegiatan($request)

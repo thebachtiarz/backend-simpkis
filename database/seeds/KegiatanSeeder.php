@@ -16,33 +16,33 @@ class KegiatanSeeder extends Seeder
             [
                 'nama' => 'Sholat Wajib',
                 'nilai' => serialize([
-                    randString(6) => ['name' => 'imam', 'poin' => '8'],
-                    randString(6) => ['name' => 'muadzin', 'poin' => '6'],
-                    randString(6) => ['name' => 'hadir', 'poin' => '4'],
-                    randString(6) => ['name' => 'haid', 'poin' => '0'],
-                    randString(6) => ['name' => 'alpha', 'poin' => '-2']
+                    randString(6) => ['name' => 'Imam', 'poin' => '8'],
+                    randString(6) => ['name' => 'Muadzin', 'poin' => '6'],
+                    randString(6) => ['name' => 'Hadir', 'poin' => '4'],
+                    randString(6) => ['name' => 'Haid', 'poin' => '0'],
+                    randString(6) => ['name' => 'Alpha', 'poin' => '-2']
                 ]),
-                'akses' => '7'
+                'akses' => '5'
             ],
             [
                 'nama' => 'Sholat Jumat',
                 'nilai' => serialize([
-                    randString(6) => ['name' => 'imam', 'poin' => '10'],
-                    randString(6) => ['name' => 'muadzin', 'poin' => '7'],
-                    randString(6) => ['name' => 'hadir', 'poin' => '4'],
-                    randString(6) => ['name' => 'alpha', 'poin' => '-4']
+                    randString(6) => ['name' => 'Imam', 'poin' => '10'],
+                    randString(6) => ['name' => 'Muadzin', 'poin' => '7'],
+                    randString(6) => ['name' => 'Hadir', 'poin' => '4'],
+                    randString(6) => ['name' => 'Alpha', 'poin' => '-4']
                 ]),
-                'akses' => '7'
+                'akses' => '5'
             ],
             [
                 'nama' => 'Sholat Sunah',
                 'nilai' => serialize([
-                    randString(6) => ['name' => 'imam', 'poin' => '6'],
-                    randString(6) => ['name' => 'muadzin', 'poin' => '4'],
-                    randString(6) => ['name' => 'hadir', 'poin' => '3'],
-                    randString(6) => ['name' => 'alpha', 'poin' => '-1']
+                    randString(6) => ['name' => 'Imam', 'poin' => '6'],
+                    randString(6) => ['name' => 'Muadzin', 'poin' => '4'],
+                    randString(6) => ['name' => 'Hadir', 'poin' => '3'],
+                    randString(6) => ['name' => 'Alpha', 'poin' => '-1']
                 ]),
-                'akses' => '7'
+                'akses' => '5'
             ]
         ];
         Kegiatan::insert($newKegiatan);
