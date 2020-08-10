@@ -81,22 +81,17 @@ class KegiatanController extends Controller
 
     private function storeKegiatan($request)
     {
-        $validator = $this->storeValidator($request->all());
+        $validator = $this->kegiatanValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
         $getAvailableKegiatan = \App\Models\School\Activity\Kegiatan::getAvailableKegiatan($request->nama);
         if (!$getAvailableKegiatan->count()) {
             $dataRequest = unserialize($request->nilai);
-            $newCode = [];
             $newNilai = [];
-            foreach ($dataRequest as $key => $value) {
-                $newCode[] = randString(6);
-                $newNilai[] = $value;
-            }
-            $newKegiatan = serialize(array_combine($newCode, $newNilai));
-            // \App\Models\School\Activity\Kegiatan::create(['nama' => $request->nama, 'nilai' => $newKegiatan, 'akses' => $request->akses]);
+            foreach ($dataRequest as $key => $value) $newNilai[] = [randString(6) => $value];
+            \App\Models\School\Activity\Kegiatan::create(['nama' => $request->nama, 'nilai' => serialize(collapseArray($newNilai)), 'akses' => $request->akses]);
             return response()->json(successResponse('Berhasil membuat kegiatan baru'), 201);
         }
-        return response()->json(errorResponse('Jenis kegiatan sudah ada'), 202);
+        return response()->json(errorResponse('Jenis kegiatan [' . $request->nama . '] sudah ada'), 202);
     }
 
     private function showKegiatan($id)
@@ -110,28 +105,42 @@ class KegiatanController extends Controller
 
     private function updateKegiatan($id, $request)
     {
-        $validator = $this->updateValidator($request->all());
+        $validator = $this->kegiatanValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        //
+        $getKegiatan = \App\Models\School\Activity\Kegiatan::find($id);
+        if (((bool) $getKegiatan) && (in_array(User_getStatus(User_checkStatus()), array_keys($this->canAllow)))) {
+            $getAvailableKegiatan = \App\Models\School\Activity\Kegiatan::getAvailableKegiatan($request->nama);
+            if (!$getAvailableKegiatan->count()) {
+                $getReq = unserialize($request->nilai);
+                $fixNilai = [];
+                foreach ($getReq as $key => $value) {
+                    if (is_numeric($key)) $fixNilai[] = [randString(6) => $value];
+                    else $fixNilai[] = [$key => $value];
+                }
+                $getKegiatan->update(['nama' => $request->nama, 'nilai' => serialize(collapseArray($fixNilai)), 'akses' => $request->akses]);
+                return response()->json(successResponse('Berhasil memperbarui kegiatan'), 201);
+            }
+            return response()->json(errorResponse('Jenis kegiatan [' . $request->nama . '] sudah ada'), 202);
+        }
+        return response()->json(errorResponse('Kegiatan tidak ditemukan'), 202);
     }
 
     private function destroyKegiatan($id)
     {
-        //
+        $getKegiatan = \App\Models\School\Activity\Kegiatan::find($id);
+        if ((bool) $getKegiatan) {
+            $getKegiatan->delete();
+            return response()->json(successResponse('Berhasil menghapus kegiatan'), 201);
+        }
+        return response()->json(errorResponse('Jenis kegiatan tidak ditemukan'), 202);
     }
 
-    private function storeValidator($request)
+    private function kegiatanValidator($request)
     {
         return Validator($request, [
             'nama' => 'required|string|regex:/^[a-zA-Z_,.\s]+$/',
             'nilai' => 'required|string',
             'akses' => 'required|string|numeric|regex:/^[57]+$/'
         ]);
-        // return serialize([['name' => 'Imam', 'poin' => '6'],['name' => 'Muadzin', 'poin' => '4'],['name' => 'Hadir', 'poin' => '3'],['name' => 'Alpha', 'poin' => '-1']]);
-    }
-
-    private function updateValidator($request)
-    {
-        return Validator($request, []);
     }
 }
