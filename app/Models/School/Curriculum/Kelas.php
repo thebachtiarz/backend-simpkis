@@ -60,6 +60,6 @@ class Kelas extends Model
 
     public function siswa()
     {
-        return $this->hasMany(\App\Models\School\Actor\Siswa::class, 'ketua_kelas', 'id_kelas', 'id');
+        return $this->hasMany(\App\Models\School\Actor\Siswa::class, 'id_kelas');
     }
 }

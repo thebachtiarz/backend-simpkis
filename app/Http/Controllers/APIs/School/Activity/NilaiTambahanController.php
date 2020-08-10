@@ -69,7 +69,22 @@ class NilaiTambahanController extends Controller
     {
         $validator = $this->listValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        //
+        $getNilaiTambahan = \App\Models\School\Activity\NilaiTambahan::query();
+        if (isset($request->smtid)) {
+            $getNilaiTambahan = $getNilaiTambahan->where('id_semester', $request->smtid);
+        } else {
+            $getNilaiTambahan = $getNilaiTambahan->where('id_semester', Cur_getActiveIDSemesterNow());
+        }
+        if (isset($request->kegiatanid) || isset($request->siswaid)) {
+            if (isset($request->kegiatanid)) {
+                $getNilaiTambahan = $getNilaiTambahan->where('id_kegiatan', $request->kegiatanid);
+            }
+            if (isset($request->siswaid)) {
+                $getNilaiTambahan = $getNilaiTambahan->where('id_siswa', $request->siswaid);
+            }
+            return response()->json(dataResponse($getNilaiTambahan->get()->map->nilaitambahanSimpleListMap(), '', 'Total: ' . $getNilaiTambahan->count() . ' poin kegiatan'), 200);
+        }
+        return response()->json(errorResponse('Tentukan [id siswa] atau [id kegiatan] yang akan dicari'), 202);
     }
 
     private function storeNilaiTambahan($request)
@@ -98,7 +113,11 @@ class NilaiTambahanController extends Controller
 
     private function listValidator($request)
     {
-        return Validator($request, []);
+        return Validator($request, [
+            'siswaid' => ['nullable', 'string', 'numeric', 'required_without:kegiatanid'],
+            'kegiatanid' => ['nullable', 'string', 'numeric', 'required_without:siswaid'],
+            'smtid' => 'nullable|string|numeric'
+        ]);
     }
 
     private function storeValidator($request)

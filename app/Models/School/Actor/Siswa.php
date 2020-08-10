@@ -41,6 +41,11 @@ class Siswa extends Model
 
     public function kelas()
     {
-        return $this->belongsToMany(\App\Models\School\Curriculum\Kelas::class, 'id_siswa', 'id_kelas');
+        return $this->belongsTo(\App\Models\School\Curriculum\Kelas::class, 'id_kelas');
+    }
+
+    public function nilaitambahan()
+    {
+        return $this->hasMany(\App\Models\School\Activity\NilaiTambahan::class, 'id_siswa');
     }
 }

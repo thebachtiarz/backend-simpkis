@@ -33,4 +33,8 @@ class Semester extends Model
     }
 
     # relation
+    public function nilaitambahan()
+    {
+        return $this->hasMany(\App\Models\School\Activity\NilaiTambahan::class, 'id_semester');
+    }
 }

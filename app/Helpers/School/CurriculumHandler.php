@@ -9,6 +9,7 @@
  */
 
 use App\Models\School\Curriculum\Kelas;
+use App\Models\School\Curriculum\Semester;
 
 /** */
 
@@ -60,4 +61,14 @@ function Cur_getSemesterNow()
 {
     $monthNow = date('n');
     return (($monthNow >= 1) && ($monthNow <= 7)) ? Cur_convSemesterByCode('2') : Cur_convSemesterByCode('1');
+}
+
+/**
+ * get active semester now
+ *
+ * @return void
+ */
+function Cur_getActiveIDSemesterNow()
+{
+    return Semester::orderByDesc('id')->first('id')->id;
 }

@@ -73,4 +73,8 @@ class Kegiatan extends Model
     }
 
     # relation
+    public function nilaitambahan()
+    {
+        return $this->hasMany(NilaiTambahan::class, 'id_kegiatan');
+    }
 }
