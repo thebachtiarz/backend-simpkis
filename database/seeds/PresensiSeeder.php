@@ -17,25 +17,30 @@ class PresensiSeeder extends Seeder
      */
     public function run(Faker $faker)
     {
-        $countOfGroup = 50;
-        $countOfPress = 1000;
+        $countOfGroup = 200;
         $newPresGroup = [];
         $newPresensi = [];
         //
         $getKegiatan = \App\Models\School\Activity\Kegiatan::getKegiatanKetuaKelasOnly()->get()->map->kegiatanCollectMap();
+        $getSiswa = \App\Models\School\Actor\Siswa::get(['id', 'id_kelas']);
         $getIdSemester = pluckArray(\App\Models\School\Curriculum\Semester::get('id'), 'id');
-        $getIdSiswa = pluckArray(\App\Models\School\Actor\Siswa::get('id'), 'id');
         $getIdKegiatan = pluckArray($getKegiatan, 'id');
         //
+        $siswaGroupKelas = [];
+        foreach ($getSiswa as $key => $value) $siswaGroupKelas[$value['id_kelas']][] = $value;
+        //
         for ($i = 1; $i <= $countOfGroup; $i++) {
-            $newPresGroup[] = ['catatan' => $faker->sentence(), 'approve' => '7'];
-            for ($j = 0; $j < $countOfPress; $j++) {
-                $randKegiatan = (int) randArray($getIdKegiatan);
+            $newPresGroup[] = ['catatan' => $faker->sentence(), 'approve' => randArray(['7', '5'])];
+            $getRandIdKelas = randArray(array_keys($siswaGroupKelas));
+            $getIdSiswa = pluckArray($siswaGroupKelas[$getRandIdKelas], 'id');
+            $randKegiatan = (int) randArray($getIdKegiatan);
+            $randSemester = randArray($getIdSemester);
+            for ($j = 0; $j < count($getIdSiswa); $j++) {
                 $newPresensi[] = [
                     'id_presensi' => $i,
-                    'id_semester' => randArray($getIdSemester),
+                    'id_semester' => $randSemester,
                     'id_kegiatan' => $randKegiatan,
-                    'id_siswa' => randArray($getIdSiswa),
+                    'id_siswa' => $getIdSiswa[$j],
                     // if an error in array_search below, just ignore it, it's happen because dumb php-intelephense when debugging
                     'nilai' => randArray(pluckArray($getKegiatan[array_search($randKegiatan, $getIdKegiatan)]['nilai'], 'code'))
                 ];
