@@ -16,6 +16,7 @@ class CreatePresensiGroupsTable extends Migration
         Schema::create('presensi_groups', function (Blueprint $table) {
             $table->id();
             $table->text('catatan')->nullable();
+            $table->string('approve');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
         });

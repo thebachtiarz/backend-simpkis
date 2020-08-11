@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PresensiGroup extends Model
 {
-    protected $fillable = ['catatan'];
+    protected $fillable = ['catatan', 'approve'];
 
     # map
 

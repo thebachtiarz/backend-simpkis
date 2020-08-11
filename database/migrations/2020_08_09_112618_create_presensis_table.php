@@ -20,7 +20,6 @@ class CreatePresensisTable extends Migration
             $table->string('id_kegiatan');
             $table->string('id_siswa');
             $table->string('nilai');
-            $table->string('approve');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
         });
