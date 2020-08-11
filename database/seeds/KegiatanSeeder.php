@@ -22,7 +22,7 @@ class KegiatanSeeder extends Seeder
                     randString(6) => ['name' => 'Haid', 'poin' => '0'],
                     randString(6) => ['name' => 'Alpha', 'poin' => '-2']
                 ]),
-                'akses' => '5'
+                'akses' => Atv_setAksesKegiatan('presensi')
             ],
             [
                 'nama' => 'Sholat Jumat',
@@ -32,7 +32,7 @@ class KegiatanSeeder extends Seeder
                     randString(6) => ['name' => 'Hadir', 'poin' => '4'],
                     randString(6) => ['name' => 'Alpha', 'poin' => '-4']
                 ]),
-                'akses' => '5'
+                'akses' => Atv_setAksesKegiatan('presensi')
             ],
             [
                 'nama' => 'Sholat Sunah',
@@ -42,7 +42,7 @@ class KegiatanSeeder extends Seeder
                     randString(6) => ['name' => 'Hadir', 'poin' => '3'],
                     randString(6) => ['name' => 'Alpha', 'poin' => '-1']
                 ]),
-                'akses' => '5'
+                'akses' => Atv_setAksesKegiatan('presensi')
             ],
             [
                 'nama' => 'Membersihkan Musholla',
@@ -51,7 +51,7 @@ class KegiatanSeeder extends Seeder
                     randString(6) => ['name' => 'Sedang', 'poin' => '4'],
                     randString(6) => ['name' => 'Rendah', 'poin' => '2']
                 ]),
-                'akses' => '7'
+                'akses' => Atv_setAksesKegiatan('tambahan')
             ],
             [
                 'nama' => 'Jumat Mengaji',
@@ -60,7 +60,7 @@ class KegiatanSeeder extends Seeder
                     randString(6) => ['name' => 'Sedang', 'poin' => '10'],
                     randString(6) => ['name' => 'Rendah', 'poin' => '6']
                 ]),
-                'akses' => '7'
+                'akses' => Atv_setAksesKegiatan('tambahan')
             ],
             [
                 'nama' => 'Khotbah Jumat',
@@ -69,7 +69,7 @@ class KegiatanSeeder extends Seeder
                     randString(6) => ['name' => 'Sedang', 'poin' => '12'],
                     randString(6) => ['name' => 'Rendah', 'poin' => '10']
                 ]),
-                'akses' => '7'
+                'akses' => Atv_setAksesKegiatan('tambahan')
             ]
         ];
         Kegiatan::insert($newKegiatan);

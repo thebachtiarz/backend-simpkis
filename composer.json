@@ -50,6 +50,7 @@
             "app/Helpers/Apps/CarbonTimeHandler.php",
             "app/Helpers/Apps/ResponseHandler.php",
             "app/Helpers/Auth/UserHandler.php",
+            "app/Helpers/School/ActivityHandler.php",
             "app/Helpers/School/ActorHandler.php",
             "app/Helpers/School/CurriculumHandler.php"
         ]

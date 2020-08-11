@@ -72,3 +72,14 @@ function Cur_getActiveIDSemesterNow()
 {
     return Semester::orderByDesc('id')->first('id')->id;
 }
+
+/**
+ * convert approve code to string
+ *
+ * @param string $approve
+ * @return void
+ */
+function Cur_convApproveCodeToString($approve)
+{
+    return $approve == '7' ? 'Ya' : 'Tidak';
+}

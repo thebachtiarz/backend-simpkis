@@ -88,7 +88,7 @@ class KegiatanController extends Controller
             $dataRequest = unserialize($request->nilai);
             $newNilai = [];
             foreach ($dataRequest as $key => $value) $newNilai[] = [randString(6) => $value];
-            \App\Models\School\Activity\Kegiatan::create(['nama' => $request->nama, 'nilai' => serialize(collapseArray($newNilai)), 'akses' => $request->akses]);
+            \App\Models\School\Activity\Kegiatan::create(['nama' => $request->nama, 'nilai' => serialize(collapseArray($newNilai)), 'akses' => Atv_setAksesKegiatan($request->akses)]);
             return response()->json(successResponse('Berhasil membuat kegiatan baru'), 201);
         }
         return response()->json(errorResponse('Jenis kegiatan [' . $request->nama . '] sudah ada'), 202);
@@ -117,7 +117,7 @@ class KegiatanController extends Controller
                     if (is_numeric($key)) $fixNilai[] = [randString(6) => $value];
                     else $fixNilai[] = [$key => $value];
                 }
-                $getKegiatan->update(['nama' => $request->nama, 'nilai' => serialize(collapseArray($fixNilai)), 'akses' => $request->akses]);
+                $getKegiatan->update(['nama' => $request->nama, 'nilai' => serialize(collapseArray($fixNilai)), 'akses' => Atv_setAksesKegiatan($request->akses)]);
                 return response()->json(successResponse('Berhasil memperbarui kegiatan'), 201);
             }
             return response()->json(errorResponse('Jenis kegiatan [' . $request->nama . '] sudah ada'), 202);
@@ -140,7 +140,7 @@ class KegiatanController extends Controller
         return Validator($request, [
             'nama' => 'required|string|regex:/^[a-zA-Z_,.\s]+$/',
             'nilai' => 'required|string',
-            'akses' => 'required|string|numeric|regex:/^[57]+$/'
+            'akses' => 'required|string|alpha'
         ]);
     }
 }

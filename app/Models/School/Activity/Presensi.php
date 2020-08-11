@@ -12,10 +12,24 @@ class Presensi extends Model
     public function presensiSimpleListMap()
     {
         return [
+            'id' => strval($this->id),
             'siswa' => $this->siswa->nama,
             'kegiatan' => $this->kegiatan->nama,
             'nilai' => $this->getNilaiPoin($this->kegiatan->nilai, $this->nilai, 'name'),
             'dilakukan' => Carbon_HumanDateTime($this->created_at)
+        ];
+    }
+
+    public function presensiSImpleInfoMap()
+    {
+        return [
+            'id' => strval($this->id),
+            'siswa' => $this->siswa->nama,
+            'kegiatan' => $this->kegiatan->nama,
+            'nilai' => $this->getNilaiPoin($this->kegiatan->nilai, $this->nilai, 'name'),
+            'dilakukan' => Carbon_HumanDateTime($this->created_at),
+            'approve' => Cur_convApproveCodeToString($this->presensigroup->approve),
+            'catatan' => $this->presensigroup->catatan
         ];
     }
 

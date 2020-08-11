@@ -61,12 +61,12 @@ class Kegiatan extends Model
 
     public function scopeGetKegiatanGuruOnly($query)
     {
-        $query->where('akses', '7');
+        $query->where('akses', Atv_setAksesKegiatan('tambahan'));
     }
 
     public function scopeGetKegiatanKetuaKelasOnly($query)
     {
-        $query->where('akses', '5');
+        $query->where('akses', Atv_setAksesKegiatan('presensi'));
     }
 
     # relation

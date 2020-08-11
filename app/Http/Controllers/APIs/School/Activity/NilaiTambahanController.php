@@ -117,7 +117,7 @@ class NilaiTambahanController extends Controller
             $getKegiatanKey = in_array($request->nilai, array_keys($getNilaiData));
             if ((bool) $getKegiatanKey) {
                 $getNilaiTambahan->update(['id_kegiatan' => $request->kegiatanid, 'nilai' => $request->nilai]);
-                $result = ['siswa' => $getNilaiTambahan->siswa->nama, 'kegiatan' => $getKegiatan->nama, 'poin' => $getNilaiData[$request->nilai]['poin']];
+                $result = ['siswa' => $getNilaiTambahan->siswa->nama, 'kegiatan' => $getKegiatan->nama, 'poin' => $getNilaiData[$request->nilai]['name']];
                 return response()->json(successResponse('Berhasil memperbarui nilai tambahan', $result), 201);
             }
             return response()->json(errorResponse('Poin kegiatan tidak ditemukan'), 202);

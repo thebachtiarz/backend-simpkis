@@ -69,8 +69,8 @@ class PresensiController extends Controller
     {
         $validator = $this->listValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        if (isset($request->getOnly) && ($request->getType == 'list')) {
-            if ($request->getOnly == 'unapproved') {
+        if ($request->getOnly == 'unapproved') {
+            if ($request->getType == 'list') {
                 $getPresensiGroup = \App\Models\School\Activity\PresensiGroup::getUnapprovedPresenceToday();
                 return response()->json(dataResponse($getPresensiGroup->get()->map->presensigroupSImpleListMap(), '', 'Total presensi: ' . $getPresensiGroup->count() . ' belum divalidasi hari ini'), 200);
             }
@@ -99,29 +99,52 @@ class PresensiController extends Controller
     {
         $validator = $this->storeValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
+        //
     }
 
     private function showPresensi($id)
     {
-        //
+        $getPresensi = \App\Models\School\Activity\Presensi::find($id);
+        if ((bool)$getPresensi) {
+            return response()->json(dataResponse($getPresensi->presensiSImpleInfoMap()), 200);
+        }
+        return response()->json(errorResponse('Presensi tidak ditemukan'), 202);
     }
 
     private function updatePresensi($id, $request)
     {
         $validator = $this->updateValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
+        $getPresensi = \App\Models\School\Activity\Presensi::find($id);
+        $getKegiatan = \App\Models\School\Activity\Kegiatan::find((bool)$getPresensi ? $getPresensi->id_kegiatan : '');
+        if (((bool) $getPresensi) && ((bool) $getKegiatan)) {
+            $getNilaiData = unserialize($getKegiatan->nilai);
+            $getKegiatanKey = in_array($request->nilai, array_keys($getNilaiData));
+            if ((bool) $getKegiatanKey) {
+                $result = ['siswa' => $getPresensi->siswa->nama, 'kegiatan' => $getKegiatan->nama, 'poin_lama' => $getNilaiData[$getPresensi->nilai]['name'], 'poin_baru' => $getNilaiData[$request->nilai]['name']];
+                $getPresensi->update(['nilai' => $request->nilai]);
+                return response()->json(successResponse('Berhasil memperbarui data presensi', $result), 201);
+            }
+            return response()->json(errorResponse('Poin kegiatan tidak ditemukan'), 202);
+        }
+        return response()->json(errorResponse('Presensi tidak ditemukan'), 202);
     }
 
     private function destroyPresensi($id)
     {
-        //
+        $getPresensi = \App\Models\School\Activity\Presensi::find($id);
+        if ((bool)$getPresensi) {
+            $getPresensi->delete();
+            return response()->json(successResponse('Berhasil menghapus presensi'), 200);
+        }
+        return response()->json(errorResponse('Presensi tidak ditemukan'), 202);
     }
 
     private function listValidator($request)
     {
         return Validator($request, [
-            'getOnly' => 'nullable|string|alpha|required_with:getType,getOnly',
-            'getType' => 'nullable|string|alpha|required_with:getOnly,getType',
+            'getOnly' => 'nullable|string|alpha',
+            'getType' => 'nullable|string|alpha',
             'presensiid' => 'nullable|string|numeric|required_without:kegiatanid',
             'siswaid' => 'nullable|string|numeric',
             'kelasid' => 'nullable|string|numeric',
@@ -137,6 +160,8 @@ class PresensiController extends Controller
 
     private function updateValidator($request)
     {
-        return Validator($request, []);
+        return Validator($request, [
+            'nilai' => 'required|string|alpha_num|size:6'
+        ]);
     }
 }
