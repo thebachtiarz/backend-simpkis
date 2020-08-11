@@ -26,7 +26,7 @@ class NilaiTambahan extends Model
             'semester' => $this->semester->semester,
             'siswa' => $this->siswa->nama,
             'kegiatan' => $this->kegiatan->nama,
-            'nilai' => $this->getNilaiPoin($this->kegiatan->nilai, $this->nilai),
+            'nilai' => $this->getNilaiPoin($this->kegiatan->nilai, $this->nilai, 'poin'),
             'dilakukan' => Carbon_HumanDateTime($this->created_at)
         ];
     }
@@ -40,9 +40,9 @@ class NilaiTambahan extends Model
         return $result;
     }
 
-    public function getNilaiPoin($data, $key)
+    public function getNilaiPoin($data, $key, $value)
     {
-        return count($this->getNilai($data)) ? $this->getNilai($data)[$key]['poin'] : '';
+        return count($this->getNilai($data)) ? $this->getNilai($data)[$key][$value] : '';
     }
 
     # scope

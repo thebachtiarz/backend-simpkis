@@ -36,12 +36,17 @@ class Siswa extends Model
     # relation
     public function ketuakelas()
     {
-        return $this->hasOne(KetuaKelas::class, 'id_siswa', 'id');
+        return $this->hasOne(KetuaKelas::class, 'id_siswa');
     }
 
     public function kelas()
     {
         return $this->belongsTo(\App\Models\School\Curriculum\Kelas::class, 'id_kelas');
+    }
+
+    public function presensi()
+    {
+        return $this->hasMany(\App\Models\School\Activity\Presensi::class, 'id_siswa');
     }
 
     public function nilaitambahan()

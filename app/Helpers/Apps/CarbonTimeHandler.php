@@ -40,12 +40,12 @@ function Carbon_DBtimeNow()
 }
 
 /**
- * get date now
+ * get date time today
  * for DB
  *
  * @return void
  */
-function Carbon_DBtimeToday()
+function Carbon_DBdatetimeToday()
 {
     return Carbon::today()->toDateTimeString();
 }

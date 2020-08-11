@@ -33,6 +33,11 @@ class Semester extends Model
     }
 
     # relation
+    public function presensi()
+    {
+        return $this->hasMany(\App\Models\School\Activity\Presensi::class, 'id_semester');
+    }
+
     public function nilaitambahan()
     {
         return $this->hasMany(\App\Models\School\Activity\NilaiTambahan::class, 'id_semester');

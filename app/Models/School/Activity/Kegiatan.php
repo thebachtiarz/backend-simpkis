@@ -70,6 +70,11 @@ class Kegiatan extends Model
     }
 
     # relation
+    public function presensi()
+    {
+        return $this->hasMany(\App\Models\School\Activity\Presensi::class, 'id_kegiatan');
+    }
+
     public function nilaitambahan()
     {
         return $this->hasMany(NilaiTambahan::class, 'id_kegiatan');

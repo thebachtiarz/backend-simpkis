@@ -69,7 +69,30 @@ class PresensiController extends Controller
     {
         $validator = $this->listValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        //
+        if (isset($request->getOnly) && ($request->getType == 'list')) {
+            if ($request->getOnly == 'unapproved') {
+                $getPresensiGroup = \App\Models\School\Activity\PresensiGroup::getUnapprovedPresenceToday();
+                return response()->json(dataResponse($getPresensiGroup->get()->map->presensigroupSImpleListMap(), '', 'Total presensi: ' . $getPresensiGroup->count() . ' belum divalidasi hari ini'), 200);
+            }
+        }
+        if (isset($request->presensiid)) {
+            $getPresensi = \App\Models\School\Activity\Presensi::where('id_presensi', $request->presensiid);
+            return response()->json(dataResponse($getPresensi->get()->map->presensiSimpleListMap(), '', 'Presensi: ' . $getPresensi->get()[0]->kegiatan->nama . ', Kelas: ' . Cur_getKelasNameByID($getPresensi->get()[0]->siswa->id_kelas)), 200);
+        }
+        if (isset($request->kelasid) || isset($request->siswaid)) {
+            $getPresensi = \App\Models\School\Activity\Presensi::query();
+            if (isset($request->smtid)) $getPresensi = $getPresensi->where('id_semester', $request->smtid);
+            else $getPresensi = $getPresensi->where('id_semester', Cur_getActiveIDSemesterNow());
+            $getPresensi = $getPresensi->where('id_kegiatan', $request->kegiatanid);
+            if (isset($request->kelasid)) {
+                $getPresensi = $getPresensi->whereIn('id_siswa', function ($q) use ($request) {
+                    $q->select('id')->from('siswas')->where('id_kelas', $request->kelasid);
+                });
+            }
+            if (isset($request->siswaid)) $getPresensi = $getPresensi->where('id_siswa', $request->siswaid);
+            return response()->json(dataResponse($getPresensi->get()->map->presensiSimpleListMap(), '', 'Total: ' . $getPresensi->count() . ' rekap presensi'), 200);
+        }
+        return response()->json(errorResponse('Tentukan [id siswa] atau [id kelas] yang akan dicari'), 202);
     }
 
     private function storePresensi($request)
@@ -97,8 +120,12 @@ class PresensiController extends Controller
     private function listValidator($request)
     {
         return Validator($request, [
-            'siswaid' => ['nullable', 'string', 'numeric', 'required_without:kegiatanid'],
-            'kegiatanid' => ['nullable', 'string', 'numeric', 'required_without:siswaid'],
+            'getOnly' => 'nullable|string|alpha|required_with:getType,getOnly',
+            'getType' => 'nullable|string|alpha|required_with:getOnly,getType',
+            'presensiid' => 'nullable|string|numeric|required_without:kegiatanid',
+            'siswaid' => 'nullable|string|numeric',
+            'kelasid' => 'nullable|string|numeric',
+            'kegiatanid' => 'nullable|string|numeric|required_without:presensiid',
             'smtid' => 'nullable|string|numeric'
         ]);
     }
