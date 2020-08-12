@@ -20,7 +20,7 @@ class Presensi extends Model
         ];
     }
 
-    public function presensiSImpleInfoMap()
+    public function presensiSimpleInfoMap()
     {
         return [
             'id' => strval($this->id),

@@ -4,6 +4,8 @@
  * use libraries
  */
 
+use App\Models\School\Activity\PresensiGroup;
+
 /**
  * use models
  */
@@ -22,4 +24,14 @@ function Atv_setAksesKegiatan($akses)
 {
     if ($akses == 'presensi') return '5';
     elseif ($akses == 'tambahan') return '7';
+}
+
+/**
+ * get last id presensi group
+ *
+ * @return void
+ */
+function Atv_getLastIdPresensi()
+{
+    return PresensiGroup::orderByDesc('id')->first('id')->id;
 }

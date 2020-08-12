@@ -16,7 +16,7 @@ class NilaiTambahanSeeder extends Seeder
     public function run()
     {
         $newNilaiTambahan = [];
-        $getKegiatan = Kegiatan::getKegiatanGuruOnly()->get()->map->kegiatanCollectMap();
+        $getKegiatan = Kegiatan::getKegiatanTambahan()->get()->map->kegiatanCollectMap();
         $getIdSemester = pluckArray(Semester::get('id'), 'id');
         $getIdSiswa = pluckArray(Siswa::get('id'), 'id');
         $getIdKegiatan = pluckArray($getKegiatan, 'id');

@@ -65,6 +65,11 @@ class SiswaController extends Controller
     }
 
     # private -> move to services
+    private function userstat() // move to constructor at services
+    {
+        return User_getStatus(User_checkStatus());
+    }
+
     private function listSiswa($request)
     {
         $validator = $this->listValidator($request->all());
@@ -76,7 +81,7 @@ class SiswaController extends Controller
             $getSiswa->where('id_kelas', $request->kelasID)->onlyTrashed();
         } else {
             $kelas = $request->kelasID;
-            if (auth()->user()->userstat->status == User_setStatus('ketuakelas')) $kelas = auth()->user()->ketuakelas->id_kelas;
+            if ($this->userstat() == 'ketuakelas') $kelas = auth()->user()->ketuakelas->id_kelas;
             $getSiswa->where('id_kelas', $kelas);
         }
         return response()->json(dataResponse($getSiswa->get()->map->siswaSimpleListMap()), 200);
@@ -100,10 +105,8 @@ class SiswaController extends Controller
     {
         $getSiswa = \App\Models\School\Actor\Siswa::withTrashed()->find($id);
         if ((bool) $getSiswa) {
-            $getMe = auth()->user();
-            $getMyStatus = User_getStatus($getMe->userstat->status);
             // jika (saya == ketuakelas dan siswa ada pada kelas saya) atau (saya bukan ketuakelas) maka benar
-            if ((($getMyStatus == 'ketuakelas') && ($getSiswa->id_kelas == $getMe->ketuakelas->id_kelas)) || ($getMyStatus != 'ketuakelas'))
+            if ((($this->userstat() == 'ketuakelas') && ($getSiswa->id_kelas == auth()->user()->ketuakelas->id_kelas)) || ($this->userstat() != 'ketuakelas'))
                 return response()->json(dataResponse($getSiswa->siswaSimpleInfoMap()), 200);
         }
         return response()->json(errorResponse('Siswa tidak ditemukan'), 202);
@@ -158,7 +161,7 @@ class SiswaController extends Controller
     private function listValidator($request)
     {
         return Validator($request, [
-            'kelasID' => ['nullable', 'string', 'numeric', \Illuminate\Validation\Rule::requiredIf(auth()->user()->userstat->status != User_setStatus('ketuakelas'))],
+            'kelasID' => ['nullable', 'string', 'numeric', \Illuminate\Validation\Rule::requiredIf($this->userstat() != 'ketuakelas')],
             'method' => 'nullable|string|alpha'
         ], [
             'kelasID.required' => 'Kelas ID field is required.'

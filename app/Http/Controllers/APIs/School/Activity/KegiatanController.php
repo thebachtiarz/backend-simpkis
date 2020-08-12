@@ -67,10 +67,15 @@ class KegiatanController extends Controller
     # private -> move to services
     protected $canAllow = ['guru' => ['7', '5'], 'ketuakelas' => ['5']];
 
+    private function userstat() // move to constructor at services
+    {
+        return User_getStatus(User_checkStatus());
+    }
+
     private function listKegiatan()
     {
-        if (in_array(User_getStatus(User_checkStatus()), array_keys($this->canAllow))) {
-            $getKegiatan = \App\Models\School\Activity\Kegiatan::whereIn('akses', $this->canAllow[User_getStatus(User_checkStatus())]);
+        if (in_array($this->userstat(), array_keys($this->canAllow))) {
+            $getKegiatan = \App\Models\School\Activity\Kegiatan::whereIn('akses', $this->canAllow[$this->userstat()]);
             if ($getKegiatan->count()) {
                 $getKegiatan = $getKegiatan->get()->map->kegiatanSimpleListMap();
                 return response()->json(dataResponse($getKegiatan), 200);
@@ -97,7 +102,7 @@ class KegiatanController extends Controller
     private function showKegiatan($id)
     {
         $getKegiatan = \App\Models\School\Activity\Kegiatan::find($id);
-        if (((bool) $getKegiatan) && (in_array(User_getStatus(User_checkStatus()), array_keys($this->canAllow)))) {
+        if (((bool) $getKegiatan) && (in_array($this->userstat(), array_keys($this->canAllow)))) {
             return response()->json(dataResponse($getKegiatan->kegiatanSimpleInfoMap()), 200);
         }
         return response()->json(errorResponse('Kegiatan tidak ditemukan'), 202);
@@ -108,7 +113,7 @@ class KegiatanController extends Controller
         $validator = $this->kegiatanValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
         $getKegiatan = \App\Models\School\Activity\Kegiatan::find($id);
-        if (((bool) $getKegiatan) && (in_array(User_getStatus(User_checkStatus()), array_keys($this->canAllow)))) {
+        if (((bool) $getKegiatan) && (in_array($this->userstat(), array_keys($this->canAllow)))) {
             $getAvailableKegiatan = \App\Models\School\Activity\Kegiatan::getAvailableKegiatan($request->nama);
             if (!$getAvailableKegiatan->count()) {
                 $getReq = unserialize($request->nilai);

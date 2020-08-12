@@ -21,7 +21,7 @@ class PresensiSeeder extends Seeder
         $newPresGroup = [];
         $newPresensi = [];
         //
-        $getKegiatan = \App\Models\School\Activity\Kegiatan::getKegiatanKetuaKelasOnly()->get()->map->kegiatanCollectMap();
+        $getKegiatan = \App\Models\School\Activity\Kegiatan::getKegiatanPresensi()->get()->map->kegiatanCollectMap();
         $getSiswa = \App\Models\School\Actor\Siswa::get(['id', 'id_kelas']);
         $getIdSemester = pluckArray(\App\Models\School\Curriculum\Semester::get('id'), 'id');
         $getIdKegiatan = pluckArray($getKegiatan, 'id');
