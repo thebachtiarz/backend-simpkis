@@ -31,6 +31,15 @@ class NilaiTambahan extends Model
         ];
     }
 
+    public function nilaitambahanResourceMap()
+    {
+        return [
+            'id_siswa' => $this->id_siswa,
+            'id_kegiatan' => $this->id_kegiatan,
+            'nilai' => $this->nilai
+        ];
+    }
+
     # private
     public function getNilai($data)
     {

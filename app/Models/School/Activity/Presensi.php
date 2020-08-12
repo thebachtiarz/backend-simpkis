@@ -33,6 +33,15 @@ class Presensi extends Model
         ];
     }
 
+    public function presensiResourceMap()
+    {
+        return [
+            'id_siswa' => $this->id_siswa,
+            'id_kegiatan' => $this->id_kegiatan,
+            'nilai' => $this->nilai
+        ];
+    }
+
     # private
     public function getNilai($data)
     {

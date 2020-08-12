@@ -14,6 +14,35 @@ use App\Models\School\Curriculum\Semester;
 /** */
 
 /**
+ * !: processing nilai_akhir with formula
+ *
+ * @param int $total_presensi
+ * @param int $total_nilaitambahan
+ * @return void
+ */
+function Cur_formulaNilaiAkhir($total_presensi, $total_nilaitambahan)
+{
+    $presTotal = $total_presensi;
+    $niltamTotal = $total_nilaitambahan;
+    $process = ($presTotal * 0.7) + ($niltamTotal * 0.3);
+    $result = $process > 0 ? $process : 0;
+    // proses untuk pengkategorian hasil akhir nilai
+    return strval(round($result, 2));
+}
+
+/**
+ * get semester name by id semester
+ *
+ * @param string $id_semester
+ * @return void
+ */
+function Cur_getSemesterNameByID($id_semester)
+{
+    $getSemester = Semester::find($id_semester);
+    return (bool) $getSemester ? "{$getSemester->semester}" : 'Semester tidak ditemukan';
+}
+
+/**
  * get kelas name by id kelas
  *
  * @param string $id_kelas

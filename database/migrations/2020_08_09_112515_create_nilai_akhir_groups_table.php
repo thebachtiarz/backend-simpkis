@@ -15,6 +15,8 @@ class CreateNilaiAkhirGroupsTable extends Migration
     {
         Schema::create('nilai_akhir_groups', function (Blueprint $table) {
             $table->id();
+            $table->string('id_semester');
+            $table->string('id_kelas');
             $table->text('catatan')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();

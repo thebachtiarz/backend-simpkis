@@ -38,6 +38,14 @@ class Kegiatan extends Model
         ];
     }
 
+    public function kegiatanResourceMap()
+    {
+        return [
+            'id' => $this->id,
+            'nilai' => $this->getNilaiEachKegiatan($this->nilai, 0)
+        ];
+    }
+
     # private
     private function getNilai($data, $auth = 1)
     {
@@ -48,6 +56,18 @@ class Kegiatan extends Model
             foreach ($getNilai as $keyCode => $nilai) {
                 if ($getAuth == User_setStatus('guru')) $result[] = ['code' => $keyCode, 'name' => $nilai['name'], 'poin' => $nilai['poin']];
                 else $result[] = ['code' => $keyCode, 'name' => $nilai['name']];
+            }
+        }
+        return $result;
+    }
+
+    private function getNilaiEachKegiatan($data)
+    {
+        $decode = unserialize($data);
+        $result = [];
+        if ((is_array($decode)) && (count($decode) > 0)) {
+            foreach ($decode as $key => $nilai) {
+                $result[$key] = $nilai['poin'];
             }
         }
         return $result;

@@ -118,7 +118,7 @@ function Carbon_AnyDateParse($datetime)
  */
 function Carbon_HumanDateParse($datetime)
 {
-    return Carbon::parse($datetime ? $datetime : Carbon_DBtimeToday())->format('d F Y');
+    return Carbon::parse($datetime ? $datetime : Carbon_DBdatetimeToday())->format('d F Y');
 }
 
 /**
@@ -196,14 +196,14 @@ function Carbon_DateSubYesterday($datetime, $days = 1)
 function Carbon_RangeDateYesterday($rangedate)
 {
     if ($rangedate == 'today') {
-        return Carbon_dateSubYesterday(Carbon_DBtimeToday(), 0);
+        return Carbon_dateSubYesterday(Carbon_DBdatetimeToday(), 0);
     } elseif ($rangedate == 'yesterday') {
-        return Carbon_dateSubYesterday(Carbon_DBtimeToday(), 1);
+        return Carbon_dateSubYesterday(Carbon_DBdatetimeToday(), 1);
     } elseif ($rangedate == 'last-week') {
-        return Carbon_dateSubYesterday(Carbon_DBtimeToday(), 7);
+        return Carbon_dateSubYesterday(Carbon_DBdatetimeToday(), 7);
     } elseif ($rangedate == 'last-month') {
-        return Carbon_dateSubYesterday(Carbon_DBtimeToday(), 30);
+        return Carbon_dateSubYesterday(Carbon_DBdatetimeToday(), 30);
     } else {
-        return Carbon_dateSubYesterday(Carbon_DBtimeToday(), 10000);
+        return Carbon_dateSubYesterday(Carbon_DBdatetimeToday(), 10000);
     }
 }
