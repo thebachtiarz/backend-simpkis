@@ -17,4 +17,8 @@ class NilaiAkhirGroup extends Model
     }
 
     # relation
+    public function nilaiakhir()
+    {
+        return $this->hasMany(NilaiAkhir::class, 'id_nilai');
+    }
 }

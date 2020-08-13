@@ -25,29 +25,17 @@ class NilaiAkhirSeeder extends Seeder
         // ! do ifelse below it for checking if nilai akhir was processed
         $newNilaiAkhirGroupId = (int) (NilaiAkhirGroup::query()->count() ? (NilaiAkhirGroup::orderByDesc('id')->first('id')->id) : 0) + 1;
         $getSiswa = Siswa::select(['id'])->where('id_kelas', $idKelas);
-        $getKegiatan = Kegiatan::all()->map->kegiatanResourceMap();
-        $getPresensi = Presensi::select(['id_siswa', 'id_kegiatan', 'nilai'])->where('id_semester', $idSemester);
-        $getNilaiTam = NilaiTambahan::select(['id_siswa', 'id_kegiatan', 'nilai'])->where('id_semester', $idSemester);
         //
-        $resKegiatan = [];
-        foreach ($getKegiatan as $key => $value) {
-            $resKegiatan[$value['id']] = $value['nilai'];
-        }
-        $resPresensi = [];
-        foreach ($getPresensi->get() as $key => $value) {
-            $resPresensi[$value['id_siswa']][] = $value;
-        }
-        $resNilaiTam = [];
-        foreach ($getNilaiTam->get() as $key => $value) {
-            $resNilaiTam[$value['id_siswa']][] = $value;
-        }
+        $resKegiatan = Atv_getKegiatanResource();
+        $resPresensi = Atv_getPresensiResource($idSemester);
+        $resNilaiTam = Atv_getNilaiTambahanResource($idSemester);
         //
         $newNilaiAkhir = [];
         //
         for ($i = 0; $i < $getSiswa->count(); $i++) {
             $idSiswa = $getSiswa->get()[$i]['id'];
             $dataPresensiSiswa = array_key_exists($idSiswa, $resPresensi) ? $resPresensi[$idSiswa] : [];
-            $dataNilaiTamSiswa = array_key_exists($idSiswa, $resNilaiTam) ? $resNilaiTam[$idSiswa] : [];;
+            $dataNilaiTamSiswa = array_key_exists($idSiswa, $resNilaiTam) ? $resNilaiTam[$idSiswa] : [];
             //
             $presensiState = 0;
             $nilaitamState = 0;
@@ -76,8 +64,8 @@ class NilaiAkhirSeeder extends Seeder
         foreach ($newNilaiAkhir as $key => $value) {
             $setNilaiAkhir[] = [
                 'id_nilai' => $newNilaiAkhirGroupId,
-                'id_siswa' => $value['id_siswa'],
                 'id_semester' => $idSemester,
+                'id_siswa' => $value['id_siswa'],
                 'nilai_akhir' => $value['nilai_akhir']
             ];
         }

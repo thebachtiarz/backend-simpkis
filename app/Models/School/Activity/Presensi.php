@@ -57,6 +57,10 @@ class Presensi extends Model
     }
 
     # scope
+    public function scopeGetPresensiResource($query, $id_semester)
+    {
+        $query->where('id_semester', $id_semester);
+    }
 
     # relation
     public function presensigroup()

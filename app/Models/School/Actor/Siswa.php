@@ -44,6 +44,11 @@ class Siswa extends Model
         return $this->belongsTo(\App\Models\School\Curriculum\Kelas::class, 'id_kelas');
     }
 
+    public function nilaiakhir()
+    {
+        return $this->hasMany(\App\Models\School\Curriculum\NilaiAkhir::class, 'id_siswa');
+    }
+
     public function presensi()
     {
         return $this->hasMany(\App\Models\School\Activity\Presensi::class, 'id_siswa');

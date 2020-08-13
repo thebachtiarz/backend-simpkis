@@ -86,8 +86,7 @@ class PresensiController extends Controller
         }
         if (isset($request->kelasid) || isset($request->siswaid)) {
             $getPresensi = \App\Models\School\Activity\Presensi::query();
-            if (isset($request->smtid)) $getPresensi = $getPresensi->where('id_semester', $request->smtid);
-            else $getPresensi = $getPresensi->where('id_semester', Cur_getActiveIDSemesterNow());
+            $getPresensi = $getPresensi->where('id_semester', isset($request->smtid) ? $request->smtid : Cur_getActiveIDSemesterNow());
             $getPresensi = $getPresensi->where('id_kegiatan', $request->kegiatanid);
             if (isset($request->kelasid)) {
                 $getPresensi = $getPresensi->whereIn('id_siswa', function ($q) use ($request) {

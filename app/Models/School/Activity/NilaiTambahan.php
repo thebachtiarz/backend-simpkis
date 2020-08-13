@@ -55,6 +55,10 @@ class NilaiTambahan extends Model
     }
 
     # scope
+    public function scopeGetNilaiTambahanResource($query, $id_semester)
+    {
+        $query->where('id_semester', $id_semester);
+    }
 
     # relation
     public function semester()
