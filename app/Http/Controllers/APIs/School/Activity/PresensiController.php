@@ -112,18 +112,12 @@ class PresensiController extends Controller
             $getKegiatan = $getKegiatan->kegiatanCollectMap();
             $kodeKegiatan = pluckArray($getKegiatan['nilai'], 'code');
             $getDataPresensi = (new \App\Models\School\Activity\Presensi)->getNilai($request->presensidata);
-            $getNewIDPresensi = (int) Atv_getLastIdPresensi() + 1;
             $newPresensi = [];
-            foreach ($getDataPresensi as $key => $value) $newPresensi[] = in_array($value['nilai'], $kodeKegiatan) ? ['id_presensi' => strval($getNewIDPresensi), 'id_semester' => strval(Cur_getActiveIDSemesterNow()), 'id_kegiatan' => $request->kegiatanid, 'id_siswa' => $value['id_siswa'], 'nilai' => $value['nilai']] : [];
-            try {
-                \Illuminate\Support\Facades\DB::transaction(function () use ($request, $approve, $newPresensi) {
-                    \Illuminate\Support\Facades\DB::table('presensi_groups')->insert(['catatan' => $request->catatan, 'approve' => $approve]);
-                    \Illuminate\Support\Facades\DB::table('presensis')->insert($newPresensi);
-                }, 5);
-                return response()->json(successResponse('Berhasil melakukan presensi'), 201);
-            } catch (\Exception $e) {
-                return response()->json(errorResponse('Presensi gagal dilakukan, silahkan coba kembali'), 202);
-            }
+            $newPresensiGroup = \App\Models\School\Activity\PresensiGroup::query();
+            $newPresensiGroup->create(['catatan' => $request->catatan, 'approve' => $approve]);
+            foreach ($getDataPresensi as $key => $value) if (in_array($value['nilai'], $kodeKegiatan)) $newPresensi[] = ['id_presensi' => strval($newPresensiGroup->id), 'id_semester' => strval(Cur_getActiveIDSemesterNow()), 'id_kegiatan' => $request->kegiatanid, 'id_siswa' => $value['id_siswa'], 'nilai' => $value['nilai']];
+            if (count($newPresensi)) \App\Models\School\Activity\Presensi::create($newPresensi);
+            return response()->json(successResponse('Berhasil melakukan presensi'), 201);
         }
         return response()->json(errorResponse('Kegiatan tidak ditemukan'), 202);
     }
@@ -131,9 +125,7 @@ class PresensiController extends Controller
     private function showPresensi($id)
     {
         $getPresensi = \App\Models\School\Activity\Presensi::find($id);
-        if ((bool) $getPresensi) {
-            return response()->json(dataResponse($getPresensi->presensiSimpleInfoMap()), 200);
-        }
+        if ((bool) $getPresensi) return response()->json(dataResponse($getPresensi->presensiSimpleInfoMap()), 200);
         return response()->json(errorResponse('Presensi tidak ditemukan'), 202);
     }
 
