@@ -70,11 +70,8 @@ class SemesterController extends Controller
         $validator = $this->listValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
         $getSemester = \App\Models\School\Curriculum\Semester::query();
-        if ($request->get == 'now') {
-            $getSemester = $getSemester->limit(1)->orderByDesc('id')->get();
-        } else {
-            $getSemester = $getSemester->get();
-        }
+        if ($request->get == 'now') $getSemester = $getSemester->limit(1)->orderByDesc('id')->get();
+        else $getSemester = $getSemester->get();
         return response()->json(dataResponse($getSemester->map->semesterSimpleListMap()), 200);
     }
 
@@ -82,10 +79,11 @@ class SemesterController extends Controller
     {
         $validator = $this->semesterValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        $getSemester = \App\Models\School\Curriculum\Semester::getAvailableSemester(Cur_setNewSemesterFormat($request->tahun, $request->semester));
+        $newSemester = Cur_setNewSemesterFormat($request->tahun, $request->semester);
+        $getSemester = \App\Models\School\Curriculum\Semester::getAvailableSemester($newSemester);
         if (!$getSemester->count()) {
-            \App\Models\School\Curriculum\Semester::create(['semester' => Cur_setNewSemesterFormat($request->tahun, $request->semester)]);
-            return response()->json(dataResponse(['new_semester' => Cur_setNewSemesterFormat($request->tahun, $request->semester)], '', 'Berhasil menambahkan semester baru'), 201);
+            \App\Models\School\Curriculum\Semester::create(['semester' => $newSemester]);
+            return response()->json(dataResponse(['new_semester' => $newSemester], '', 'Berhasil menambahkan semester baru'), 201);
         }
         return response()->json(errorResponse('Semester sudah ada'), 202);
     }
@@ -93,9 +91,7 @@ class SemesterController extends Controller
     private function showSemester($id)
     {
         $getSemester = \App\Models\School\Curriculum\Semester::find($id);
-        if ((bool) $getSemester) {
-            return response()->json(dataResponse($getSemester->semesterSimpleInfoMap()), 200);
-        }
+        if ((bool) $getSemester) return response()->json(dataResponse($getSemester->semesterSimpleInfoMap()), 200);
         return response()->json(errorResponse('Semester tidak ditemukan'), 202);
     }
 
@@ -105,10 +101,8 @@ class SemesterController extends Controller
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
         $getSemester = \App\Models\School\Curriculum\Semester::find($id);
         if ((bool) $getSemester) {
-            $tahun = (isset($request->tahun)) ? $request->tahun : date('Y');
-            $semester = (isset($request->semester)) ? Cur_convSemesterByCode($request->semester) : Cur_getSemesterNow();
             $oldSemester = $getSemester->semester;
-            $newSemester = "{$tahun}/{$semester}";
+            $newSemester = Cur_setNewSemesterFormat($request->tahun, $request->semester);
             $getSemester->update(['semester' => $newSemester]);
             return response()->json(dataResponse(['old' => $oldSemester, 'new' => $newSemester], '', 'Berhasil memperbarui semester'), 201);
         }
