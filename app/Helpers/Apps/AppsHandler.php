@@ -116,3 +116,14 @@ function collapseArray($array_data)
 {
     return Arr::collapse($array_data);
 }
+
+/**
+ * filter a sentence into string only
+ *
+ * @param string $sentence
+ * @return void
+ */
+function Str_pregStringOnly($sentence)
+{
+    return preg_replace("/[^A-Za-z?![:space:]]/", '', $sentence);
+}

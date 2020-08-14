@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\APIs\School\Curriculum;
 
 use App\Http\Controllers\Controller;
-use App\Models\School\Curriculum\Kelas;
 
 class KelasController extends Controller
 {
@@ -67,7 +66,7 @@ class KelasController extends Controller
     {
         $validator = $this->softDeleteValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        $getKelas = Kelas::query();
+        $getKelas = \App\Models\School\Curriculum\Kelas::query();
         if ($request->method == 'all') {
             return response()->json(dataResponse($getKelas->withTrashed()->get()->map->kelasSimpleListMap()), 200);
         } elseif ($request->method == 'deleted') {
@@ -80,17 +79,24 @@ class KelasController extends Controller
     {
         $validator = $this->storeValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        $checkAvailabel = Kelas::getAvailableKelas($request->tingkat, $request->nama)->count();
-        if (!$checkAvailabel) {
+        $checkAvailable = \App\Models\School\Curriculum\Kelas::getAvailableKelas($request->tingkat, $request->nama)->count();
+        if (!$checkAvailable) {
+            $checkGroupKelas = \App\Models\School\Curriculum\KelasGroup::getAvailableGroupKelas($request->tingkat, $request->nama);
+            if ($checkGroupKelas->count()) {
+                $getKelasGroupId = $checkGroupKelas->get()[0]->id;
+                \App\Models\School\Curriculum\Kelas::create(['nama' => $request->nama, 'id_group' => $getKelasGroupId]);
+            } else {
+                $newKelasGroup = \App\Models\School\Curriculum\KelasGroup::create(['tingkat' => $request->tingkat, 'nama_group' => Str_pregStringOnly($request->nama)]);
+                \App\Models\School\Curriculum\Kelas::create(['nama' => $request->nama, 'id_group' => $newKelasGroup->id]);
+            }
             return response()->json(successResponse('Kelas berhasil dibuat'), 201);
         }
         return response()->json(errorResponse('Kelas sudah ada'), 202);
-        // return preg_replace("/[^A-Za-z?![:space:]]/", '', 'Teknik Komputer Jaringan 2'); // for checking group kelas
     }
 
     private function showKelas($id)
     {
-        $getKelas = Kelas::withTrashed()->find($id);
+        $getKelas = \App\Models\School\Curriculum\Kelas::withTrashed()->find($id);
         return (bool) $getKelas
             ? response()->json(dataResponse($getKelas->kelasFullInfoMap()), 200)
             : response()->json(errorResponse('Kelas tidak ditemukan'), 202);
@@ -100,23 +106,30 @@ class KelasController extends Controller
     {
         $validator = $this->updateValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        $getKelas = Kelas::find($id);
-        if ((bool) $getKelas) {
-            $tingkatNow = $getKelas->kelasgroup->tingkat;
-            if (($request->updateTingkat == 'naik') && ($tingkatNow < '12')) {
-                $response = [
-                    'sebelumnya' => "{$tingkatNow} - {$getKelas->nama}",
-                    'sekarang' => strval(intval($tingkatNow + 1)) . " - {$getKelas->nama}"
-                ];
-                return response()->json(dataResponse($response, '', 'Berhasil menaikkan kelas'), 200);
-            } elseif (($request->updateTingkat == 'lulus') && ($tingkatNow >= '12')) {
-                $statLulus = '(L-' . Carbon_AnyDateParse(Carbon_DBdatetimeToday()) . ')';
-                $response = [
-                    'sebelumnya' => "{$tingkatNow} - {$getKelas->nama}",
-                    'sekarang' => "{$statLulus} - {$getKelas->nama}"
-                ];
-                return response()->json(dataResponse($response, '', 'Berhasil meluluskan kelas'), 200);
+        if (isset($request->updateTingkat)) {
+            $getKelasGroup = \App\Models\School\Curriculum\KelasGroup::find($id);
+            if ((bool) $getKelasGroup) {
+                $tingkatNow = $getKelasGroup->tingkat;
+                $tingkatNew = '';
+                $message = 'Berhasil :status kelas';
+                if (($request->updateTingkat == 'naik') && ($tingkatNow < '12')) {
+                    $tingkatNew = strval(intval($tingkatNow + 1));
+                    preg_replace_array('/:[a-z]+/', ['menaikkan'], $message);
+                } elseif (($request->updateTingkat == 'lulus') && ($tingkatNow >= '12')) {
+                    $tingkatNew = Cur_formatKelasLulus();
+                    preg_replace_array('/:[a-z]+/', ['meluluskan'], $message);
+                }
+                if (isset($tingkatNew)) {
+                    $getKelasGroup->update(['tingkat' => $tingkatNew]);
+                    return response()->json(successResponse($message), 201);
+                }
             }
+            return response()->json(errorResponse('Group kelas tidak ditemukan'), 202);
+        }
+        $getKelas = \App\Models\School\Curriculum\Kelas::find($id);
+        if ((bool) $getKelas) {
+            $getKelas->update(['nama' => $request->nama]);
+            return response()->json(successResponse('Berhasil memperbarui kelas'), 201);
         }
         return response()->json(errorResponse('Kelas tidak ditemukan'), 202);
     }
@@ -125,7 +138,7 @@ class KelasController extends Controller
     {
         $validator = $this->softDeleteValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        $getKelas = Kelas::where('id', $id);
+        $getKelas = \App\Models\School\Curriculum\Kelas::where('id', $id);
         if ($request->method == 'force') $getKelas->onlyTrashed();
         if ($getKelas->count()) {
             if ($request->method == 'force') {
@@ -150,7 +163,8 @@ class KelasController extends Controller
     private function updateValidator($request)
     {
         return Validator($request, [
-            'updateTingkat' => 'required|string|alpha'
+            'updateTingkat' => 'nullable|string|alpha',
+            'nama' => 'nullable|string|regex:/^[a-z0-9A-Z_\s]+$/|required_without:updateTingkat'
         ]);
     }
 
