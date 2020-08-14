@@ -124,13 +124,8 @@ class SiswaController extends Controller
                     $getChangeKey = array_keys($getChange); // get key from request
                     $oldData = [];
                     for ($i = 0; $i < count($getChangeKey); $i++) array_push($oldData, $getSiswa[$getChangeKey[$i]]);
-                    /**
-                     * ubah data(nisn, nama, id_kelas) pada siswas(Model:: Siswa) dengan input($request->all())
-                     * todo: gunakan method update dengan input($getChange)
-                     */
-                    if ((bool) $getSiswa->ketuakelas) {
-                        // ubah data pada user_biodatas(Model:: UserBiodata) berdasarkan id_user yang terdapat pada ketua_kelas(Model:: KetuaKelas)
-                    }
+                    $getSiswa->update($getChange);
+                    if ((bool) $getSiswa->ketuakelas && isset($request->nama)) $getSiswa->ketuakelas->user->userbio->update(['name' => $request->nama]);
                     $response = ['oldData' => array_combine($getChangeKey, $oldData), 'newData' => $getChange];
                     return response()->json(dataResponse($response, '', 'Berhasil memperbarui data siswa'), 200);
                 } catch (\Exception $e) {
@@ -178,7 +173,7 @@ class SiswaController extends Controller
     private function updateValidator($request)
     {
         return Validator($request, [
-            'nisn' => 'nullable|string|numeric|digits_between:7,15',
+            'nisn' => 'nullable|string|numeric|digits_between:10,15',
             'nama' => 'nullable|string|regex:/^[a-zA-Z_,.\s]+$/',
             'id_kelas' => 'nullable|string|numeric'
         ]);
