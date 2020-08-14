@@ -110,7 +110,7 @@ class KelasController extends Controller
                 ];
                 return response()->json(dataResponse($response, '', 'Berhasil menaikkan kelas'), 200);
             } elseif (($request->updateTingkat == 'lulus') && ($tingkatNow >= '12')) {
-                $statLulus = '(L-' . Carbon_AnyDateParse(Carbon_DBtimeToday()) . ')';
+                $statLulus = '(L-' . Carbon_AnyDateParse(Carbon_DBdatetimeToday()) . ')';
                 $response = [
                     'sebelumnya' => "{$tingkatNow} - {$getKelas->nama}",
                     'sekarang' => "{$statLulus} - {$getKelas->nama}"

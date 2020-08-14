@@ -166,8 +166,9 @@ function Carbon_AnyConvDateToTimestamp($datetime)
  */
 function Carbon_HumanRangeDateTimeDuration($start, $end)
 {
-    $checkStart = DBDateParse($start);
-    $checkEnd = DBDateParse($end);
+    $checkStart = Carbon_DBDateParse($start);
+    $checkEnd = Carbon_DBDateParse($end);
+    // if date is today, then return date only in first
     if ($checkStart == $checkEnd) {
         return Carbon::parse($start)->format('l, d F Y') . '. ' . Carbon::parse($start)->format('H:i') . ' - ' . Carbon::parse($end)->format('H:i');
     } else {

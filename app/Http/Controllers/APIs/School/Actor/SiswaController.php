@@ -120,17 +120,13 @@ class SiswaController extends Controller
         if ((bool) $getChange) {
             $getSiswa = \App\Models\School\Actor\Siswa::find($id);
             if ((bool) $getSiswa) {
-                try {
-                    $getChangeKey = array_keys($getChange); // get key from request
-                    $oldData = [];
-                    for ($i = 0; $i < count($getChangeKey); $i++) array_push($oldData, $getSiswa[$getChangeKey[$i]]);
-                    $getSiswa->update($getChange);
-                    if ((bool) $getSiswa->ketuakelas && isset($request->nama)) $getSiswa->ketuakelas->user->userbio->update(['name' => $request->nama]);
-                    $response = ['oldData' => array_combine($getChangeKey, $oldData), 'newData' => $getChange];
-                    return response()->json(dataResponse($response, '', 'Berhasil memperbarui data siswa'), 200);
-                } catch (\Exception $e) {
-                    return response()->json(errorResponse('Terdapat kesalahan dalam proses, silahkan coba kembali'), 202);
-                }
+                $getChangeKey = array_keys($getChange); // get key from request
+                $oldData = [];
+                for ($i = 0; $i < count($getChangeKey); $i++) array_push($oldData, $getSiswa[$getChangeKey[$i]]);
+                $getSiswa->update($getChange);
+                if ((bool) $getSiswa->ketuakelas && isset($request->nama)) $getSiswa->ketuakelas->user->userbio->update(['name' => $request->nama]);
+                $response = ['oldData' => array_combine($getChangeKey, $oldData), 'newData' => $getChange];
+                return response()->json(dataResponse($response, '', 'Berhasil memperbarui data siswa'), 200);
             }
             return response()->json(errorResponse('Siswa tidak ditemukan'), 202);
         }
@@ -145,8 +141,10 @@ class SiswaController extends Controller
         if ($request->method == 'force') $getSiswa->withTrashed();
         if ($getSiswa->count()) {
             if ($request->method == 'force') {
+                $getSiswa->forceDelete();
                 return response()->json(successResponse('Berhasil menghapus siswa secara permanen'), 200);
             } else {
+                $getSiswa->delete();
                 return response()->json(successResponse('Berhasil menghapus siswa'), 200);
             }
         }
