@@ -102,9 +102,7 @@ class KegiatanController extends Controller
     private function showKegiatan($id)
     {
         $getKegiatan = \App\Models\School\Activity\Kegiatan::find($id);
-        if (((bool) $getKegiatan) && (in_array($this->userstat(), array_keys($this->canAllow)))) {
-            return response()->json(dataResponse($getKegiatan->kegiatanSimpleInfoMap()), 200);
-        }
+        if (((bool) $getKegiatan) && (in_array($this->userstat(), array_keys($this->canAllow)))) return response()->json(dataResponse($getKegiatan->kegiatanSimpleInfoMap()), 200);
         return response()->json(errorResponse('Kegiatan tidak ditemukan'), 202);
     }
 
