@@ -4,10 +4,10 @@ namespace App\Imports\Siswa;
 
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Illuminate\Validation\Rule;
+// use Maatwebsite\Excel\Concerns\WithValidation;
 use App\Models\School\Actor\Siswa;
 
-class SiswaImport implements ToModel, WithHeadingRow
+class SiswaImport implements ToModel, WithHeadingRow/*, WithValidation*/
 {
     /**
      * @param array $row
@@ -26,9 +26,9 @@ class SiswaImport implements ToModel, WithHeadingRow
     public function rules(): array
     {
         return [
-            '0' => Rule::in(['required', 'string', 'numeric', 'digits_between:10,15']),
-            '1' => Rule::in(['required', 'numeric', 'regex:/^[a-zA-Z_,.\s]+$/']),
-            '2' => Rule::in(['required', 'string', 'numeric'])
+            '0' => 'required|string|numeric|digits_between:10,15',
+            '1' => 'required|string|regex:/^[a-zA-Z_,.\s]+$/',
+            '2' => 'required|string|numeric'
         ];
     }
 
