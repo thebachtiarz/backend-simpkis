@@ -75,11 +75,9 @@ class SiswaController extends Controller
         $validator = $this->listValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
         $getSiswa = \App\Models\School\Actor\Siswa::query();
-        if ($request->method == 'all') {
-            $getSiswa->where('id_kelas', $request->kelasID)->withTrashed();
-        } elseif ($request->method == 'deleted') {
-            $getSiswa->where('id_kelas', $request->kelasID)->onlyTrashed();
-        } else {
+        if ($request->method == 'all') $getSiswa->where('id_kelas', $request->kelasID)->withTrashed();
+        elseif ($request->method == 'deleted') $getSiswa->where('id_kelas', $request->kelasID)->onlyTrashed();
+        else {
             $kelas = $request->kelasID;
             if ($this->userstat() == 'ketuakelas') $kelas = auth()->user()->ketuakelas->id_kelas;
             $getSiswa->where('id_kelas', $kelas);
@@ -91,14 +89,12 @@ class SiswaController extends Controller
     {
         $validator = $this->storeValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        /**
-         * insert data siswa berdasarkan file(csv) yang sudah di upload pada tabel csv_inserts(Model:: CsvInsert)
-         * request berisikan kode file yang menuju lokasi file yang telah tersedia
-         * file(csv) akan diubah menjadi array untuk dikelola
-         * lalu insert ke tabel siswas(Model::Siswa)
-         * todo: gunakan try catch!!
-         */
-        return response()->json(successResponse('Berhasil menambahkan data siswa dengan kode file: ' . $request->fileCode), 200);
+        try {
+            \Maatwebsite\Excel\Facades\Excel::import(new \App\Imports\Siswa\SiswaImport, $request->file('file'));
+            return response()->json(successResponse('Berhasil menambahkan data siswa'), 200);
+        } catch (\Throwable $th) {
+            return response()->json(errorResponse('Gagal menambahkan siswa, error: ' . $th->getMessage()), 202);
+        }
     }
 
     private function showSiswa($id)
@@ -164,7 +160,7 @@ class SiswaController extends Controller
     private function storeValidator($request)
     {
         return Validator($request, [
-            'fileCode' => 'required|string|alpha_num'
+            'file' => 'required|file'
         ]);
     }
 
