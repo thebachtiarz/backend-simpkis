@@ -192,7 +192,7 @@ function User_getStatusForHuman($status)
  */
 function User_createNewCode()
 {
-    return randString(64);
+    return Str_random(64);
 }
 
 /**
