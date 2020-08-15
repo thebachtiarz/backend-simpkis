@@ -4,9 +4,6 @@
  * use libraries
  */
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Arr;
-
 /**
  * use models
  *
@@ -69,61 +66,4 @@ function default_user_image()
 function getClientIpAddress()
 {
     return request()->ip();
-}
-
-/**
- * create custom amount random string
- *
- * @param int $rand_amount
- * @return void
- */
-function randString($rand_amount)
-{
-    return Str::random($rand_amount);
-}
-
-/**
- * get random element from array data
- *
- * @param array $array_data
- * @return void
- */
-function randArray($array_data)
-{
-    return Arr::random($array_data);
-}
-
-/**
- * get only the specified key from array data
- * similar with : array_column()
- *
- * @param array $array_data
- * @param string $key
- * @return void
- */
-function pluckArray($array_data, $key)
-{
-    return Arr::pluck($array_data, $key);
-}
-
-/**
- * collapse an array into slim version
- *
- * @param array $array_data
- * @return void
- */
-function collapseArray($array_data)
-{
-    return Arr::collapse($array_data);
-}
-
-/**
- * filter a sentence into string only
- *
- * @param string $sentence
- * @return void
- */
-function Str_pregStringOnly($sentence)
-{
-    return preg_replace("/[^A-Za-z?![:space:]]/", '', $sentence);
 }

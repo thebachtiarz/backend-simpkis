@@ -47,8 +47,10 @@
         ],
         "files": [
             "app/Helpers/Apps/AppsHandler.php",
+            "app/Helpers/Apps/ArrayHandler.php",
             "app/Helpers/Apps/CarbonTimeHandler.php",
             "app/Helpers/Apps/ResponseHandler.php",
+            "app/Helpers/Apps/StringHandler.php",
             "app/Helpers/Auth/UserHandler.php",
             "app/Helpers/School/ActivityHandler.php",
             "app/Helpers/School/ActorHandler.php",

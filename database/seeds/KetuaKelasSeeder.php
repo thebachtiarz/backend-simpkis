@@ -22,10 +22,10 @@ class KetuaKelasSeeder extends Seeder
         $newKetua = [];
         $getLastIdUser = User::orderByDesc('id')->first('id')->id;
         $getSiswa = Siswa::select(['id', 'id_kelas', 'nisn', 'nama'])->where('id', '>', 500)->groupBy('id_kelas')->get();
-        $getKelasOnly = pluckArray($getSiswa, 'id_kelas');
-        $getSiswaOnly = pluckArray($getSiswa, 'id');
-        $getNisnOnly = pluckArray($getSiswa, 'nisn');
-        $getNamaOnly = pluckArray($getSiswa, 'nama');
+        $getKelasOnly = Arr_pluck($getSiswa, 'id_kelas');
+        $getSiswaOnly = Arr_pluck($getSiswa, 'id');
+        $getNisnOnly = Arr_pluck($getSiswa, 'nisn');
+        $getNamaOnly = Arr_pluck($getSiswa, 'nama');
 
         for ($i = 0; $i < count($getKelasOnly); $i++) {
             $moreUser = [

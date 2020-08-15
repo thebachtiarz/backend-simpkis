@@ -22,7 +22,7 @@ class UserFakerSeeder extends Seeder
             $moreUser = [
                 'code' => User_createNewCode(),
                 'name' => $faker->name,
-                'tagname' => strtolower(randString(7)),
+                'tagname' => strtolower(Str_random(7)),
                 'active' => User_setActiveStatus('active'),
                 'status' => User_setStatus('ketuakelas')
             ];

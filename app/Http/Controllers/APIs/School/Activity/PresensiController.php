@@ -110,7 +110,7 @@ class PresensiController extends Controller
         $getKegiatan = \App\Models\School\Activity\Kegiatan::getKegiatanPresensi()->find($request->kegiatanid);
         if ((bool) $getKegiatan) {
             $getKegiatan = $getKegiatan->kegiatanCollectMap();
-            $kodeKegiatan = pluckArray($getKegiatan['nilai'], 'code');
+            $kodeKegiatan = Arr_pluck($getKegiatan['nilai'], 'code');
             $getDataPresensi = (new \App\Models\School\Activity\Presensi)->getNilai($request->presensidata);
             $newPresensi = [];
             $newPresensiGroup = \App\Models\School\Activity\PresensiGroup::query();

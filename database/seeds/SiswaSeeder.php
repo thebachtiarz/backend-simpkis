@@ -15,13 +15,13 @@ class SiswaSeeder extends Seeder
     public function run(Faker $faker)
     {
         $newSiswa = [];
-        $getKelas = pluckArray(Kelas::all(), 'id');
+        $getKelas = Arr_pluck(Kelas::all(), 'id');
         $nisn = time();
         for ($i = 0; $i < 2000; $i++) {
             $newSiswa[] = [
                 'nisn' => $nisn,
                 'nama' => $faker->name,
-                'id_kelas' => randArray($getKelas)
+                'id_kelas' => Arr_random($getKelas)
             ];
             $nisn++;
         }

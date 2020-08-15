@@ -16,58 +16,58 @@ class KegiatanSeeder extends Seeder
             [
                 'nama' => 'Sholat Wajib',
                 'nilai' => serialize([
-                    randString(6) => ['name' => 'Imam', 'poin' => '8'],
-                    randString(6) => ['name' => 'Muadzin', 'poin' => '6'],
-                    randString(6) => ['name' => 'Hadir', 'poin' => '4'],
-                    randString(6) => ['name' => 'Haid', 'poin' => '0'],
-                    randString(6) => ['name' => 'Alpha', 'poin' => '-2']
+                    Str_random(6) => ['name' => 'Imam', 'poin' => '8'],
+                    Str_random(6) => ['name' => 'Muadzin', 'poin' => '6'],
+                    Str_random(6) => ['name' => 'Hadir', 'poin' => '4'],
+                    Str_random(6) => ['name' => 'Haid', 'poin' => '0'],
+                    Str_random(6) => ['name' => 'Alpha', 'poin' => '-2']
                 ]),
                 'akses' => Atv_setAksesKegiatan('presensi')
             ],
             [
                 'nama' => 'Sholat Jumat',
                 'nilai' => serialize([
-                    randString(6) => ['name' => 'Imam', 'poin' => '10'],
-                    randString(6) => ['name' => 'Muadzin', 'poin' => '7'],
-                    randString(6) => ['name' => 'Hadir', 'poin' => '4'],
-                    randString(6) => ['name' => 'Alpha', 'poin' => '-4']
+                    Str_random(6) => ['name' => 'Imam', 'poin' => '10'],
+                    Str_random(6) => ['name' => 'Muadzin', 'poin' => '7'],
+                    Str_random(6) => ['name' => 'Hadir', 'poin' => '4'],
+                    Str_random(6) => ['name' => 'Alpha', 'poin' => '-4']
                 ]),
                 'akses' => Atv_setAksesKegiatan('presensi')
             ],
             [
                 'nama' => 'Sholat Sunah',
                 'nilai' => serialize([
-                    randString(6) => ['name' => 'Imam', 'poin' => '6'],
-                    randString(6) => ['name' => 'Muadzin', 'poin' => '4'],
-                    randString(6) => ['name' => 'Hadir', 'poin' => '3'],
-                    randString(6) => ['name' => 'Alpha', 'poin' => '-1']
+                    Str_random(6) => ['name' => 'Imam', 'poin' => '6'],
+                    Str_random(6) => ['name' => 'Muadzin', 'poin' => '4'],
+                    Str_random(6) => ['name' => 'Hadir', 'poin' => '3'],
+                    Str_random(6) => ['name' => 'Alpha', 'poin' => '-1']
                 ]),
                 'akses' => Atv_setAksesKegiatan('presensi')
             ],
             [
                 'nama' => 'Membersihkan Musholla',
                 'nilai' => serialize([
-                    randString(6) => ['name' => 'Tinggi', 'poin' => '6'],
-                    randString(6) => ['name' => 'Sedang', 'poin' => '4'],
-                    randString(6) => ['name' => 'Rendah', 'poin' => '2']
+                    Str_random(6) => ['name' => 'Tinggi', 'poin' => '6'],
+                    Str_random(6) => ['name' => 'Sedang', 'poin' => '4'],
+                    Str_random(6) => ['name' => 'Rendah', 'poin' => '2']
                 ]),
                 'akses' => Atv_setAksesKegiatan('tambahan')
             ],
             [
                 'nama' => 'Jumat Mengaji',
                 'nilai' => serialize([
-                    randString(6) => ['name' => 'Tinggi', 'poin' => '12'],
-                    randString(6) => ['name' => 'Sedang', 'poin' => '10'],
-                    randString(6) => ['name' => 'Rendah', 'poin' => '6']
+                    Str_random(6) => ['name' => 'Tinggi', 'poin' => '12'],
+                    Str_random(6) => ['name' => 'Sedang', 'poin' => '10'],
+                    Str_random(6) => ['name' => 'Rendah', 'poin' => '6']
                 ]),
                 'akses' => Atv_setAksesKegiatan('tambahan')
             ],
             [
                 'nama' => 'Khotbah Jumat',
                 'nilai' => serialize([
-                    randString(6) => ['name' => 'Tinggi', 'poin' => '15'],
-                    randString(6) => ['name' => 'Sedang', 'poin' => '12'],
-                    randString(6) => ['name' => 'Rendah', 'poin' => '10']
+                    Str_random(6) => ['name' => 'Tinggi', 'poin' => '15'],
+                    Str_random(6) => ['name' => 'Sedang', 'poin' => '12'],
+                    Str_random(6) => ['name' => 'Rendah', 'poin' => '10']
                 ]),
                 'akses' => Atv_setAksesKegiatan('tambahan')
             ]

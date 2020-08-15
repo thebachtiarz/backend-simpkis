@@ -17,17 +17,17 @@ class NilaiTambahanSeeder extends Seeder
     {
         $newNilaiTambahan = [];
         $getKegiatan = Kegiatan::getKegiatanTambahan()->get()->map->kegiatanCollectMap();
-        $getIdSemester = pluckArray(Semester::get('id'), 'id');
-        $getIdSiswa = pluckArray(Siswa::get('id'), 'id');
-        $getIdKegiatan = pluckArray($getKegiatan, 'id');
+        $getIdSemester = Arr_pluck(Semester::get('id'), 'id');
+        $getIdSiswa = Arr_pluck(Siswa::get('id'), 'id');
+        $getIdKegiatan = Arr_pluck($getKegiatan, 'id');
         for ($i = 0; $i < 4000; $i++) {
-            $randKegiatan = (int) randArray($getIdKegiatan);
+            $randKegiatan = (int) Arr_random($getIdKegiatan);
             $newNilaiTambahan[] = [
-                'id_semester' => randArray($getIdSemester),
-                'id_siswa' => randArray($getIdSiswa),
+                'id_semester' => Arr_random($getIdSemester),
+                'id_siswa' => Arr_random($getIdSiswa),
                 'id_kegiatan' => $randKegiatan,
                 // if an error in array_search below, just ignore it, it's happen because dumb php-intelephense when debugging
-                'nilai' => randArray(pluckArray($getKegiatan[array_search($randKegiatan, $getIdKegiatan)]['nilai'], 'code'))
+                'nilai' => Arr_random(Arr_pluck($getKegiatan[array_search($randKegiatan, $getIdKegiatan)]['nilai'], 'code'))
             ];
         }
         NilaiTambahan::insert($newNilaiTambahan);
