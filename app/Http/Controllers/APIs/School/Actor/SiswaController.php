@@ -75,14 +75,13 @@ class SiswaController extends Controller
         $validator = $this->listValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
         $getSiswa = \App\Models\School\Actor\Siswa::query();
-        if ($request->method == 'all') {
-            $getSiswa->where('id_kelas', $request->kelasID)->withTrashed();
-        } elseif ($request->method == 'deleted') {
-            $getSiswa->where('id_kelas', $request->kelasID)->onlyTrashed();
-        } else {
-            $kelas = $request->kelasID;
-            if ($this->userstat() == 'ketuakelas') $kelas = auth()->user()->ketuakelas->id_kelas;
-            $getSiswa->where('id_kelas', $kelas);
+        if ($request->method == 'all') $getSiswa->where('id_kelas', $request->kelasid)->withTrashed();
+        elseif ($request->method == 'deleted') $getSiswa->where('id_kelas', $request->kelasid)->onlyTrashed();
+        else {
+            $kelas = $request->kelasid;
+            if ($this->userstat() == 'ketuakelas') $kelas = auth()->user()->ketuakelas->kelasid;
+            if (isset($request->searchname)) $getSiswa->where('nama', 'like', "%$request->searchname%");
+            if (isset($kelas)) $getSiswa->where('id_kelas', $kelas);
         }
         return response()->json(dataResponse($getSiswa->get()->map->siswaSimpleListMap()), 200);
     }
