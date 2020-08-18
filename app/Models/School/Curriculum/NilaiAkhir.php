@@ -33,7 +33,23 @@ class NilaiAkhir extends Model
         ];
     }
 
+    public function nilaiakhirExport()
+    {
+        return [
+            'id' => strval($this->id),
+            'nisn' => $this->siswa->nisn,
+            'nama' => $this->siswa->nama,
+            'kelas' => Cur_getKelasNameByID($this->siswa->id_kelas),
+            'semester' => $this->semester->semester,
+            'nilai_akhir' => $this->nilai_akhir
+        ];
+    }
+
     # scope
+    public function scopeGetResultSemesterNow($query)
+    {
+        $query->where('id_semester', Cur_getActiveIDSemesterNow());
+    }
 
     # relation
     public function nilaiakhirgroup()
