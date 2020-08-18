@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Kegiatan extends Model
 {
-    protected $fillable = ['nama', 'nilai', 'akses'];
+    protected $fillable = ['nama', 'nilai', 'hari', 'waktu_mulai', 'waktu_selesai', 'akses'];
 
     # map
     public function kegiatanSimpleListMap()
@@ -14,7 +14,9 @@ class Kegiatan extends Model
         return [
             'id' => strval($this->id),
             'nama' => $this->nama,
-            'nilai' => $this->getNilai($this->nilai)
+            'nilai' => $this->getNilai($this->nilai),
+            'hari' => Atv_getInfoDayKegiatan($this->hari, true),
+            'waktu' => "$this->waktu_mulai - $this->waktu_selesai"
         ];
     }
 
@@ -24,6 +26,8 @@ class Kegiatan extends Model
             'id' => strval($this->id),
             'nama' => $this->nama,
             'nilai' => $this->getNilai($this->nilai),
+            'hari' => Atv_getInfoDayKegiatan($this->hari, true),
+            'waktu' => "$this->waktu_mulai - $this->waktu_selesai",
             'dibuat' => Carbon_HumanDateTime($this->created_at),
             'diubah' => Carbon_HumanIntervalDateTime($this->updated_at)
         ];
@@ -87,6 +91,13 @@ class Kegiatan extends Model
     public function scopeGetKegiatanPresensi($query)
     {
         $query->where('akses', Atv_setAksesKegiatan('presensi'));
+    }
+
+    public function scopeGetAvailablePresensiNow($query)
+    {
+        $query->whereIn('hari', ['*', Carbon_DBDayNumOfWeek()])->where(function ($time) {
+            $time->whereTime('waktu_mulai', '<=', Carbon_AnyTimeNow())->whereTime('waktu_selesai', '>=', Carbon_AnyTimeNow());
+        });
     }
 
     # relation

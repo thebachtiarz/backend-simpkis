@@ -80,3 +80,16 @@ function Atv_getLastIdPresensi()
 {
     return PresensiGroup::orderByDesc('id')->first('id')->id;
 }
+
+/**
+ * convert day available kegiatan
+ *
+ * @param numeric $day
+ * @param boolean $locale
+ * @return void
+ */
+function Atv_getInfoDayKegiatan($day, $locale = false)
+{
+    if ($day == '*') return $locale ? 'Setiap hari' : 'Every day';
+    else return Carbon_HumanDayNameOfWeek($day, $locale);
+}

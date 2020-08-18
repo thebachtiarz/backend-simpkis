@@ -76,6 +76,7 @@ class KegiatanController extends Controller
     {
         if (in_array($this->userstat(), array_keys($this->canAllow))) {
             $getKegiatan = \App\Models\School\Activity\Kegiatan::whereIn('akses', $this->canAllow[$this->userstat()]);
+            if ($this->userstat() == 'ketuakelas') $getKegiatan->getAvailablePresensiNow();
             if ($getKegiatan->count()) {
                 $getKegiatan = $getKegiatan->get()->map->kegiatanSimpleListMap();
                 return response()->json(dataResponse($getKegiatan), 200);
