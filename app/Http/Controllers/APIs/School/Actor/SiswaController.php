@@ -102,7 +102,7 @@ class SiswaController extends Controller
         $getSiswa = \App\Models\School\Actor\Siswa::withTrashed()->find($id);
         if ((bool) $getSiswa) {
             // jika (saya == ketuakelas dan siswa ada pada kelas saya) atau (saya bukan ketuakelas) maka benar
-            if ((($this->userstat() == 'ketuakelas') && ($getSiswa->id_kelas == auth()->user()->ketuakelas->id_kelas)) || ($this->userstat() != 'ketuakelas'))
+            if ((($this->userstat() == 'ketuakelas') && ($getSiswa->kelasid == auth()->user()->ketuakelas->kelasid)) || ($this->userstat() != 'ketuakelas'))
                 return response()->json(dataResponse($getSiswa->siswaSimpleInfoMap()), 200);
         }
         return response()->json(errorResponse('Siswa tidak ditemukan'), 202);
@@ -150,10 +150,11 @@ class SiswaController extends Controller
     private function listValidator($request)
     {
         return Validator($request, [
-            'kelasID' => ['nullable', 'string', 'numeric', \Illuminate\Validation\Rule::requiredIf($this->userstat() != 'ketuakelas')],
+            'kelasid' => ['nullable', 'string', 'numeric', \Illuminate\Validation\Rule::requiredIf(($this->userstat() != 'ketuakelas') && (!isset($request['searchname'])))],
+            'searchname' => 'nullable|string|min:3|regex:/^[a-zA-Z_,.\s]+$/',
             'method' => 'nullable|string|alpha'
         ], [
-            'kelasID.required' => 'Kelas ID field is required.'
+            'kelasid.required' => 'Kelas ID field is required.'
         ]);
     }
 
@@ -169,7 +170,7 @@ class SiswaController extends Controller
         return Validator($request, [
             'nisn' => 'nullable|string|numeric|digits_between:10,15',
             'nama' => 'nullable|string|regex:/^[a-zA-Z_,.\s]+$/',
-            'id_kelas' => 'nullable|string|numeric'
+            'kelasid' => 'nullable|string|numeric'
         ]);
     }
 
