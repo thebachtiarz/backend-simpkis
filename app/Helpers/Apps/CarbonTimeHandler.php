@@ -69,7 +69,7 @@ function Carbon_DBDayNumOfWeek($date = '')
 function Carbon_HumanDayNameOfWeek($date = '', $locale = false)
 {
     $day = Carbon::create(carbon::getDays()[$date]);
-    if ($locale) $day->locale('id');
+    if ($locale) $day->locale('id_ID');
     return $day->dayName;
 }
 

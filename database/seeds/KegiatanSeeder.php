@@ -22,7 +22,7 @@ class KegiatanSeeder extends Seeder
                     Str_random(6) => ['name' => 'Haid', 'poin' => '0'],
                     Str_random(6) => ['name' => 'Alpha', 'poin' => '-2']
                 ]),
-                'hari' => '*',
+                'hari' => Atv_setDayKegiatan('all'),
                 'waktu_mulai' => Carbon_AnyTimeParse('11:30'),
                 'waktu_selesai' => Carbon_AnyTimeParse('13:00'),
                 'akses' => Atv_setAksesKegiatan('presensi')
@@ -35,7 +35,7 @@ class KegiatanSeeder extends Seeder
                     Str_random(6) => ['name' => 'Hadir', 'poin' => '4'],
                     Str_random(6) => ['name' => 'Alpha', 'poin' => '-4']
                 ]),
-                'hari' => '5',
+                'hari' => Atv_setDayKegiatan('fri'),
                 'waktu_mulai' => Carbon_AnyTimeParse('11:30'),
                 'waktu_selesai' => Carbon_AnyTimeParse('13:00'),
                 'akses' => Atv_setAksesKegiatan('presensi')
@@ -48,7 +48,7 @@ class KegiatanSeeder extends Seeder
                     Str_random(6) => ['name' => 'Hadir', 'poin' => '3'],
                     Str_random(6) => ['name' => 'Alpha', 'poin' => '-1']
                 ]),
-                'hari' => '*',
+                'hari' => Atv_setDayKegiatan('all'),
                 'waktu_mulai' => Carbon_AnyTimeParse('09:00'),
                 'waktu_selesai' => Carbon_AnyTimeParse('10:30'),
                 'akses' => Atv_setAksesKegiatan('presensi')
@@ -60,7 +60,7 @@ class KegiatanSeeder extends Seeder
                     Str_random(6) => ['name' => 'Sedang', 'poin' => '4'],
                     Str_random(6) => ['name' => 'Rendah', 'poin' => '2']
                 ]),
-                'hari' => '*',
+                'hari' => Atv_setDayKegiatan('all'),
                 'waktu_mulai' => Carbon_AnyTimeParse(),
                 'waktu_selesai' => Carbon_AnyTimeParse(),
                 'akses' => Atv_setAksesKegiatan('tambahan')
@@ -72,7 +72,7 @@ class KegiatanSeeder extends Seeder
                     Str_random(6) => ['name' => 'Sedang', 'poin' => '10'],
                     Str_random(6) => ['name' => 'Rendah', 'poin' => '6']
                 ]),
-                'hari' => '*',
+                'hari' => Atv_setDayKegiatan('all'),
                 'waktu_mulai' => Carbon_AnyTimeParse(),
                 'waktu_selesai' => Carbon_AnyTimeParse(),
                 'akses' => Atv_setAksesKegiatan('tambahan')
@@ -84,7 +84,7 @@ class KegiatanSeeder extends Seeder
                     Str_random(6) => ['name' => 'Sedang', 'poin' => '12'],
                     Str_random(6) => ['name' => 'Rendah', 'poin' => '10']
                 ]),
-                'hari' => '*',
+                'hari' => Atv_setDayKegiatan('all'),
                 'waktu_mulai' => Carbon_AnyTimeParse(),
                 'waktu_selesai' => Carbon_AnyTimeParse(),
                 'akses' => Atv_setAksesKegiatan('tambahan')

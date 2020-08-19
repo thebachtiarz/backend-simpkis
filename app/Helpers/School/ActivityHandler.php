@@ -58,6 +58,22 @@ function Atv_getNilaiTambahanResource($id_semester)
 }
 
 /**
+ * ! check if filling in attendance is allowed
+ *
+ * @param string $day
+ * @param time $time_start
+ * @param time $time_end
+ * @return void
+ */
+function Atv_boolPresensiTimeAllowed($day, $time_start, $time_end)
+{
+    $result = false;
+    if (($day == Atv_setDayKegiatan('all')) || ($day == Carbon_DBDayNumOfWeek()))
+        if ((Carbon_AnyTimeNow() >= $time_start) && (Carbon_AnyTimeNow() <= $time_end)) $result = true;
+    return $result;
+}
+
+/**
  * set akses kegiatan
  * for DB
  * note: if [5 => [Presensi Wajib Ibadah], 7 => [Nilai Tambahan]]
@@ -79,6 +95,26 @@ function Atv_setAksesKegiatan($akses)
 function Atv_getLastIdPresensi()
 {
     return PresensiGroup::orderByDesc('id')->first('id')->id;
+}
+
+/**
+ * convert to numeric day from request
+ * ex: mon (use: shortEnglishDayOfWeek)
+ *
+ * @param string $day
+ * @return void
+ */
+function Atv_setDayKegiatan($day)
+{
+    $result = '';
+    if ($day == 'mon') $result = '1';
+    elseif ($day == 'tue') $result = '2';
+    elseif ($day == 'wed') $result = '3';
+    elseif ($day == 'thu') $result = '4';
+    elseif ($day == 'fri') $result = '5';
+    elseif ($day == 'sat') $result = '6';
+    elseif ($day == 'all') $result = '*';
+    return $result;
 }
 
 /**
