@@ -74,11 +74,17 @@ class PresensiController extends Controller
     {
         $validator = $this->listValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        if ($request->getOnly == 'unapproved') {
-            if ($request->getType == 'list') {
-                $getPresensiGroup = \App\Models\School\Activity\PresensiGroup::getUnapprovedPresenceToday();
-                return response()->json(dataResponse($getPresensiGroup->get()->map->presensigroupSImpleListMap(), '', 'Total presensi: ' . $getPresensiGroup->count() . ' belum divalidasi hari ini'), 200);
+        if ($request->getOnly == 'today') {
+            $getPresensiGroup = \App\Models\School\Activity\PresensiGroup::query();
+            $message = '';
+            if ($this->userstat() == 'guru') {
+                $getPresensiGroup = $getPresensiGroup->getUnapprovedPresenceToday();
+                $message = 'Total presensi: ' . $getPresensiGroup->count() . ' belum divalidasi hari ini';
+            } else {
+                $getPresensiGroup = $getPresensiGroup->getKetuaKelasPresensiToday(auth()->user()->id);
+                $message = 'Total: ' . $getPresensiGroup->count() . ' presensi hari ini';
             }
+            return response()->json(dataResponse($getPresensiGroup->get()->map->presensigroupSimpleListMap(), '', $message), 200);
         }
         if (isset($request->presensiid)) {
             $getPresensi = \App\Models\School\Activity\Presensi::where('id_presensi', $request->presensiid);
@@ -164,7 +170,6 @@ class PresensiController extends Controller
     {
         return Validator($request, [
             'getOnly' => 'nullable|string|alpha',
-            'getType' => 'nullable|string|alpha',
             'presensiid' => 'nullable|string|numeric|required_without:kegiatanid',
             'siswaid' => 'nullable|string|numeric',
             'kelasid' => 'nullable|string|numeric',

@@ -28,7 +28,7 @@ class Presensi extends Model
             'kegiatan' => $this->kegiatan->nama,
             'nilai' => $this->getNilaiPoin($this->kegiatan->nilai, $this->nilai, 'name'),
             'dilakukan' => Carbon_HumanDateTime($this->created_at),
-            'approve' => Cur_convApproveCodeToString($this->presensigroup->approve),
+            'approve' => Atv_convApproveCodeToString($this->presensigroup->approve),
             'catatan' => $this->presensigroup->catatan
         ];
     }

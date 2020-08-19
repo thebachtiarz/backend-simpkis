@@ -88,6 +88,17 @@ function Atv_setAksesKegiatan($akses)
 }
 
 /**
+ * convert presence approve code to string
+ *
+ * @param string $approve
+ * @return void
+ */
+function Atv_convApproveCodeToString($approve)
+{
+    return $approve == '7' ? 'Sudah' : 'Belum';
+}
+
+/**
  * get last id presensi group
  *
  * @return void

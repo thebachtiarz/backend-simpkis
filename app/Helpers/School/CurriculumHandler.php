@@ -103,17 +103,6 @@ function Cur_getActiveIDSemesterNow()
 }
 
 /**
- * convert approve code to string
- *
- * @param string $approve
- * @return void
- */
-function Cur_convApproveCodeToString($approve)
-{
-    return $approve == '7' ? 'Ya' : 'Tidak';
-}
-
-/**
  * set format for kelas lulus by today
  *
  * @return void
