@@ -191,6 +191,18 @@ function Carbon_HumanIntervalDateTime($datetime)
 }
 
 /**
+ * get interval date created from date updated
+ *
+ * @param datetime $date_created
+ * @param datetime $date_updated
+ * @return void
+ */
+function Carbon_HumanIntervalCreateUpdate($date_created, $date_updated)
+{
+    return Carbon_AnyConvDateToTimestamp($date_updated) > Carbon_AnyConvDateToTimestamp($date_created) ? Carbon_HumanIntervalDateTime($date_updated) : 'Never';
+}
+
+/**
  * convert date time to timestamp
  *
  * @param date $datetime
