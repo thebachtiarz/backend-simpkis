@@ -26,11 +26,14 @@ function Atv_getKegiatanResource()
     $data = Kegiatan::all()->map->kegiatanResourceMap();
     $result = [];
     foreach ($data as $key => $value) $result[$value['id']] = $value['nilai'];
-    return $result;
+    return cache()->remember('res-kegiatan', (60 * 60 * 2/* 2 hours */), function () use ($result) {
+        return $result;
+    });
 }
 
 /**
  * ! get resources data presensi
+ * for DB processing
  *
  * @param string $id_semester
  * @return void
@@ -40,11 +43,14 @@ function Atv_getPresensiResource($id_semester)
     $data = Presensi::getPresensiResource($id_semester)->get()->map->presensiResourceMap();
     $result = [];
     foreach ($data as $key => $value) $result[$value['id_siswa']][] = $value;
-    return $result;
+    return cache()->remember('res-presensi', (60 * 60 * 2/* 2 hours */), function () use ($result) {
+        return $result;
+    });
 }
 
 /**
  * ! get resources data nilai tambahan
+ * for DB processing
  *
  * @param string $id_semester
  * @return void
@@ -54,7 +60,9 @@ function Atv_getNilaiTambahanResource($id_semester)
     $data = NilaiTambahan::getNilaiTambahanResource($id_semester)->get()->map->nilaitambahanResourceMap();
     $result = [];
     foreach ($data as $key => $value) $result[$value['id_siswa']][] = $value;
-    return $result;
+    return cache()->remember('res-nilaitambahan', (60 * 60 * 2/* 2 hours */), function () use ($result) {
+        return $result;
+    });
 }
 
 /**

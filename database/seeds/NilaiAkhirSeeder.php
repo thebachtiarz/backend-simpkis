@@ -23,6 +23,8 @@ class NilaiAkhirSeeder extends Seeder
         $idKelas = 1; // ! required from request, replace it when in services
         $idSemester = Cur_getActiveIDSemesterNow(); // ! optional from request, replace it when in services
         // ! do ifelse below it for checking if nilai akhir was processed
+        $checkAvailableProcess = \App\Models\School\Curriculum\NilaiAkhirGroup::getAvailableNilaiAkhirGroup($idSemester, $idKelas);
+        if ($checkAvailableProcess->count()) return false;
         $newNilaiAkhirGroupId = (int) (NilaiAkhirGroup::query()->count() ? (NilaiAkhirGroup::orderByDesc('id')->first('id')->id) : 0) + 1;
         $getSiswa = Siswa::select(['id'])->where('id_kelas', $idKelas);
         //
