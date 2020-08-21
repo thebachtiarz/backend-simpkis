@@ -140,19 +140,31 @@ class PresensiController extends Controller
         if ($this->userstat() != 'guru') return _throwErrorResponse();
         $validator = $this->updateValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        $getPresensi = \App\Models\School\Activity\Presensi::find($id);
-        $getKegiatan = \App\Models\School\Activity\Kegiatan::find((bool) $getPresensi ? $getPresensi->id_kegiatan : '');
-        if (((bool) $getPresensi) && ((bool) $getKegiatan)) {
-            $getNilaiData = unserialize($getKegiatan->nilai);
-            $getKegiatanKey = in_array($request->nilai, array_keys($getNilaiData));
-            if ((bool) $getKegiatanKey) {
-                $result = ['siswa' => $getPresensi->siswa->nama, 'kegiatan' => $getKegiatan->nama, 'poin_lama' => $getNilaiData[$getPresensi->nilai]['name'], 'poin_baru' => $getNilaiData[$request->nilai]['name']];
-                $getPresensi->update(['nilai' => $request->nilai]);
-                return response()->json(successResponse('Berhasil memperbarui data presensi', $result), 201);
+        if (isset($request->_update)) {
+            if ($request->_update == 'approve') {
+                $getPresensiGroup = \App\Models\School\Activity\PresensiGroup::find($id);
+                if ((bool) $getPresensiGroup) {
+                    $getPresensiGroup->update(['approve' => '7']);
+                    return response()->json(successResponse('Berhasil memverivikasi presensi'), 201);
+                }
+                return response()->json(errorResponse('Kegiatan presensi tidak ditemukan'), 202);
             }
-            return response()->json(errorResponse('Poin kegiatan tidak ditemukan'), 202);
+        } else {
+            die;
+            $getPresensi = \App\Models\School\Activity\Presensi::find($id);
+            $getKegiatan = \App\Models\School\Activity\Kegiatan::find((bool) $getPresensi ? $getPresensi->id_kegiatan : '');
+            if (((bool) $getPresensi) && ((bool) $getKegiatan)) {
+                $getNilaiData = unserialize($getKegiatan->nilai);
+                $getKegiatanKey = in_array($request->nilai, array_keys($getNilaiData));
+                if ((bool) $getKegiatanKey) {
+                    $result = ['siswa' => $getPresensi->siswa->nama, 'kegiatan' => $getKegiatan->nama, 'poin_lama' => $getNilaiData[$getPresensi->nilai]['name'], 'poin_baru' => $getNilaiData[$request->nilai]['name']];
+                    $getPresensi->update(['nilai' => $request->nilai]);
+                    return response()->json(successResponse('Berhasil memperbarui data presensi', $result), 201);
+                }
+                return response()->json(errorResponse('Poin kegiatan tidak ditemukan'), 202);
+            }
+            return response()->json(errorResponse('Presensi tidak ditemukan'), 202);
         }
-        return response()->json(errorResponse('Presensi tidak ditemukan'), 202);
     }
 
     private function destroyPresensi($id)
@@ -190,7 +202,8 @@ class PresensiController extends Controller
     private function updateValidator($request)
     {
         return Validator($request, [
-            'nilai' => 'required|string|alpha_num|size:6'
+            'nilai' => 'nullable|string|alpha_num|size:6|required_without:_update',
+            '_update' => 'nullable|string|alpha'
         ]);
     }
 

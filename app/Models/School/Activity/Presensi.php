@@ -60,6 +60,9 @@ class Presensi extends Model
     public function scopeGetPresensiResource($query, $id_semester)
     {
         $query->where('id_semester', $id_semester);
+        $query->whereIn('id_presensi', function ($approve) {
+            $approve->select('id')->from('presensi_groups')->where('approve', '7');
+        });
     }
 
     # relation
