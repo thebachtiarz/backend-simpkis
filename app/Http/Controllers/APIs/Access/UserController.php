@@ -181,7 +181,7 @@ class UserController extends Controller
         return Validator($request, [
             'username' => 'required|string|min:8|alpha_num|unique:users,username',
             'password' => 'required|string|regex:/^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9])(?=.*[!@#$&*()]).{8,})\S$/',
-            'name' => ['nullable', 'string', 'min:3', 'regex:/^[a-zA-Z_,.\s]+$/', \Illuminate\Validation\Rule::requiredIf(!isset($request->siswaid))],
+            'name' => 'nullable|string|min:3|regex:/^[a-zA-Z_,.\s]+$/|required_without:siswaid',
             'status' => 'required|string',
             'siswaid' => 'nullable|string|numeric'
         ]);
