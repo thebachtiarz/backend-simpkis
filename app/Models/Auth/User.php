@@ -54,27 +54,27 @@ class User extends Authenticatable
     # scope
     public function scopeGetUsersByStatus($query, $status)
     {
-        $query->select('users.*')->join('user_statuses', 'users.code', '=', 'user_statuses.code')->where('status', User_setStatus($status));
+        $query->select('users.*')->join('user_statuses', 'users.id', '=', 'user_statuses.id')->where('status', User_setStatus($status));
     }
 
     # relation
     public function userbio()
     {
-        return $this->hasOne(\App\Models\Auth\UserBiodata::class, 'code', 'code');
+        return $this->hasOne(\App\Models\Auth\UserBiodata::class, 'id');
     }
 
     public function userstat()
     {
-        return $this->hasOne(\App\Models\Auth\UserStatus::class, 'code', 'code');
+        return $this->hasOne(\App\Models\Auth\UserStatus::class, 'id');
     }
 
     public function lostpassword()
     {
-        return $this->hasMany(\App\Models\Access\ForgetPassword::class, 'code', 'code');
+        return $this->hasMany(\App\Models\Access\ForgetPassword::class, 'user_id');
     }
 
     public function ketuakelas()
     {
-        return $this->hasOne(\App\Models\School\Actor\KetuaKelas::class, 'id_user', 'id');
+        return $this->hasOne(\App\Models\School\Actor\KetuaKelas::class, 'id_user');
     }
 }

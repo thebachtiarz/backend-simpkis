@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ForgetPassword extends Model
 {
-    protected $fillable = ['user_access', 'user_code'];
+    protected $fillable = ['user_access', 'user_id'];
 
     # relation
     public function user()
