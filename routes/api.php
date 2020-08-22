@@ -29,7 +29,7 @@ Route::group(['prefix' => 'auth'], function () {
  * access : /api/access/---
  */
 Route::group(['middleware' => ['auth:sanctum', 'useractive:active'], 'prefix' => 'access'], function () {
-    Route::resource('/user/management', 'APIs\Access\UserManagementController');
+    Route::resource('/user/management', 'APIs\Access\UserController');
     Route::resource('/user/recover-password', 'APIs\Access\ForgetPasswordController');
 });
 

@@ -25,7 +25,7 @@ class KetuaKelas extends Model
             'nama' => $this->siswa->nama,
             'kelas' => Cur_getKelasNameByID($this->id_kelas),
             'dibuat' => Carbon_HumanDateTime($this->created_at),
-            'diubah' => Carbon_HumanIntervalDateTime($this->updated_at)
+            'diubah' => Carbon_HumanIntervalCreateUpdate($this->created_at, $this->updated_at)
         ];
     }
 

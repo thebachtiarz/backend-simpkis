@@ -22,7 +22,7 @@ class Semester extends Model
             'id' => strval($this->id),
             'semester' => $this->semester,
             'dibuat' => Carbon_HumanDateTime($this->created_at),
-            'diubah' => Carbon_HumanIntervalDateTime($this->updated_at)
+            'diubah' => Carbon_HumanIntervalCreateUpdate($this->created_at, $this->updated_at)
         ];
     }
 

@@ -26,11 +26,11 @@ class UserSeeder extends Seeder
         })->all();
 
         $biodata = $users->map(function ($data) {
-            return ['code' => $data['code'], 'name' => $data['name']];
+            return ['name' => $data['name']];
         })->all();
 
         $status = $users->map(function ($data) {
-            return ['code' => $data['code'], 'status' => $data['status']];
+            return ['status' => $data['status']];
         })->all();
 
         User::insert($user);

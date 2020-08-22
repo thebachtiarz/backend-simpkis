@@ -76,6 +76,7 @@ class KegiatanController extends Controller
     {
         if (in_array($this->userstat(), array_keys($this->canAllow))) {
             $getKegiatan = \App\Models\School\Activity\Kegiatan::whereIn('akses', $this->canAllow[$this->userstat()]);
+            if ($this->userstat() == 'ketuakelas') $getKegiatan->getAvailablePresensiNow();
             if ($getKegiatan->count()) {
                 $getKegiatan = $getKegiatan->get()->map->kegiatanSimpleListMap();
                 return response()->json(dataResponse($getKegiatan), 200);
@@ -93,7 +94,7 @@ class KegiatanController extends Controller
             $dataRequest = unserialize($request->nilai);
             $newNilai = [];
             foreach ($dataRequest as $key => $value) $newNilai[] = [Str_random(6) => $value];
-            \App\Models\School\Activity\Kegiatan::create(['nama' => $request->nama, 'nilai' => serialize(Arr_collapse($newNilai)), 'akses' => Atv_setAksesKegiatan($request->akses)]);
+            \App\Models\School\Activity\Kegiatan::create(['nama' => $request->nama, 'nilai' => serialize(Arr_collapse($newNilai)), 'hari' => Atv_setDayKegiatan($request->hari), 'waktu_mulai' => Carbon_AnyTimeParse($request->mulai), 'waktu_selesai' => Carbon_AnyTimeParse($request->selesai), 'akses' => Atv_setAksesKegiatan($request->akses)]);
             return response()->json(successResponse('Berhasil membuat kegiatan baru'), 201);
         }
         return response()->json(errorResponse('Jenis kegiatan [' . $request->nama . '] sudah ada'), 202);
@@ -120,7 +121,7 @@ class KegiatanController extends Controller
                     if (is_numeric($key)) $fixNilai[] = [Str_random(6) => $value];
                     else $fixNilai[] = [$key => $value];
                 }
-                $getKegiatan->update(['nama' => $request->nama, 'nilai' => serialize(Arr_collapse($fixNilai)), 'akses' => Atv_setAksesKegiatan($request->akses)]);
+                $getKegiatan->update(['nama' => $request->nama, 'nilai' => serialize(Arr_collapse($fixNilai)), 'hari' => Atv_setDayKegiatan($request->hari), 'waktu_mulai' => Carbon_AnyTimeParse($request->mulai), 'waktu_selesai' => Carbon_AnyTimeParse($request->selesai), 'akses' => Atv_setAksesKegiatan($request->akses)]);
                 return response()->json(successResponse('Berhasil memperbarui kegiatan'), 201);
             }
             return response()->json(errorResponse('Jenis kegiatan [' . $request->nama . '] sudah ada'), 202);
@@ -143,6 +144,9 @@ class KegiatanController extends Controller
         return Validator($request, [
             'nama' => 'required|string|regex:/^[a-zA-Z_,.\s]+$/',
             'nilai' => 'required|string',
+            'hari' => 'required|string|alpha|max:3',
+            'mulai' => 'required|date_format:H:i',
+            'selesai' => 'required|date_format:H:i',
             'akses' => 'required|string|alpha'
         ]);
     }

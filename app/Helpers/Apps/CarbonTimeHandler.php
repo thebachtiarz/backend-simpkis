@@ -51,6 +51,39 @@ function Carbon_DBdatetimeToday()
 }
 
 /**
+ * get day of week in number
+ *
+ * @return void
+ */
+function Carbon_DBDayNumOfWeek($date = '')
+{
+    return Carbon::parse($date)->dayOfWeekIso;
+}
+
+/**
+ * get day of week in name
+ *
+ * @param boolean $locale
+ * @return void
+ */
+function Carbon_HumanDayNameOfWeek($date = '', $locale = false)
+{
+    $day = Carbon::create(carbon::getDays()[$date]);
+    if ($locale) $day->locale('id_ID');
+    return $day->dayName;
+}
+
+/**
+ * get time now
+ *
+ * @return void
+ */
+function Carbon_AnyTimeNow()
+{
+    return Carbon::now()->toTimeString();
+}
+
+/**
  * get full date time now
  * for human
  *
@@ -110,6 +143,18 @@ function Carbon_AnyDateParse($datetime)
 }
 
 /**
+ * convert string to time
+ * ex: 09:30
+ *
+ * @param numeric $time
+ * @return void
+ */
+function Carbon_AnyTimeParse($time = '')
+{
+    return Carbon::parse($time ? $time : '00:00')->toTimeString();
+}
+
+/**
  * convert datetime to date only
  * for Human
  *
@@ -143,6 +188,18 @@ function Carbon_HumanDateSimpleDisplayParse($datetime = '')
 function Carbon_HumanIntervalDateTime($datetime)
 {
     return Carbon::parse($datetime)->diffForHumans();
+}
+
+/**
+ * get interval date created from date updated
+ *
+ * @param datetime $date_created
+ * @param datetime $date_updated
+ * @return void
+ */
+function Carbon_HumanIntervalCreateUpdate($date_created, $date_updated)
+{
+    return Carbon_AnyConvDateToTimestamp($date_updated) > Carbon_AnyConvDateToTimestamp($date_created) ? Carbon_HumanIntervalDateTime($date_updated) : 'Never';
 }
 
 /**

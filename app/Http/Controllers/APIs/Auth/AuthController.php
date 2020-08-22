@@ -18,13 +18,9 @@ class AuthController extends Controller
             'username' => 'required|string|min:3|alpha_num',
             'password' => 'required|string|min:3'
         ]);
-        if ($validator->fails()) {
-            return response()->json(errorResponse($validator->errors()), 202);
-        }
+        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
         if (Auth::attempt(request(['username', 'password']))) {
-            if (User_isActive(Auth::user()->code)) {
-                return $this->respondWithToken(Auth::user()->createToken(Auth::user()->username . '-' . getClientIpAddress())->plainTextToken);
-            }
+            if (User_isActive(Auth::user()->id)) return $this->respondWithToken(Auth::user()->createToken(Auth::user()->username . '-' . getClientIpAddress())->plainTextToken);
             return response()->json(errorResponse('Your account has been ' . User_getActiveStatus(Auth::user()->active) . ' due to bad behavior.'), 202);
         }
         return response()->json(errorResponse('Account not found !'), 202);
@@ -33,13 +29,9 @@ class AuthController extends Controller
     public function logout()
     {
         if (request('_action') == 'revoke') {
-            if (Auth::user()->tokens()->delete()) {
-                return response()->json(successResponse('Successfully Revoke All Logins'), 201);
-            }
+            if (Auth::user()->tokens()->delete()) return response()->json(successResponse('Successfully Revoke All Logins'), 201);
         } else {
-            if (Auth::user()->currentAccessToken()->delete()) {
-                return response()->json(successResponse('Successfully Logout'), 201);
-            }
+            if (Auth::user()->currentAccessToken()->delete()) return response()->json(successResponse('Successfully Logout'), 201);
         }
         return response()->json(errorResponse('Failed to Logout'), 202);
     }
@@ -54,7 +46,7 @@ class AuthController extends Controller
     {
         return response()->json(dataResponse([
             'account_name' => Auth::user()->userbio->name,
-            'status' => User_getStatusForHuman(Auth::user()->userstat->status),
+            'status' => User_getStatus(Auth::user()->userstat->status),
             'access_token' => $token
         ], '', 'Authorization'));
     }

@@ -15,7 +15,6 @@ class CreateUserBiodatasTable extends Migration
     {
         Schema::create('user_biodatas', function (Blueprint $table) {
             $table->id();
-            $table->string('code');
             $table->string('name');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();

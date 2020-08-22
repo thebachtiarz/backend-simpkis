@@ -31,7 +31,7 @@ class Kelas extends Model
             'dibuat' => Carbon_HumanDateTime($this->created_at),
             'diubah' => Carbon_AnyConvDateToTimestamp($this->kelasgroup->updated_at) > Carbon_AnyConvDateToTimestamp($this->updated_at)
                 ? Carbon_HumanIntervalDateTime($this->kelasgroup->updated_at)
-                : Carbon_HumanIntervalDateTime($this->updated_at)
+                : Carbon_HumanIntervalCreateUpdate($this->created_at, $this->updated_at)
         ];
     }
 
