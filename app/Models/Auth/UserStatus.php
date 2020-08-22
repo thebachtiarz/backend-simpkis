@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserStatus extends Model
 {
-    protected $fillable = ['code', 'status'];
+    protected $fillable = ['status'];
 
     #relation
     public function user()

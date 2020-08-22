@@ -33,11 +33,9 @@ class UserFakerSeeder extends Seeder
                 'active' => $moreUser['active']
             ];
             $newUserBiodata[] = [
-                'code' => $moreUser['code'],
                 'name' => $moreUser['name']
             ];
             $newUserStatus[] = [
-                'code' => $moreUser['code'],
                 'status' => $moreUser['status']
             ];
         }

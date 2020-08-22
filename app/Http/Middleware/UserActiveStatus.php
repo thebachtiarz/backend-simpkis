@@ -15,7 +15,7 @@ class UserActiveStatus
      */
     public function handle($request, Closure $next, ...$allow)
     {
-        if (in_array(User_getActiveStatus(User_getActiveStatusByCode($request->user()->code)), $allow)) {
+        if (in_array(User_getActiveStatus($request->user()->active), $allow)) {
             return $next($request);
         }
         return response()->json(errorResponse('Account has been ' . User_getActiveStatus($request->user()->active) . ' due to bad behavior.'), 202);

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserBiodata extends Model
 {
-    protected $fillable = ['code', 'name'];
+    protected $fillable = ['name'];
 
     #relation
     public function user()

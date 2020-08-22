@@ -5,7 +5,7 @@ namespace App\Http\Controllers\APIs\Access;
 use App\Http\Controllers\Controller;
 use App\Models\Auth\User;
 
-class UserManagementController extends Controller
+class UserController extends Controller
 {
     public function __construct()
     {
@@ -72,8 +72,9 @@ class UserManagementController extends Controller
     {
         $validator = $this->listValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        if (in_array($request->_getUsers, $this->canAllow[User_getStatus(User_checkStatus())])) {
-            return response()->json(dataResponse(User::getUsersByStatus($request->_getUsers)->get()->map->userSimpleListMap()), 200);
+        if (in_array($request->status, $this->canAllow[User_getStatus(User_checkStatus())])) {
+            $getUsers = User::getUsersByStatus($request->status);
+            return response()->json(dataResponse($getUsers->get()->map->userSimpleListMap(), '', 'Total: ' . $getUsers->count() . ' ' . User_getStatusForHuman(User_setStatus($request->status))), 200);
         }
         return _throwErrorResponse();
     }
@@ -133,14 +134,17 @@ class UserManagementController extends Controller
                 try {
                     $getChangeKey = array_keys($getChange); // get key from request
                     $oldData = [];
-                    for ($i = 0; $i < count($getChangeKey); $i++) array_push($oldData, $getUser[$getChangeKey[$i]]);
-                    /**
-                     * ubah data(name) pada user_biodatas(Model:: UserBiodata) dengan input($request->name)
-                     * ubah data(status) pada user_statuses(Model: UserStatus) dengan input($request->status)
-                     * todo: gunakan if secara terpisah untuk melihat kondisi apakah terdapat value pada input
-                     */
+                    if (isset($request->name)) {
+                        array_push($oldData, $getUser->userbio->name);
+                        $getUser->userbio->update(['name' => $request->name]);
+                    }
+                    if (isset($request->status) && in_array($request->status, $this->canAllow[User_getStatus(User_checkStatus())])) {
+                        array_push($oldData, User_getStatusForHuman($getUser->userstat->status));
+                        $getUser->userstat->update(['status' => User_setStatus($request->status)]);
+                        $getChange['status'] = User_getStatusForHuman(User_setStatus($request->status));
+                    }
                     $response = ['oldData' => array_combine($getChangeKey, $oldData), 'newData' => $getChange];
-                    return response()->json(dataResponse($response, '', 'Berhasil memperbarui data pengguna'), 200);
+                    return response()->json(dataResponse($response, '', 'Berhasil memperbarui data pengguna'), 201);
                 } catch (\Exception $e) {
                     return response()->json(errorResponse('Gagal memperbarui data pengguna, silahkan coba kembali'), 202);
                 }
@@ -168,7 +172,7 @@ class UserManagementController extends Controller
     private function listValidator($request)
     {
         return Validator($request, [
-            '_getUsers' => 'required|string|alpha'
+            'status' => 'required|string|alpha'
         ]);
     }
 

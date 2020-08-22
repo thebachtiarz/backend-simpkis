@@ -11,8 +11,6 @@ use Illuminate\Support\Facades\Hash;
  */
 
 use App\Models\Auth\User;
-use App\Models\Auth\UserBiodata;
-use App\Models\Auth\UserStatus;
 
 /** */
 
@@ -58,40 +56,40 @@ function User_getActiveStatus($status)
 }
 
 /**
- * get user active by code
+ * get user active by id
  *
- * @param string $code
+ * @param int $id
  * @return void
  */
-function User_getActiveStatusByCode($code)
+function User_getActiveStatusById($id)
 {
-    $user = User::where('code', $code)->first('active');
-    return $user && $user['active'] ? $user['active'] : null;
+    $user = User::find($id);
+    return (bool) $user ? $user->active : null;
 }
 
 /**
  * get user status active condition
- * true or false
+ * boolean
  *
- * @param string $code
+ * @param int $id
  * @return void
  */
-function User_isActive($code)
+function User_isActive($id)
 {
-    $user = User::where('code', $code)->first('active');
-    return $user && (User_getActiveStatus($user['active'] == 'active')) ? true : false;
+    $user = User::find($id);
+    return ((bool) $user && ($user->active == User_setActiveStatus('active'))) ? true : false;
 }
 
 /**
- * get user name by code
+ * get user name by id
  *
- * @param string $code
+ * @param string $id
  * @return void
  */
-function User_getNameByCode($code)
+function User_getNameById($id)
 {
-    $user = UserBiodata::where('code', $code)->first('name');
-    return $user && $user['name'] ? $user['name'] : null;
+    $user = User::find($id);
+    return (bool) $user ? $user->userbio->name : null;
 }
 
 /**
@@ -105,15 +103,15 @@ function User_checkStatus()
 }
 
 /**
- * get user status by code
+ * get user status by id
  *
- * @param string $code
+ * @param string $id
  * @return void
  */
-function User_getStatusByCode($code)
+function User_getStatusById($id)
 {
-    $user = UserStatus::where('code', $code)->first('status');
-    return $user && $user['status'] ? $user['status'] : null;
+    $user = User::find($id);
+    return (bool) $user ? $user->userstat->status : null;
 }
 
 /**

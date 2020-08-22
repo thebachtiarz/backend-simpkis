@@ -16,7 +16,7 @@ class CreateForgetPasswordsTable extends Migration
         Schema::create('forget_passwords', function (Blueprint $table) {
             $table->id();
             $table->string('user_access');
-            $table->string('user_code');
+            $table->string('user_id');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
         });
