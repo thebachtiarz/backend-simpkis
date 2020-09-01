@@ -64,8 +64,12 @@ class KelasController extends Controller
     # private -> move to services
     public function listKelas($request)
     {
-        $validator = $this->softDeleteValidator($request->all());
+        $validator = $this->listValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
+        if ($request->method == 'searchgroup') {
+            $getKelasGroup = \App\Models\School\Curriculum\KelasGroup::searchKelasGroupByName($request->searchnama, $request->tingkat);
+            return response()->json(dataResponse($getKelasGroup->get()->map->kelasgroupSimpleListMap()), 200);
+        }
         $getKelas = \App\Models\School\Curriculum\Kelas::query();
         if ($request->method == 'all') {
             return response()->json(dataResponse($getKelas->withTrashed()->get()->map->kelasSimpleListMap()), 200);
@@ -148,6 +152,15 @@ class KelasController extends Controller
             }
         }
         return response()->json(errorResponse('Kelas tidak ditemukan'), 202);
+    }
+
+    private function listValidator($request)
+    {
+        return Validator($request, [
+            'method' => 'nullable|string|alpha',
+            'tingkat' => 'nullable|string|numeric|between:10,12',
+            'searchnama' => 'nullable|string|min:3|regex:/^[a-zA-Z_\s]+$/'
+        ]);
     }
 
     private function storeValidator($request)

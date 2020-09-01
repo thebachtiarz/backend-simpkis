@@ -14,6 +14,17 @@ class PresensiGroup extends Model
         return [
             'id' => strval($this->id),
             'kegiatan' => $this->kegiatan->nama,
+            'kelas' => Cur_getKelasNameByID($this->presensi[0]->siswa->kelas->id),
+            'approve' => Atv_convApproveCodeToString($this->approve),
+            'waktu' => Carbon_HumanDateTime($this->created_at)
+        ];
+    }
+
+    public function presensigroupSimpleInfoMap()
+    {
+        return [
+            'id' => strval($this->id),
+            'kegiatan' => $this->kegiatan->nama,
             'pengabsen' => $this->user->userbio->name,
             'catatan' => $this->catatan,
             'approve' => Atv_convApproveCodeToString($this->approve),

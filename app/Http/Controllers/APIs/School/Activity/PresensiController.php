@@ -118,7 +118,7 @@ class PresensiController extends Controller
             } else $approve = '7';
             $getKegiatan = $getKegiatan->kegiatanCollectMap();
             $kodeKegiatan = Arr_pluck($getKegiatan['nilai'], 'code');
-            $getDataPresensi = (new \App\Models\School\Activity\Presensi)->getNilai($request->presensidata);
+            $getDataPresensi = (new \App\Models\School\Activity\Presensi)->getNilai($request->presensidata); // unserialize
             $newPresensi = [];
             $newPresensiGroup = \App\Models\School\Activity\PresensiGroup::create(['catatan' => $request->catatan, 'approve' => $approve]);
             foreach ($getDataPresensi as $key => $value) if (in_array($value['nilai'], $kodeKegiatan)) $newPresensi[] = ['id_presensi' => strval($newPresensiGroup->id), 'id_semester' => strval(Cur_getActiveIDSemesterNow()), 'id_kegiatan' => $request->kegiatanid, 'id_siswa' => $value['id_siswa'], 'nilai' => $value['nilai']];
@@ -150,7 +150,6 @@ class PresensiController extends Controller
                 return response()->json(errorResponse('Kegiatan presensi tidak ditemukan'), 202);
             }
         } else {
-            die;
             $getPresensi = \App\Models\School\Activity\Presensi::find($id);
             $getKegiatan = \App\Models\School\Activity\Kegiatan::find((bool) $getPresensi ? $getPresensi->id_kegiatan : '');
             if (((bool) $getPresensi) && ((bool) $getKegiatan)) {
@@ -182,10 +181,10 @@ class PresensiController extends Controller
     {
         return Validator($request, [
             'getOnly' => 'nullable|string|alpha',
-            'presensiid' => 'nullable|string|numeric|required_without:kegiatanid',
+            'presensiid' => 'nullable|string|numeric|required_without_all:kegiatanid,getOnly',
             'siswaid' => 'nullable|string|numeric',
             'kelasid' => 'nullable|string|numeric',
-            'kegiatanid' => 'nullable|string|numeric|required_without:presensiid',
+            'kegiatanid' => 'nullable|string|numeric|required_without_all:presensiid,getOnly',
             'smtid' => 'nullable|string|numeric'
         ]);
     }
