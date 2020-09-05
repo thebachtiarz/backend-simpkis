@@ -84,5 +84,22 @@ class NilaiAkhirSeeder extends Seeder
          *
          *
          */
+
+        /**
+         * keg_id 1 -> avg -> 4 -> /w 4 -> /s = 5mo -> 80      -> 320
+         * keg_id 2 -> avg -> 4 -> /w 1 -> /s = 5mo -> 20      -> 80
+         * keg_id 3 -> avg -> 3 -> /w 5 -> /s = 5mo -> 100     -> 300
+         *
+         *             avg/w -> 35 -> /s = 5mo -> 700
+         *                                 70% -> 490
+         *
+         *             490/7 = 70
+         *
+         * 0 <  70 < 140 < 210 < 280 < 350 < 420 < 490
+         * D    D+   C     C+    B     B+    A
+         *
+         *
+         *
+         */
     }
 }
