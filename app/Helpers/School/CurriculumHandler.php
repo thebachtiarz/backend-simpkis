@@ -111,3 +111,33 @@ function Cur_formatKelasLulus()
 {
     return '(L-' . Carbon_AnyDateParse(Carbon_DBdatetimeToday()) . ')';
 }
+
+/**
+ * set status kelas
+ *
+ * @param string $status
+ * @return void
+ */
+function Cur_setKelasStatus($status)
+{
+    if ($status == 'active') {
+        return '7';
+    } elseif ($status == 'graduated') {
+        return '5';
+    }
+}
+
+/**
+ * get status kelas
+ *
+ * @param numeric $status
+ * @return void
+ */
+function Cur_getKelasStatus($status)
+{
+    if ($status == '7') {
+        return 'active';
+    } elseif ($status == '5') {
+        return 'graduated';
+    }
+}

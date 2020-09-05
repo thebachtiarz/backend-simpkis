@@ -70,7 +70,11 @@ class KelasController extends Controller
             $getKelasGroup = \App\Models\School\Curriculum\KelasGroup::searchKelasGroupByName($request->searchnama, $request->tingkat);
             return response()->json(dataResponse($getKelasGroup->get()->map->kelasgroupSimpleListMap()), 200);
         }
-        $getKelas = \App\Models\School\Curriculum\Kelas::query();
+        if ($request->method == 'graduated') {
+            $getGraduated = \App\Models\School\Curriculum\Kelas::getGraduatedKelas();
+            return response()->json(dataResponse($getGraduated->get()->map->kelasSimpleListMap()), 200);
+        }
+        $getKelas = \App\Models\School\Curriculum\Kelas::getActiveKelas();
         if ($request->method == 'all') {
             return response()->json(dataResponse($getKelas->withTrashed()->get()->map->kelasSimpleListMap()), 200);
         } elseif ($request->method == 'deleted') {
@@ -88,10 +92,10 @@ class KelasController extends Controller
             $checkGroupKelas = \App\Models\School\Curriculum\KelasGroup::getAvailableGroupKelas($request->tingkat, $request->nama);
             if ($checkGroupKelas->count()) {
                 $getKelasGroupId = $checkGroupKelas->get()[0]->id;
-                \App\Models\School\Curriculum\Kelas::create(['nama' => $request->nama, 'id_group' => $getKelasGroupId]);
+                \App\Models\School\Curriculum\Kelas::create(['nama' => $request->nama, 'id_group' => $getKelasGroupId, 'status' => Cur_setKelasStatus('active')]);
             } else {
                 $newKelasGroup = \App\Models\School\Curriculum\KelasGroup::create(['tingkat' => $request->tingkat, 'nama_group' => Str_pregStringOnly($request->nama)]);
-                \App\Models\School\Curriculum\Kelas::create(['nama' => $request->nama, 'id_group' => $newKelasGroup->id]);
+                \App\Models\School\Curriculum\Kelas::create(['nama' => $request->nama, 'id_group' => $newKelasGroup->id, 'status' => Cur_setKelasStatus('active')]);
             }
             return response()->json(successResponse('Kelas berhasil dibuat'), 201);
         }
@@ -118,10 +122,11 @@ class KelasController extends Controller
                 $message = 'Berhasil :status kelas';
                 if (($request->updateTingkat == 'naik') && ($tingkatNow < '12')) {
                     $tingkatNew = strval(intval($tingkatNow + 1));
-                    preg_replace_array('/:[a-z]+/', ['menaikkan'], $message);
-                } elseif (($request->updateTingkat == 'lulus') && ($tingkatNow >= '12')) {
+                    $message = preg_replace_array('/:[a-z]+/', ['menaikkan'], $message);
+                } elseif (($request->updateTingkat == 'naik') && ($tingkatNow >= '12')) {
                     $tingkatNew = Cur_formatKelasLulus();
-                    preg_replace_array('/:[a-z]+/', ['meluluskan'], $message);
+                    $getKelasGroup->update(['status' => Cur_setKelasStatus('graduated')]);
+                    $message = preg_replace_array('/:[a-z]+/', ['meluluskan'], $message);
                 }
                 if (isset($tingkatNew)) {
                     $getKelasGroup->update(['tingkat' => $tingkatNew]);

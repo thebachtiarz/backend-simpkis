@@ -13,14 +13,13 @@ class KelasGroupSeeder extends Seeder
     public function run()
     {
         $kelasGroup = [];
-        $kelasName = ['Teknik Komputer Jaringan', 'Administrasi', 'Multimedia'];
-        $j = 0;
-        for ($i = 10; $i <= 12; $i++) {
+        $kelasName = ['Teknik Komputer Jaringan', 'Administrasi', 'Multimedia', 'Permesinan', 'Teknik Sepeda Motor', 'Keperawatan', 'Kesehatan'];
+        for ($i = 0; $i < count($kelasName); $i++) {
             $kelasGroup[] = [
-                'tingkat' => strval($i),
-                'nama_group' => $kelasName[$j]
+                'tingkat' => strval(Arr_random(['10', '11', '12'])),
+                'nama_group' => $kelasName[$i],
+                'status' => Cur_setKelasStatus('active')
             ];
-            $j++;
         }
         KelasGroup::insert($kelasGroup);
     }

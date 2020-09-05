@@ -47,6 +47,20 @@ class Kelas extends Model
         $query->where('id', $id);
     }
 
+    public function scopeGetActiveKelas($query)
+    {
+        $query->whereIn('id_group', function ($group) {
+            $group->select('id')->from('kelas_groups')->where('status', Cur_setKelasStatus('active'));
+        });
+    }
+
+    public function scopeGetGraduatedKelas($query)
+    {
+        $query->whereIn('id_group', function ($group) {
+            $group->select('id')->from('kelas_groups')->where('status', Cur_setKelasStatus('graduated'));
+        });
+    }
+
     # relation
     public function kelasgroup()
     {

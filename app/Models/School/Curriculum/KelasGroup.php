@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class KelasGroup extends Model
 {
-    protected $fillable = ['tingkat', 'nama_group'];
+    protected $fillable = ['tingkat', 'nama_group', 'status'];
 
     # map
     public function kelasgroupSimpleListMap()
@@ -22,6 +22,7 @@ class KelasGroup extends Model
     public function scopeSearchKelasGroupByName($query, $nama, $tingkat = '')
     {
         $query->where('nama_group', 'like', "%{$nama}%");
+        $query->where('status', Cur_setKelasStatus('active'));
         if (isset($tingkat)) $query->where('tingkat', $tingkat);
     }
 
