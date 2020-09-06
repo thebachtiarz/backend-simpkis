@@ -16,18 +16,111 @@ use App\Models\School\Activity\PresensiGroup;
 /** */
 
 /**
- * ! get resources data kegiatan
+ * ! get repository kegiatan all
+ * for DB processing
+ *
+ * @return void
+ */
+function Atv_getRepoKegiatanAll()
+{
+    return cache()->remember('repo-kegiatan-all', (60 * 60 * 2/* 2 hours */), function () {
+        return Kegiatan::all()->map->kegiatanResourceMap();
+    });
+}
+
+/**
+ * ! get repository kegiatan presensi
+ * for DB processing
+ *
+ * @return void
+ */
+function Atv_getRepoKegiatanPresensi()
+{
+    return cache()->remember('repo-kegiatan-presensi', (60 * 60 * 2/* 2 hours */), function () {
+        return Kegiatan::getKegiatanPresensi()->get()->map->kegiatanResourceMap();
+    });
+}
+
+/**
+ * ! get repository kegiatan tambahan
+ * for DB processing
+ *
+ * @return void
+ */
+function Atv_getRepoKegiatanTambahan()
+{
+    return cache()->remember('repo-kegiatan-tambahan', (60 * 60 * 2/* 2 hours */), function () {
+        return Kegiatan::getKegiatanTambahan()->get()->map->kegiatanResourceMap();
+    });
+}
+
+/**
+ * ! get resources data kegiatan all
  * for DB processing
  *
  * @return void
  */
 function Atv_getKegiatanResource()
 {
-    $data = Kegiatan::all()->map->kegiatanResourceMap();
+    $data = Atv_getRepoKegiatanAll();
     $result = [];
     foreach ($data as $key => $value) $result[$value['id']] = $value['nilai'];
     return cache()->remember('res-kegiatan', (60 * 60 * 2/* 2 hours */), function () use ($result) {
         return $result;
+    });
+}
+
+/**
+ * ! get resources data kegiatan presensi
+ * for DB processing
+ *
+ * @return void
+ */
+function Atv_getKegiatanPresensiResource()
+{
+    $data = Atv_getRepoKegiatanPresensi();
+    $result = [];
+    foreach ($data as $key => $value) $result[$value['id']] = $value['nilai'];
+    return cache()->remember('res-kegiatan-presensi', (60 * 60 * 2/* 2 hours */), function () use ($result) {
+        return $result;
+    });
+}
+
+/**
+ * ! get resources data kegiatan tambahan
+ * for DB processing
+ *
+ * @return void
+ */
+function Atv_getKegiatanTambahanResource()
+{
+    $data = Atv_getRepoKegiatanTambahan();
+    $result = [];
+    foreach ($data as $key => $value) $result[$value['id']] = $value['nilai'];
+    return cache()->remember('res-kegiatan-tambahan', (60 * 60 * 2/* 2 hours */), function () use ($result) {
+        return $result;
+    });
+}
+
+/**
+ * ! get resources kegiatan presensi average nilai
+ * for DB processing
+ *
+ * @return void
+ */
+function Atv_getPresensiAvgNilai()
+{
+    $resPresensi = Atv_getRepoKegiatanPresensi();
+    $splitPresensiAvgNilai = explode(',', env('KEGIATAN_PRESENSI_AVG_NILAI'));
+    $arrPresensiNilai = [];
+    for ($i = 0; $i < count($resPresensi); $i++) {
+        $arrPresensiNilai[] = [
+            'id' => $resPresensi[$i]['id'],
+            'avg' => array_values($resPresensi[$i]['nilai'])[$splitPresensiAvgNilai[$i] - 1]
+        ];
+    }
+    return cache()->remember('res-kegiatan-presensi-avg-nilai', (60 * 60 * 2/* 2 hours */), function () use ($arrPresensiNilai) {
+        return $arrPresensiNilai;
     });
 }
 

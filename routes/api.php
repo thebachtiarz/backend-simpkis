@@ -49,3 +49,20 @@ Route::group(['middleware' => ['auth:sanctum', 'useractive:active'], 'prefix' =>
     Route::resource('/presensi', 'APIs\School\Activity\PresensiController');
     Route::resource('/nilai-akhir', 'APIs\School\Curriculum\NilaiAkhirController');
 });
+
+Route::get('/test/api', function () {
+    // return (new \App\Services\School\Curriculum\NilaiAkhirService(245, Cur_getActiveIDSemesterNow()))->generate();
+    //
+    $getKelas = \App\Models\School\Curriculum\Kelas::getActiveKelas();
+    $data = [];
+    for ($i = 0; $i < $getKelas->count(); $i++) {
+        for ($j = 0; $j < count($getKelas->get()[$i]->siswa); $j++) {
+            $data[] = (new \App\Services\School\Curriculum\NilaiAkhirService($getKelas->get()[$i]->siswa[$j]->id, Cur_getActiveIDSemesterNow()))->generate();
+        }
+    }
+    return ($data);
+})->middleware(['auth:sanctum', 'useractive:active']);
+
+Route::get('/test/web', function () {
+    return Atv_getPresensiAvgNilai();
+});

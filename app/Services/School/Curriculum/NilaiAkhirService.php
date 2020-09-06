@@ -19,6 +19,7 @@ class NilaiAkhirService
         $this->data_presensi = $this->getPresensi();
         $this->data_nilaitambahan = $this->getNilaiTambahan();
         $this->data_kegiatan = $this->getKegiatan();
+        $this->presensi_avg_nilai = $this->generateAverageNilai();
         $this->sumNilaiPresensi();
         $this->sumNilaiTambahan();
         $this->totalNilaiAkhir = $this->setTotalNilaiAkhir();
@@ -80,12 +81,32 @@ class NilaiAkhirService
 
     private function setStringNilaiAkhir()
     {
-        if ($this->totalNilaiAkhir < 70) return 'D';
-        elseif ($this->totalNilaiAkhir < 140) return 'D+';
-        elseif ($this->totalNilaiAkhir < 210) return 'C';
-        elseif ($this->totalNilaiAkhir < 280) return 'C+';
-        elseif ($this->totalNilaiAkhir < 350) return 'B';
-        elseif ($this->totalNilaiAkhir < 420) return 'B+';
+        if ($this->totalNilaiAkhir < $this->presensi_avg_nilai['D']) return 'D';
+        elseif ($this->totalNilaiAkhir < $this->presensi_avg_nilai['D+']) return 'D+';
+        elseif ($this->totalNilaiAkhir < $this->presensi_avg_nilai['C']) return 'C';
+        elseif ($this->totalNilaiAkhir < $this->presensi_avg_nilai['C+']) return 'C+';
+        elseif ($this->totalNilaiAkhir < $this->presensi_avg_nilai['B']) return 'B';
+        elseif ($this->totalNilaiAkhir < $this->presensi_avg_nilai['B+']) return 'B+';
         else return 'A';
+    }
+
+    private function generateAverageNilai()
+    {
+        $resPresensiAvgNilai = Atv_getPresensiAvgNilai();
+        $dataPresensiStaticAvg = 0;
+        $resPresensiStaticString = ['D', 'D+', 'C', 'C+', 'B', 'B+', 'A'];
+        $dataPresensiStaticString = [];
+        //
+        foreach ($resPresensiAvgNilai as $key => $value) {
+            $dataPresensiStaticAvg += ($value['avg'] * count($this->data_presensi->where('id_kegiatan', $value['id'])));
+        }
+        $seventyPercentPresenciAvg = ($dataPresensiStaticAvg * 0.7);
+        //
+        for ($i = 1; $i <= count($resPresensiStaticString); $i++) {
+            $dataPresensiStaticString[] = [
+                $resPresensiStaticString[$i - 1] => strval(round(($seventyPercentPresenciAvg / count($resPresensiStaticString) * $i), 2))
+            ];
+        }
+        return Arr_collapse($dataPresensiStaticString);
     }
 }
