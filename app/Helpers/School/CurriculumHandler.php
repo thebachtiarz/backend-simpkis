@@ -14,20 +14,16 @@ use App\Models\School\Curriculum\Semester;
 /** */
 
 /**
- * !: processing nilai_akhir with formula
+ * ! set format nilai akhir
+ * for DB processing
  *
- * @param int $total_presensi
- * @param int $total_nilaitambahan
+ * @param float $totalNilai
+ * @param string $stringNilai
  * @return void
  */
-function Cur_formulaNilaiAkhir($total_presensi, $total_nilaitambahan)
+function Cur_setFormatNilaiAkhir($totalNilai, $stringNilai)
 {
-    $presTotal = $total_presensi;
-    $niltamTotal = $total_nilaitambahan;
-    $process = ($presTotal * 0.7) + ($niltamTotal * 0.3);
-    $result = $process > 0 ? $process : 0;
-    // proses untuk pengkategorian hasil akhir nilai
-    return strval(round($result, 2));
+    return serialize(['total' => $totalNilai, 'string' => $stringNilai]);
 }
 
 /**

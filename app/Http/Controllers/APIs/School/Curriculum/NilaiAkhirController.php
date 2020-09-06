@@ -83,7 +83,7 @@ class NilaiAkhirController extends Controller
                 });
             }
             if (isset($request->siswaid)) $getNilaiAkhir = $getNilaiAkhir->where('id_siswa', $request->siswaid);
-            return response()->json(dataResponse($getNilaiAkhir->get()->map->nilaiakhirSimpleListMap(), '', 'Total: ' . $getNilaiAkhir->count() . ' data nilai akhir'), 200);
+            return response()->json(dataResponse($getNilaiAkhir->get()->map->nilaiakhirSimpleListMap(), '', $getNilaiAkhir->get()[0]->nilaiakhirgroup->catatan), 200);
         }
         return response()->json(errorResponse('Tentukan [id siswa] atau [id kelas] yang akan dicari'), 202);
     }

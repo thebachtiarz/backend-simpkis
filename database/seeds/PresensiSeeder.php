@@ -14,8 +14,6 @@ class PresensiSeeder extends Seeder
      */
     public function run(Faker $faker)
     {
-        $countOfPresensi = 240;
-        //
         $keg01PerSmt = 80;
         $keg02PerSmt = 20;
         $keg03PerSmt = 100;
