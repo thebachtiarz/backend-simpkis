@@ -55,7 +55,7 @@ class Kegiatan extends Model
     private function getNilai($data, $auth = 1)
     {
         $getAuth = (bool) $auth ? User_checkStatus() : 'ketuakelas';
-        $getNilai = unserialize($data);
+        $getNilai = Arr_unserialize($data);
         $result = [];
         if ((is_array($getNilai)) && (count($getNilai) > 0)) {
             foreach ($getNilai as $keyCode => $nilai) {
@@ -68,7 +68,7 @@ class Kegiatan extends Model
 
     private function getNilaiEachKegiatan($data)
     {
-        $decode = unserialize($data);
+        $decode = Arr_unserialize($data);
         $result = [];
         if ((is_array($decode)) && (count($decode) > 0)) {
             foreach ($decode as $key => $nilai) {

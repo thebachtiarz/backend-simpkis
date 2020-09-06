@@ -45,7 +45,7 @@ class Presensi extends Model
     # private
     public function getNilai($data)
     {
-        $getNilai = unserialize($data);
+        $getNilai = Arr_unserialize($data);
         $result = [];
         if ((is_array($getNilai)) && (count($getNilai) > 0)) $result = $getNilai;
         return $result;

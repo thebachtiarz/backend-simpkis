@@ -91,7 +91,7 @@ class KegiatanController extends Controller
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
         $getAvailableKegiatan = \App\Models\School\Activity\Kegiatan::getAvailableKegiatan($request->nama);
         if (!$getAvailableKegiatan->count()) {
-            $dataRequest = unserialize($request->nilai);
+            $dataRequest = Arr_unserialize($request->nilai);
             $newNilai = [];
             foreach ($dataRequest as $key => $value) $newNilai[] = [Str_random(6) => $value];
             \App\Models\School\Activity\Kegiatan::create(['nama' => $request->nama, 'nilai' => serialize(Arr_collapse($newNilai)), 'hari' => Atv_setDayKegiatan($request->hari), 'waktu_mulai' => Carbon_AnyTimeParse($request->mulai), 'waktu_selesai' => Carbon_AnyTimeParse($request->selesai), 'akses' => Atv_setAksesKegiatan($request->akses)]);
@@ -115,7 +115,7 @@ class KegiatanController extends Controller
         if (((bool) $getKegiatan) && (in_array($this->userstat(), array_keys($this->canAllow)))) {
             $getAvailableKegiatan = \App\Models\School\Activity\Kegiatan::getAvailableKegiatan($request->nama);
             if (!$getAvailableKegiatan->count()) {
-                $getReq = unserialize($request->nilai);
+                $getReq = Arr_unserialize($request->nilai);
                 $fixNilai = [];
                 foreach ($getReq as $key => $value) {
                     if (is_numeric($key)) $fixNilai[] = [Str_random(6) => $value];

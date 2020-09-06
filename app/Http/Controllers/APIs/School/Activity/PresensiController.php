@@ -153,7 +153,7 @@ class PresensiController extends Controller
             $getPresensi = \App\Models\School\Activity\Presensi::find($id);
             $getKegiatan = \App\Models\School\Activity\Kegiatan::find((bool) $getPresensi ? $getPresensi->id_kegiatan : '');
             if (((bool) $getPresensi) && ((bool) $getKegiatan)) {
-                $getNilaiData = unserialize($getKegiatan->nilai);
+                $getNilaiData = Arr_unserialize($getKegiatan->nilai);
                 $getKegiatanKey = in_array($request->nilai, array_keys($getNilaiData));
                 if ((bool) $getKegiatanKey) {
                     $result = ['siswa' => $getPresensi->siswa->nama, 'kegiatan' => $getKegiatan->nama, 'poin_lama' => $getNilaiData[$getPresensi->nilai]['name'], 'poin_baru' => $getNilaiData[$request->nilai]['name']];
@@ -218,6 +218,6 @@ class PresensiController extends Controller
         }
         $serialize = 'a:30:{i:0;a:2:{s:8:"id_siswa";s:1:"2";s:5:"nilai";s:6:"U0WSfQ";}i:1;a:2:{s:8:"id_siswa";s:2:"16";s:5:"nilai";s:6:"U0WSfQ";}i:2;a:2:{s:8:"id_siswa";s:2:"17";s:5:"nilai";s:6:"yYU3iO";}i:3;a:2:{s:8:"id_siswa";s:2:"31";s:5:"nilai";s:6:"MDcaHu";}i:4;a:2:{s:8:"id_siswa";s:2:"53";s:5:"nilai";s:6:"yYU3iO";}i:5;a:2:{s:8:"id_siswa";s:2:"79";s:5:"nilai";s:6:"yYU3iO";}i:6;a:2:{s:8:"id_siswa";s:3:"100";s:5:"nilai";s:6:"yYU3iO";}i:7;a:2:{s:8:"id_siswa";s:3:"105";s:5:"nilai";s:6:"MDcaHu";}i:8;a:2:{s:8:"id_siswa";s:3:"107";s:5:"nilai";s:6:"U0WSfQ";}i:9;a:2:{s:8:"id_siswa";s:3:"108";s:5:"nilai";s:6:"GU6NpL";}i:10;a:2:{s:8:"id_siswa";s:3:"112";s:5:"nilai";s:6:"yYU3iO";}i:11;a:2:{s:8:"id_siswa";s:3:"113";s:5:"nilai";s:6:"U0WSfQ";}i:12;a:2:{s:8:"id_siswa";s:3:"117";s:5:"nilai";s:6:"GU6NpL";}i:13;a:2:{s:8:"id_siswa";s:3:"136";s:5:"nilai";s:6:"GU6NpL";}i:14;a:2:{s:8:"id_siswa";s:3:"139";s:5:"nilai";s:6:"yYU3iO";}i:15;a:2:{s:8:"id_siswa";s:3:"146";s:5:"nilai";s:6:"U0WSfQ";}i:16;a:2:{s:8:"id_siswa";s:3:"151";s:5:"nilai";s:6:"U0WSfQ";}i:17;a:2:{s:8:"id_siswa";s:3:"161";s:5:"nilai";s:6:"U0WSfQ";}i:18;a:2:{s:8:"id_siswa";s:3:"165";s:5:"nilai";s:6:"U0WSfQ";}i:19;a:2:{s:8:"id_siswa";s:3:"213";s:5:"nilai";s:6:"U0WSfQ";}i:20;a:2:{s:8:"id_siswa";s:3:"217";s:5:"nilai";s:6:"MDcaHu";}i:21;a:2:{s:8:"id_siswa";s:3:"218";s:5:"nilai";s:6:"U0WSfQ";}i:22;a:2:{s:8:"id_siswa";s:3:"222";s:5:"nilai";s:6:"GU6NpL";}i:23;a:2:{s:8:"id_siswa";s:3:"234";s:5:"nilai";s:6:"GU6NpL";}i:24;a:2:{s:8:"id_siswa";s:3:"239";s:5:"nilai";s:6:"yYU3iO";}i:25;a:2:{s:8:"id_siswa";s:3:"243";s:5:"nilai";s:6:"GU6NpL";}i:26;a:2:{s:8:"id_siswa";s:3:"244";s:5:"nilai";s:6:"MDcaHu";}i:27;a:2:{s:8:"id_siswa";s:3:"247";s:5:"nilai";s:6:"MDcaHu";}i:28;a:2:{s:8:"id_siswa";s:3:"249";s:5:"nilai";s:6:"MDcaHu";}i:29;a:2:{s:8:"id_siswa";s:3:"259";s:5:"nilai";s:6:"MDcaHu";}}';
         // return serialize($arr);
-        return unserialize($serialize);
+        return Arr_unserialize($serialize);
     }
 }
