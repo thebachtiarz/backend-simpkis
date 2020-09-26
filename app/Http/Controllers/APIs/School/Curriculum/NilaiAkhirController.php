@@ -93,7 +93,9 @@ class NilaiAkhirController extends Controller
         if ($this->userstat() != 'guru') return _throwErrorResponse();
         $validator = $this->storeValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        // gunakan services
+        $semester = isset($request->smtid) ? $request->smtid : Cur_getActiveIDSemesterNow();
+        $processNilaiAkhir = (new \App\Services\School\Curriculum\NilaiAkhirCreatorService($semester))->result();
+        return response()->json($processNilaiAkhir, 200);
     }
 
     private function showNilaiAkhir($id)
@@ -127,17 +129,16 @@ class NilaiAkhirController extends Controller
     private function listValidator($request)
     {
         return Validator($request, [
-            'kelasid' => 'nullable|string|numeric',
-            'siswaid' => 'nullable|string|numeric',
-            'smtid' => 'nullable|string|numeric'
+            'kelasid' => 'nullable|numeric',
+            'siswaid' => 'nullable|numeric',
+            'smtid' => 'nullable|numeric'
         ]);
     }
 
     private function storeValidator($request)
     {
         return Validator($request, [
-            'kelasid' => 'required|string|numeric',
-            'smtid' => 'nullable|string|numeric'
+            'smtid' => 'nullable|numeric'
         ]);
     }
 

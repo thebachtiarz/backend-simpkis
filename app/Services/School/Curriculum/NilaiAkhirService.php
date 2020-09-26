@@ -47,7 +47,7 @@ class NilaiAkhirService
     {
         $presensi = $this->data_siswa->presensi->where('id_semester', $this->id_semester);
         $data = [];
-        foreach ($presensi as $key => $value) if ($presensi[$key]->presensigroup->approve == '7') $data[] = $value;
+        foreach ($presensi as $key => $value) if ($value->presensigroup->approve == '7') $data[] = $value;
         return $data;
     }
 
@@ -84,7 +84,8 @@ class NilaiAkhirService
 
     private function setStringNilaiAkhir()
     {
-        if ($this->totalNilaiAkhir < $this->presensi_avg_nilai['D']) return 'D';
+        if ($this->totalNilaiAkhir == 0) return 'E';
+        elseif ($this->totalNilaiAkhir < $this->presensi_avg_nilai['D']) return 'D';
         elseif ($this->totalNilaiAkhir < $this->presensi_avg_nilai['D+']) return 'D+';
         elseif ($this->totalNilaiAkhir < $this->presensi_avg_nilai['C']) return 'C';
         elseif ($this->totalNilaiAkhir < $this->presensi_avg_nilai['C+']) return 'C+';
@@ -113,3 +114,28 @@ class NilaiAkhirService
         return Arr_collapse($dataPresensiStaticString);
     }
 }
+
+/**
+ * !! this is how this services work
+ *
+ * mengambil nilai rata-rata dari setiap kegiatan presensi
+ * dikalikan dengan (berapa kali siswa melakukan presensi berdasarkan kegiatan) per kegiatan
+ * (diasumsikan rata-rata presensi dilakukan per semester, jumlah presensi adalah 200 kali (80+20+100))
+ * hasil dari nilai rata-rata tersebut kemudian dikalikan 70%
+ * sehingga pada nilai rata-rata 70%, agar mendapatkan nilai A
+ * (nilai 70% tersebut dibagi menjadi 7 kelompok (terdapat di bawah))
+ * sehingga menghasilkan nilai akhir berdasarkan presensi selama satu semester
+ *
+ * keg_id 1 -> avg -> 4 -> /w 4 -> /s = 5mo -> 80      -> 320
+ * keg_id 2 -> avg -> 4 -> /w 1 -> /s = 5mo -> 20      -> 80
+ * keg_id 3 -> avg -> 3 -> /w 5 -> /s = 5mo -> 100     -> 300
+ *
+ *             avg/w -> 35 -> /s = 5mo -> 700
+ *                                 70% -> 490
+ *
+ *             490/7 = 70
+ *
+ * 0 <  70 < 140 < 210 < 280 < 350 < 420 < 490
+ * D    D+   C     C+    B     B+    A
+ *
+ */
