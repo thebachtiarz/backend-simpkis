@@ -79,8 +79,8 @@ class SiswaController extends Controller
         elseif ($request->method == 'deleted') $getSiswa->where('id_kelas', $request->kelasid)->onlyTrashed();
         else {
             $kelas = $request->kelasid;
-            if ($this->userstat() == 'ketuakelas') $kelas = auth()->user()->ketuakelas->kelasid;
-            // todo: tambahkan pilihan hanya mengambil siswa yang belum melakukan presensi berdasarkan kegiatan pada hari ini
+            if ($this->userstat() == 'ketuakelas') $kelas = auth()->user()->ketuakelas->id_kelas;
+            if (isset($request->presensikegiatan)) $getSiswa->GetUnPresensiByKegiatanToday($request->presensikegiatan);
             if (isset($request->searchname)) $getSiswa->where('nama', 'like', "%$request->searchname%");
             if (isset($kelas)) $getSiswa->where('id_kelas', $kelas);
         }
@@ -154,7 +154,8 @@ class SiswaController extends Controller
     private function listValidator($request)
     {
         return Validator($request, [
-            'kelasid' => ['nullable', 'string', 'numeric', \Illuminate\Validation\Rule::requiredIf(($this->userstat() != 'ketuakelas') && (!isset($request['searchname'])))],
+            'kelasid' => ['nullable', 'numeric', \Illuminate\Validation\Rule::requiredIf(($this->userstat() != 'ketuakelas') && (!isset($request['searchname'])))],
+            'presensikegiatan' => 'nullable|numeric',
             'searchname' => 'nullable|string|min:3|regex:/^[a-zA-Z_,.\s]+$/',
             'method' => 'nullable|string|alpha'
         ], [
@@ -172,9 +173,9 @@ class SiswaController extends Controller
     private function updateValidator($request)
     {
         return Validator($request, [
-            'nisn' => 'nullable|string|numeric|digits_between:10,15',
+            'nisn' => 'nullable|numeric|digits_between:10,15',
             'nama' => 'nullable|string|regex:/^[a-zA-Z_,.\s]+$/',
-            'kelasid' => 'nullable|string|numeric'
+            'kelasid' => 'nullable|numeric'
         ]);
     }
 

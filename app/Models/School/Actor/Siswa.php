@@ -32,6 +32,16 @@ class Siswa extends Model
     }
 
     # scope
+    public function scopeGetUnPresensiByKegiatanToday($query, $id_kegiatan)
+    {
+        $query->whereNotIn('id', function ($id_siswa) use ($id_kegiatan) {
+            $id_siswa->join('presensi_groups', 'presensis.id_presensi', '=', 'presensi_groups.id')
+                ->select('presensis.id_siswa')
+                ->from('presensis')
+                ->where('presensi_groups.id_kegiatan', $id_kegiatan)
+                ->whereDate('presensis.created_at', Carbon_DBdatetimeToday());
+        });
+    }
 
     # relation
     public function ketuakelas()
