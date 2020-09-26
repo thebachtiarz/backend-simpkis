@@ -120,8 +120,9 @@ class PresensiController extends Controller
             $kodeKegiatan = Arr_pluck($getKegiatan['nilai'], 'code');
             $getDataPresensi = (new \App\Models\School\Activity\Presensi)->getNilai($request->presensidata); // unserialize
             $newPresensi = [];
-            $newPresensiGroup = \App\Models\School\Activity\PresensiGroup::create(['catatan' => $request->catatan, 'approve' => $approve]);
-            foreach ($getDataPresensi as $key => $value) if (in_array($value['nilai'], $kodeKegiatan)) $newPresensi[] = ['id_presensi' => strval($newPresensiGroup->id), 'id_semester' => strval(Cur_getActiveIDSemesterNow()), 'id_kegiatan' => $request->kegiatanid, 'id_siswa' => $value['id_siswa'], 'nilai' => $value['nilai']];
+            $newPresensiGroup = \App\Models\School\Activity\PresensiGroup::create(['id_kegiatan' => $request->kegiatanid, 'id_user' => auth()->user()->id, 'catatan' => $request->catatan, 'approve' => $approve]);
+            foreach ($getDataPresensi as $key => $value)
+                if (in_array($value['nilai'], $kodeKegiatan)) $newPresensi[] = ['id_presensi' => strval($newPresensiGroup->id), 'id_semester' => strval(Cur_getActiveIDSemesterNow()), 'id_siswa' => $value['id_siswa'], 'nilai' => $value['nilai'],];
             if (count($newPresensi)) \App\Models\School\Activity\Presensi::insert($newPresensi);
             return response()->json(successResponse('Berhasil melakukan presensi'), 201);
         }

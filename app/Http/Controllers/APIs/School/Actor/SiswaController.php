@@ -80,6 +80,7 @@ class SiswaController extends Controller
         else {
             $kelas = $request->kelasid;
             if ($this->userstat() == 'ketuakelas') $kelas = auth()->user()->ketuakelas->kelasid;
+            // todo: tambahkan pilihan hanya mengambil siswa yang belum melakukan presensi berdasarkan kegiatan pada hari ini
             if (isset($request->searchname)) $getSiswa->where('nama', 'like', "%$request->searchname%");
             if (isset($kelas)) $getSiswa->where('id_kelas', $kelas);
         }
