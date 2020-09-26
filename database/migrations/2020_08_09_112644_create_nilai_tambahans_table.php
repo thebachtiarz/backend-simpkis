@@ -15,9 +15,6 @@ class CreateNilaiTambahansTable extends Migration
     {
         Schema::create('nilai_tambahans', function (Blueprint $table) {
             $table->id();
-            // $table->integer('id_semester');
-            // $table->integer('id_siswa');
-            // $table->integer('id_kegiatan');
             $table->foreignId('id_semester')->constrained('semesters')->cascadeOnDelete();
             $table->foreignId('id_siswa')->constrained('siswas')->cascadeOnDelete();
             $table->foreignId('id_kegiatan')->constrained('kegiatans')->cascadeOnDelete();

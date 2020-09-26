@@ -15,9 +15,6 @@ class CreateNilaiAkhirsTable extends Migration
     {
         Schema::create('nilai_akhirs', function (Blueprint $table) {
             $table->id();
-            // $table->integer('id_nilai');
-            // $table->integer('id_semester');
-            // $table->integer('id_siswa');
             $table->foreignId('id_nilai')->constrained('nilai_akhir_groups')->cascadeOnDelete();
             $table->foreignId('id_semester')->constrained('semesters')->cascadeOnDelete();
             $table->foreignId('id_siswa')->constrained('siswas')->cascadeOnDelete();
