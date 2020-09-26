@@ -45,7 +45,10 @@ class NilaiAkhirService
 
     private function getPresensi()
     {
-        return $this->data_siswa->presensi->where('id_semester', $this->id_semester);
+        $presensi = $this->data_siswa->presensi->where('id_semester', $this->id_semester);
+        $data = [];
+        foreach ($presensi as $key => $value) if ($presensi[$key]->presensigroup->approve == '7') $data[] = $value;
+        return $data;
     }
 
     private function getNilaiTambahan()
@@ -62,7 +65,7 @@ class NilaiAkhirService
     {
         if (count($this->data_presensi))
             for ($i = 0; $i < count($this->data_presensi); $i++)
-                $this->stateNilaiPresensi += $this->data_kegiatan[$this->data_presensi[$i]->id_kegiatan][$this->data_presensi[$i]->nilai];
+                $this->stateNilaiPresensi += $this->data_kegiatan[$this->data_presensi[$i]->presensigroup->id_kegiatan][$this->data_presensi[$i]->nilai];
     }
 
     private function sumNilaiTambahan()
@@ -98,13 +101,13 @@ class NilaiAkhirService
         $dataPresensiStaticString = [];
         //
         foreach ($resPresensiAvgNilai as $key => $value) {
-            $dataPresensiStaticAvg += ($value['avg'] * count($this->data_presensi->where('id_kegiatan', $value['id'])));
+            $dataPresensiStaticAvg += ($value['avg'] * count(collect($this->data_presensi)->where('presensigroup.id_kegiatan', $value['id'])));
         }
-        $seventyPercentPresenciAvg = ($dataPresensiStaticAvg * 0.7);
+        $seventyPercentPresensiAvg = ($dataPresensiStaticAvg * 0.7);
         //
         for ($i = 1; $i <= count($resPresensiStaticString); $i++) {
             $dataPresensiStaticString[] = [
-                $resPresensiStaticString[$i - 1] => strval(round(($seventyPercentPresenciAvg / count($resPresensiStaticString) * $i), 2))
+                $resPresensiStaticString[$i - 1] => strval(round(($seventyPercentPresensiAvg / count($resPresensiStaticString) * $i), 2))
             ];
         }
         return Arr_collapse($dataPresensiStaticString);

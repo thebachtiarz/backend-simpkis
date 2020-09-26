@@ -111,12 +111,11 @@ function Atv_getKegiatanTambahanResource()
 function Atv_getPresensiAvgNilai()
 {
     $resPresensi = Atv_getRepoKegiatanPresensi();
-    $splitPresensiAvgNilai = explode(',', env('KEGIATAN_PRESENSI_AVG_NILAI'));
     $arrPresensiNilai = [];
     for ($i = 0; $i < count($resPresensi); $i++) {
         $arrPresensiNilai[] = [
             'id' => $resPresensi[$i]['id'],
-            'avg' => array_values($resPresensi[$i]['nilai'])[$splitPresensiAvgNilai[$i] - 1]
+            'avg' => $resPresensi[$i]['nilai_avg']
         ];
     }
     return cache()->remember('res-kegiatan-presensi-avg-nilai', (60 * 60 * 2/* 2 hours */), function () use ($arrPresensiNilai) {
@@ -169,7 +168,8 @@ function Atv_getNilaiTambahanResource($id_semester)
 function Atv_boolPresensiTimeAllowed($day, $time_start, $time_end)
 {
     $result = false;
-    if (($day == Atv_setDayKegiatan('all')) || ($day == Carbon_DBDayNumOfWeek()))
+    // jika 'all' maka hanya boleh hari senin sampai jumat, atau hari yang ditentukan diluar itu
+    if ((($day == Atv_setDayKegiatan('all')) && (Carbon_IsWorkDayNow())) || ($day == Carbon_DBDayNumOfWeek()))
         if ((Carbon_AnyTimeNow() >= $time_start) && (Carbon_AnyTimeNow() <= $time_end)) $result = true;
     return $result;
 }

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Presensi extends Model
 {
-    protected $fillable = ['id_presensi', 'id_semester', 'id_kegiatan', 'id_siswa', 'nilai'];
+    protected $fillable = ['id_presensi', 'id_semester', 'id_siswa', 'nilai'];
 
     # map
     public function presensiSimpleListMap()
@@ -37,7 +37,7 @@ class Presensi extends Model
     {
         return [
             'id_siswa' => $this->id_siswa,
-            'id_kegiatan' => $this->id_kegiatan,
+            'id_kegiatan' => $this->presensigroup->id_kegiatan,
             'nilai' => $this->nilai
         ];
     }

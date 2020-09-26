@@ -74,6 +74,19 @@ function Carbon_HumanDayNameOfWeek($date = '', $locale = false)
 }
 
 /**
+ * check if today is work day
+ *
+ * @return void
+ */
+function Carbon_IsWorkDayNow()
+{
+    $result = false;
+    $getNumDayNow = Carbon::today()->dayOfWeekIso;
+    if (($getNumDayNow >= 1) && ($getNumDayNow <= 5)) $result = true;
+    return $result;
+}
+
+/**
  * get time now
  *
  * @return void

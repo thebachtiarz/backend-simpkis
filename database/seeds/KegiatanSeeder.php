@@ -22,6 +22,7 @@ class KegiatanSeeder extends Seeder
                     Str_random(6) => ['name' => 'Haid', 'poin' => '0'],
                     Str_random(6) => ['name' => 'Alpha', 'poin' => '-2']
                 ]),
+                'nilai_avg' => 5,
                 'hari' => Atv_setDayKegiatan('all'),
                 'waktu_mulai' => Carbon_AnyTimeParse('11:30'),
                 'waktu_selesai' => Carbon_AnyTimeParse('13:00'),
@@ -35,6 +36,7 @@ class KegiatanSeeder extends Seeder
                     Str_random(6) => ['name' => 'Hadir', 'poin' => '4'],
                     Str_random(6) => ['name' => 'Alpha', 'poin' => '-4']
                 ]),
+                'nilai_avg' => 4,
                 'hari' => Atv_setDayKegiatan('fri'),
                 'waktu_mulai' => Carbon_AnyTimeParse('11:30'),
                 'waktu_selesai' => Carbon_AnyTimeParse('13:00'),
@@ -48,6 +50,7 @@ class KegiatanSeeder extends Seeder
                     Str_random(6) => ['name' => 'Hadir', 'poin' => '3'],
                     Str_random(6) => ['name' => 'Alpha', 'poin' => '-1']
                 ]),
+                'nilai_avg' => 3,
                 'hari' => Atv_setDayKegiatan('all'),
                 'waktu_mulai' => Carbon_AnyTimeParse('09:00'),
                 'waktu_selesai' => Carbon_AnyTimeParse('10:30'),
@@ -60,6 +63,7 @@ class KegiatanSeeder extends Seeder
                     Str_random(6) => ['name' => 'Sedang', 'poin' => '4'],
                     Str_random(6) => ['name' => 'Rendah', 'poin' => '2']
                 ]),
+                'nilai_avg' => 0,
                 'hari' => Atv_setDayKegiatan('all'),
                 'waktu_mulai' => Carbon_AnyTimeParse(),
                 'waktu_selesai' => Carbon_AnyTimeParse(),
@@ -72,6 +76,7 @@ class KegiatanSeeder extends Seeder
                     Str_random(6) => ['name' => 'Sedang', 'poin' => '10'],
                     Str_random(6) => ['name' => 'Rendah', 'poin' => '6']
                 ]),
+                'nilai_avg' => 0,
                 'hari' => Atv_setDayKegiatan('fri'),
                 'waktu_mulai' => Carbon_AnyTimeParse('11:00'),
                 'waktu_selesai' => Carbon_AnyTimeParse('13:00'),
@@ -84,6 +89,7 @@ class KegiatanSeeder extends Seeder
                     Str_random(6) => ['name' => 'Sedang', 'poin' => '12'],
                     Str_random(6) => ['name' => 'Rendah', 'poin' => '10']
                 ]),
+                'nilai_avg' => 0,
                 'hari' => Atv_setDayKegiatan('fri'),
                 'waktu_mulai' => Carbon_AnyTimeParse('11:00'),
                 'waktu_selesai' => Carbon_AnyTimeParse('13:00'),

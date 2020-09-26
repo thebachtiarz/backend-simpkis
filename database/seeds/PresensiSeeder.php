@@ -35,7 +35,6 @@ class PresensiSeeder extends Seeder
                     $newPresensi[] = [
                         'id_presensi' => $idPresensi,
                         'id_semester' => Cur_getActiveIDSemesterNow(),
-                        'id_kegiatan' => '1',
                         'id_siswa' => $getKetua[$i]->kelas->siswa[$ja]->id,
                         'nilai' => Arr_random(Arr_pluck($getKegiatan[0]['nilai'], 'code'))
                     ];
@@ -50,7 +49,6 @@ class PresensiSeeder extends Seeder
                     $newPresensi[] = [
                         'id_presensi' => $idPresensi,
                         'id_semester' => Cur_getActiveIDSemesterNow(),
-                        'id_kegiatan' => '2',
                         'id_siswa' => $getKetua[$i]->kelas->siswa[$ka]->id,
                         'nilai' => Arr_random(Arr_pluck($getKegiatan[1]['nilai'], 'code'))
                     ];
@@ -65,7 +63,6 @@ class PresensiSeeder extends Seeder
                     $newPresensi[] = [
                         'id_presensi' => $idPresensi,
                         'id_semester' => Cur_getActiveIDSemesterNow(),
-                        'id_kegiatan' => '3',
                         'id_siswa' => $getKetua[$i]->kelas->siswa[$la]->id,
                         'nilai' => Arr_random(Arr_pluck($getKegiatan[2]['nilai'], 'code'))
                     ];
@@ -74,7 +71,7 @@ class PresensiSeeder extends Seeder
             }
         }
 
-        PresensiGroup::insert($newPresGroup);
+        foreach (array_chunk($newPresGroup, 10000) as $setPresGroup) PresensiGroup::insert($setPresGroup);
         foreach (array_chunk($newPresensi, 10000) as $setPresensi) Presensi::insert($setPresensi);
     }
 }
