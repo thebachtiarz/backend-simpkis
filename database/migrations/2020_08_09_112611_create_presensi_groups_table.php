@@ -15,8 +15,8 @@ class CreatePresensiGroupsTable extends Migration
     {
         Schema::create('presensi_groups', function (Blueprint $table) {
             $table->id();
-            $table->string('id_kegiatan');
-            $table->string('id_user');
+            $table->foreignId('id_kegiatan')->constrained('kegiatans')->cascadeOnDelete();
+            $table->foreignId('id_user')->constrained('users')->cascadeOnDelete();
             $table->text('catatan')->nullable();
             $table->string('approve');
             $table->timestamp('created_at')->useCurrent();

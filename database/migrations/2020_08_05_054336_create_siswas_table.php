@@ -17,7 +17,7 @@ class CreateSiswasTable extends Migration
             $table->id();
             $table->string('nisn')->unique();
             $table->string('nama');
-            $table->string('id_kelas');
+            $table->foreignId('id_kelas')->constrained('kelas')->cascadeOnDelete();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
             $table->softDeletes();

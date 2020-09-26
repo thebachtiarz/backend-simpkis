@@ -17,13 +17,12 @@ class NilaiTambahanSeeder extends Seeder
     {
         $newNilaiTambahan = [];
         $getKegiatan = Kegiatan::getKegiatanTambahan()->get()->map->kegiatanCollectMap();
-        $getIdSemester = Arr_pluck(Semester::get('id'), 'id');
         $getIdSiswa = Arr_pluck(Siswa::get('id'), 'id');
         $getIdKegiatan = Arr_pluck($getKegiatan, 'id');
         for ($i = 0; $i < 4000; $i++) {
             $randKegiatan = (int) Arr_random($getIdKegiatan);
             $newNilaiTambahan[] = [
-                'id_semester' => Arr_random($getIdSemester),
+                'id_semester' => Cur_getActiveIDSemesterNow(),
                 'id_siswa' => Arr_random($getIdSiswa),
                 'id_kegiatan' => $randKegiatan,
                 // if an error in array_search below, just ignore it, it's happen because dumb php-intelephense when debugging

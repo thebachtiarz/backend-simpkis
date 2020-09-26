@@ -17,6 +17,7 @@ class CreateKegiatansTable extends Migration
             $table->id();
             $table->string('nama');
             $table->text('nilai');
+            $table->integer('nilai_avg')->default('0');
             $table->string('hari');
             $table->timeTz('waktu_mulai');
             $table->timeTz('waktu_selesai');

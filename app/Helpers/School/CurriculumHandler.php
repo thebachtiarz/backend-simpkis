@@ -14,20 +14,16 @@ use App\Models\School\Curriculum\Semester;
 /** */
 
 /**
- * !: processing nilai_akhir with formula
+ * ! set format nilai akhir
+ * for DB processing
  *
- * @param int $total_presensi
- * @param int $total_nilaitambahan
+ * @param float $totalNilai
+ * @param string $stringNilai
  * @return void
  */
-function Cur_formulaNilaiAkhir($total_presensi, $total_nilaitambahan)
+function Cur_setFormatNilaiAkhir($totalNilai, $stringNilai)
 {
-    $presTotal = $total_presensi;
-    $niltamTotal = $total_nilaitambahan;
-    $process = ($presTotal * 0.7) + ($niltamTotal * 0.3);
-    $result = $process > 0 ? $process : 0;
-    // proses untuk pengkategorian hasil akhir nilai
-    return strval(round($result, 2));
+    return serialize(['total' => $totalNilai, 'string' => $stringNilai]);
 }
 
 /**
@@ -110,4 +106,34 @@ function Cur_getActiveIDSemesterNow()
 function Cur_formatKelasLulus()
 {
     return '(L-' . Carbon_AnyDateParse(Carbon_DBdatetimeToday()) . ')';
+}
+
+/**
+ * set status kelas
+ *
+ * @param string $status
+ * @return void
+ */
+function Cur_setKelasStatus($status)
+{
+    if ($status == 'active') {
+        return '7';
+    } elseif ($status == 'graduated') {
+        return '5';
+    }
+}
+
+/**
+ * get status kelas
+ *
+ * @param numeric $status
+ * @return void
+ */
+function Cur_getKelasStatus($status)
+{
+    if ($status == '7') {
+        return 'active';
+    } elseif ($status == '5') {
+        return 'graduated';
+    }
 }

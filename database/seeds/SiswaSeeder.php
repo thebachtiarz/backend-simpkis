@@ -14,16 +14,20 @@ class SiswaSeeder extends Seeder
      */
     public function run(Faker $faker)
     {
+        $siswaPerKelas = 30;
+        //
         $newSiswa = [];
-        $getKelas = Arr_pluck(Kelas::all(), 'id');
+        $getKelas = Kelas::all();
         $nisn = time();
-        for ($i = 0; $i < 2000; $i++) {
-            $newSiswa[] = [
-                'nisn' => $nisn,
-                'nama' => $faker->name,
-                'id_kelas' => Arr_random($getKelas)
-            ];
-            $nisn++;
+        for ($i = 0; $i < count($getKelas); $i++) {
+            for ($j = 0; $j < $siswaPerKelas; $j++) {
+                $newSiswa[] = [
+                    'nisn' => $nisn,
+                    'nama' => $faker->name,
+                    'id_kelas' => $getKelas[$i]->id
+                ];
+                $nisn++;
+            }
         }
         Siswa::insert($newSiswa);
     }

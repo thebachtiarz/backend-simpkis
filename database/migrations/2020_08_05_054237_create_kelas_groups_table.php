@@ -17,6 +17,7 @@ class CreateKelasGroupsTable extends Migration
             $table->id();
             $table->string('tingkat');
             $table->string('nama_group');
+            $table->string('status');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
         });

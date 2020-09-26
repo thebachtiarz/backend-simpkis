@@ -1,12 +1,9 @@
 <?php
 
-use App\Models\School\Activity\Kegiatan;
 use Illuminate\Database\Seeder;
 use Faker\Generator as Faker;
 use App\Models\School\Activity\PresensiGroup;
 use App\Models\School\Activity\Presensi;
-use App\Models\School\Actor\Siswa;
-use App\Models\School\Curriculum\Semester;
 
 class PresensiSeeder extends Seeder
 {
@@ -17,38 +14,64 @@ class PresensiSeeder extends Seeder
      */
     public function run(Faker $faker)
     {
-        $countOfPresensi = 20;
+        $keg01PerSmt = 80;
+        $keg02PerSmt = 20;
+        $keg03PerSmt = 100;
+        //
         $newPresGroup = [];
         $newPresensi = [];
         //
+        $getKetua = \App\Models\School\Actor\KetuaKelas::all();
         $getKegiatan = \App\Models\School\Activity\Kegiatan::getKegiatanPresensi()->get()->map->kegiatanCollectMap();
-        $getSiswa = \App\Models\School\Actor\Siswa::get(['id', 'id_kelas']);
-        $getIdKegiatan = Arr_pluck($getKegiatan, 'id');
         //
-        $getKelas = \App\Models\School\Curriculum\Kelas::all();
-        $getKetua = [];
-        foreach ($getKelas as $key => $value) $getKetua[] = ['id_kelas' => strval($value->id), 'id_user' => strval($value->ketuakelas->user->id)];
-        //
-        $siswaGroupKelas = [];
-        foreach ($getSiswa as $key => $value) $siswaGroupKelas[$value['id_kelas']][] = $value;
-        //
-        for ($a = 0; $a < $countOfPresensi; $a++) {
-            for ($i = 0; $i < count($getKetua); $i++) {
-                $randKegiatan = Arr_random($getIdKegiatan);
-                $newPresGroup[] = ['id_kegiatan' => $randKegiatan, 'id_user' => $getKetua[$i]['id_user'], 'catatan' => $faker->sentence(), 'approve' => '5'];
-                for ($j = 0; $j < count($siswaGroupKelas[$getKetua[$i]['id_kelas']]); $j++) {
+
+        for ($i = 0; $i < count($getKetua); $i++) {
+            $idPresensi = 1;
+            //
+            // presensi kegiatan id 1
+            for ($j = 0; $j < $keg01PerSmt; $j++) {
+                $newPresGroup[] = ['id_kegiatan' => '1', 'id_user' => $getKetua[$i]->id_user, 'catatan' => $faker->sentence(), 'approve' => '7'];
+                for ($ja = 0; $ja < count($getKetua[$i]->kelas->siswa); $ja++) {
                     $newPresensi[] = [
-                        'id_presensi' => strval($i + 1),
-                        'id_semester' => strval(Cur_getActiveIDSemesterNow()),
-                        'id_kegiatan' => strval($randKegiatan),
-                        'id_siswa' => strval($siswaGroupKelas[$getKetua[$i]['id_kelas']][$j]['id']),
-                        // if an error in array_search below, just ignore it, it's happen because dumb php-intelephense when debugging
-                        'nilai' => Arr_random(Arr_pluck($getKegiatan[array_search($randKegiatan, $getIdKegiatan)]['nilai'], 'code'))
+                        'id_presensi' => $idPresensi,
+                        'id_semester' => Cur_getActiveIDSemesterNow(),
+                        'id_siswa' => $getKetua[$i]->kelas->siswa[$ja]->id,
+                        'nilai' => Arr_random(Arr_pluck($getKegiatan[0]['nilai'], 'code'))
                     ];
                 }
+                $idPresensi++;
+            }
+            //
+            // presensi kegiatan id 2
+            for ($k = 0; $k < $keg02PerSmt; $k++) {
+                $newPresGroup[] = ['id_kegiatan' => '2', 'id_user' => $getKetua[$i]->id_user, 'catatan' => $faker->sentence(), 'approve' => '7'];
+                for ($ka = 0; $ka < count($getKetua[$i]->kelas->siswa); $ka++) {
+                    $newPresensi[] = [
+                        'id_presensi' => $idPresensi,
+                        'id_semester' => Cur_getActiveIDSemesterNow(),
+                        'id_siswa' => $getKetua[$i]->kelas->siswa[$ka]->id,
+                        'nilai' => Arr_random(Arr_pluck($getKegiatan[1]['nilai'], 'code'))
+                    ];
+                }
+                $idPresensi++;
+            }
+            //
+            // presensi kegiatan id 3
+            for ($l = 0; $l < $keg03PerSmt; $l++) {
+                $newPresGroup[] = ['id_kegiatan' => '3', 'id_user' => $getKetua[$i]->id_user, 'catatan' => $faker->sentence(), 'approve' => '7'];
+                for ($la = 0; $la < count($getKetua[$i]->kelas->siswa); $la++) {
+                    $newPresensi[] = [
+                        'id_presensi' => $idPresensi,
+                        'id_semester' => Cur_getActiveIDSemesterNow(),
+                        'id_siswa' => $getKetua[$i]->kelas->siswa[$la]->id,
+                        'nilai' => Arr_random(Arr_pluck($getKegiatan[2]['nilai'], 'code'))
+                    ];
+                }
+                $idPresensi++;
             }
         }
-        PresensiGroup::insert($newPresGroup);
+
+        foreach (array_chunk($newPresGroup, 10000) as $setPresGroup) PresensiGroup::insert($setPresGroup);
         foreach (array_chunk($newPresensi, 10000) as $setPresensi) Presensi::insert($setPresensi);
     }
 }

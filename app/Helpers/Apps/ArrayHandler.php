@@ -47,3 +47,18 @@ function Arr_collapse($array_data)
 {
     return Arr::collapse($array_data);
 }
+
+/**
+ * unserialize without error
+ *
+ * @param string $data
+ * @return void
+ */
+function Arr_unserialize($data)
+{
+    try {
+        return unserialize($data);
+    } catch (\Throwable $th) {
+        return $th;
+    }
+}

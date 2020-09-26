@@ -15,10 +15,9 @@ class CreatePresensisTable extends Migration
     {
         Schema::create('presensis', function (Blueprint $table) {
             $table->id();
-            $table->string('id_presensi');
-            $table->string('id_semester');
-            $table->string('id_kegiatan');
-            $table->string('id_siswa');
+            $table->foreignId('id_presensi')->constrained('presensi_groups')->cascadeOnDelete();
+            $table->foreignId('id_semester')->constrained('semesters')->cascadeOnDelete();
+            $table->foreignId('id_siswa')->constrained('siswas')->cascadeOnDelete();
             $table->string('nilai');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();

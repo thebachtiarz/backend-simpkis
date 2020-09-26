@@ -91,10 +91,18 @@ class KegiatanController extends Controller
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
         $getAvailableKegiatan = \App\Models\School\Activity\Kegiatan::getAvailableKegiatan($request->nama);
         if (!$getAvailableKegiatan->count()) {
-            $dataRequest = unserialize($request->nilai);
+            $dataRequest = Arr_unserialize($request->nilai);
             $newNilai = [];
             foreach ($dataRequest as $key => $value) $newNilai[] = [Str_random(6) => $value];
-            \App\Models\School\Activity\Kegiatan::create(['nama' => $request->nama, 'nilai' => serialize(Arr_collapse($newNilai)), 'hari' => Atv_setDayKegiatan($request->hari), 'waktu_mulai' => Carbon_AnyTimeParse($request->mulai), 'waktu_selesai' => Carbon_AnyTimeParse($request->selesai), 'akses' => Atv_setAksesKegiatan($request->akses)]);
+            \App\Models\School\Activity\Kegiatan::create([
+                'nama' => $request->nama,
+                'nilai' => serialize(Arr_collapse($newNilai)),
+                'nilai_avg' => isset($request->nilai_avg) ? $request->nilai_avg : 0,
+                'hari' => Atv_setDayKegiatan($request->hari),
+                'waktu_mulai' => Carbon_AnyTimeParse($request->mulai),
+                'waktu_selesai' => Carbon_AnyTimeParse($request->selesai),
+                'akses' => Atv_setAksesKegiatan($request->akses)
+            ]);
             return response()->json(successResponse('Berhasil membuat kegiatan baru'), 201);
         }
         return response()->json(errorResponse('Jenis kegiatan [' . $request->nama . '] sudah ada'), 202);
@@ -115,13 +123,21 @@ class KegiatanController extends Controller
         if (((bool) $getKegiatan) && (in_array($this->userstat(), array_keys($this->canAllow)))) {
             $getAvailableKegiatan = \App\Models\School\Activity\Kegiatan::getAvailableKegiatan($request->nama);
             if (!$getAvailableKegiatan->count()) {
-                $getReq = unserialize($request->nilai);
+                $getReq = Arr_unserialize($request->nilai);
                 $fixNilai = [];
                 foreach ($getReq as $key => $value) {
                     if (is_numeric($key)) $fixNilai[] = [Str_random(6) => $value];
                     else $fixNilai[] = [$key => $value];
                 }
-                $getKegiatan->update(['nama' => $request->nama, 'nilai' => serialize(Arr_collapse($fixNilai)), 'hari' => Atv_setDayKegiatan($request->hari), 'waktu_mulai' => Carbon_AnyTimeParse($request->mulai), 'waktu_selesai' => Carbon_AnyTimeParse($request->selesai), 'akses' => Atv_setAksesKegiatan($request->akses)]);
+                $getKegiatan->update([
+                    'nama' => $request->nama,
+                    'nilai' => serialize(Arr_collapse($fixNilai)),
+                    'nilai_avg' => isset($request->nilai_avg) ? $request->nilai_avg : 0,
+                    'hari' => Atv_setDayKegiatan($request->hari),
+                    'waktu_mulai' => Carbon_AnyTimeParse($request->mulai),
+                    'waktu_selesai' => Carbon_AnyTimeParse($request->selesai),
+                    'akses' => Atv_setAksesKegiatan($request->akses)
+                ]);
                 return response()->json(successResponse('Berhasil memperbarui kegiatan'), 201);
             }
             return response()->json(errorResponse('Jenis kegiatan [' . $request->nama . '] sudah ada'), 202);
@@ -144,6 +160,7 @@ class KegiatanController extends Controller
         return Validator($request, [
             'nama' => 'required|string|regex:/^[a-zA-Z_,.\s]+$/',
             'nilai' => 'required|string',
+            'nilai_avg' => 'nullable|numeric',
             'hari' => 'required|string|alpha|max:3',
             'mulai' => 'required|date_format:H:i',
             'selesai' => 'required|date_format:H:i',

@@ -87,7 +87,7 @@ class NilaiTambahanController extends Controller
         $getSiswa = \App\Models\School\Actor\Siswa::find($request->siswaid);
         $getKegiatan = \App\Models\School\Activity\Kegiatan::find($request->kegiatanid);
         if (((bool) $getSiswa) && ((bool) $getKegiatan)) {
-            $getNilaiData = unserialize($getKegiatan->nilai);
+            $getNilaiData = Arr_unserialize($getKegiatan->nilai);
             $getKegiatanKey = in_array($request->nilai, array_keys($getNilaiData));
             if ((bool) $getKegiatanKey) {
                 \App\Models\School\Activity\NilaiTambahan::create(['id_semester' => Cur_getActiveIDSemesterNow(), 'id_siswa' => $request->siswaid, 'id_kegiatan' => $request->kegiatanid, 'nilai' => $request->nilai]);
@@ -113,7 +113,7 @@ class NilaiTambahanController extends Controller
         $getNilaiTambahan = \App\Models\School\Activity\NilaiTambahan::find($id);
         $getKegiatan = \App\Models\School\Activity\Kegiatan::find($request->kegiatanid);
         if (((bool) $getNilaiTambahan) && ((bool) $getKegiatan)) {
-            $getNilaiData = unserialize($getKegiatan->nilai);
+            $getNilaiData = Arr_unserialize($getKegiatan->nilai);
             $getKegiatanKey = in_array($request->nilai, array_keys($getNilaiData));
             if ((bool) $getKegiatanKey) {
                 $getNilaiTambahan->update(['id_kegiatan' => $request->kegiatanid, 'nilai' => $request->nilai]);

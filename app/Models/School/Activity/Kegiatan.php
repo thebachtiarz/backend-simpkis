@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Kegiatan extends Model
 {
-    protected $fillable = ['nama', 'nilai', 'hari', 'waktu_mulai', 'waktu_selesai', 'akses'];
+    protected $fillable = ['nama', 'nilai', 'nilai_avg', 'hari', 'waktu_mulai', 'waktu_selesai', 'akses'];
 
     # map
     public function kegiatanSimpleListMap()
@@ -47,7 +47,8 @@ class Kegiatan extends Model
     {
         return [
             'id' => $this->id,
-            'nilai' => $this->getNilaiEachKegiatan($this->nilai, 0)
+            'nilai' => $this->getNilaiEachKegiatan($this->nilai, 0),
+            'nilai_avg' => $this->nilai_avg
         ];
     }
 
@@ -55,7 +56,7 @@ class Kegiatan extends Model
     private function getNilai($data, $auth = 1)
     {
         $getAuth = (bool) $auth ? User_checkStatus() : 'ketuakelas';
-        $getNilai = unserialize($data);
+        $getNilai = Arr_unserialize($data);
         $result = [];
         if ((is_array($getNilai)) && (count($getNilai) > 0)) {
             foreach ($getNilai as $keyCode => $nilai) {
@@ -68,7 +69,7 @@ class Kegiatan extends Model
 
     private function getNilaiEachKegiatan($data)
     {
-        $decode = unserialize($data);
+        $decode = Arr_unserialize($data);
         $result = [];
         if ((is_array($decode)) && (count($decode) > 0)) {
             foreach ($decode as $key => $nilai) {
@@ -96,7 +97,8 @@ class Kegiatan extends Model
 
     public function scopeGetAvailablePresensiNow($query)
     {
-        $query->whereIn('hari', ['*', Carbon_DBDayNumOfWeek()])->where(function ($time) {
+        $allDay = Carbon_IsWorkDayNow() ? '*' : '';
+        $query->whereIn('hari', [$allDay, Carbon_DBDayNumOfWeek()])->where(function ($time) {
             $time->whereTime('waktu_mulai', '<=', Carbon_AnyTimeNow())->whereTime('waktu_selesai', '>=', Carbon_AnyTimeNow());
         });
     }

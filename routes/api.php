@@ -49,3 +49,29 @@ Route::group(['middleware' => ['auth:sanctum', 'useractive:active'], 'prefix' =>
     Route::resource('/presensi', 'APIs\School\Activity\PresensiController');
     Route::resource('/nilai-akhir', 'APIs\School\Curriculum\NilaiAkhirController');
 });
+
+Route::get('/test/api', function () {
+    $getKelas = \App\Models\School\Curriculum\Kelas::getActiveKelas();
+    $data = [];
+    for ($i = 0; $i < $getKelas->count(); $i++) {
+        for ($j = 0; $j < count($getKelas->get()[$i]->siswa); $j++) {
+            $data[] = (new \App\Services\School\Curriculum\NilaiAkhirService($getKelas->get()[$i]->siswa[$j]->id, Cur_getActiveIDSemesterNow()))->generate();
+        }
+    }
+    return ($data);
+})->middleware(['auth:sanctum', 'useractive:active']);
+
+Route::get('/test/web/{id}', function ($id) {
+    // $siswa = \App\Models\School\Actor\Siswa::find($id);
+    // $presensi = $siswa->presensi->where('id_semester', 12);
+    // $data = [];
+    // foreach ($presensi as $key => $value) {
+    //     if ($presensi[$key]->presensigroup->approve == '7') {
+    //         $data[] = $value;
+    //     }
+    // }
+    // return collect($data)->where('presensigroup.id_kegiatan', 1);
+    //
+    // return (new \App\Services\School\Curriculum\NilaiAkhirService($id, Cur_getActiveIDSemesterNow()))->generate();
+    return Carbon_DBDayNumOfWeek();
+});

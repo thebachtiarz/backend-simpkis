@@ -16,7 +16,7 @@ class NilaiAkhir extends Model
             'nama' => $this->siswa->nama,
             'kelas' => Cur_getKelasNameByID($this->siswa->id_kelas),
             'semester' => $this->semester->semester,
-            'nilai_akhir' => $this->nilai_akhir
+            'nilai_akhir' => Arr_unserialize($this->nilai_akhir)
         ];
     }
 
@@ -27,7 +27,7 @@ class NilaiAkhir extends Model
             'nama' => $this->siswa->nama,
             'kelas' => Cur_getKelasNameByID($this->siswa->id_kelas),
             'semester' => $this->semester->semester,
-            'nilai_akhir' => $this->nilai_akhir,
+            'nilai_akhir' => Arr_unserialize($this->nilai_akhir),
             'dibuat' => Carbon_HumanDateTime($this->created_at),
             'catatan' => $this->nilaiakhirgroup->catatan
         ];

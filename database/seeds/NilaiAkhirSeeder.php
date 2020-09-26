@@ -1,12 +1,10 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Models\School\Activity\Kegiatan;
-use App\Models\School\Activity\NilaiTambahan;
-use App\Models\School\Activity\Presensi;
-use App\Models\School\Actor\Siswa;
+use App\Models\School\Curriculum\Kelas;
 use App\Models\School\Curriculum\NilaiAkhirGroup;
 use App\Models\School\Curriculum\NilaiAkhir;
+use App\Services\School\Curriculum\NilaiAkhirService;
 
 class NilaiAkhirSeeder extends Seeder
 {
@@ -20,60 +18,41 @@ class NilaiAkhirSeeder extends Seeder
         /**
          * ! this function is using in services
          */
-        $idKelas = 1; // ! required from request, replace it when in services
         $idSemester = Cur_getActiveIDSemesterNow(); // ! optional from request, replace it when in services
-        // ! do ifelse below it for checking if nilai akhir was processed
-        $checkAvailableProcess = \App\Models\School\Curriculum\NilaiAkhirGroup::getAvailableNilaiAkhirGroup($idSemester, $idKelas);
-        if ($checkAvailableProcess->count()) return false;
         $newNilaiAkhirGroupId = (int) (NilaiAkhirGroup::query()->count() ? (NilaiAkhirGroup::orderByDesc('id')->first('id')->id) : 0) + 1;
-        $getSiswa = Siswa::select(['id'])->where('id_kelas', $idKelas);
         //
-        $resKegiatan = Atv_getKegiatanResource();
-        $resPresensi = Atv_getPresensiResource($idSemester);
-        $resNilaiTam = Atv_getNilaiTambahanResource($idSemester);
-        //
+        $getKelas = Kelas::getActiveKelas();
+        $newNilaiAkhirGroup = [];
         $newNilaiAkhir = [];
-        //
-        for ($i = 0; $i < $getSiswa->count(); $i++) {
-            $idSiswa = $getSiswa->get()[$i]['id'];
-            $dataPresensiSiswa = array_key_exists($idSiswa, $resPresensi) ? $resPresensi[$idSiswa] : [];
-            $dataNilaiTamSiswa = array_key_exists($idSiswa, $resNilaiTam) ? $resNilaiTam[$idSiswa] : [];
-            //
-            $presensiState = 0;
-            $nilaitamState = 0;
-            //
-            if (count($dataPresensiSiswa)) {
-                for ($j = 0; $j < count($dataPresensiSiswa); $j++) {
-                    $presensiState += $resKegiatan[$dataPresensiSiswa[$j]['id_kegiatan']][$dataPresensiSiswa[$j]['nilai']];
+        for ($i = 0; $i < $getKelas->count(); $i++) {
+            $setKelas = $getKelas->get()[$i];
+            $checkAvailableProcess = \App\Models\School\Curriculum\NilaiAkhirGroup::getAvailableNilaiAkhirGroup($idSemester, $setKelas->id);
+            if (!$checkAvailableProcess->count()) {
+                $newNilaiAkhirGroup[] = [
+                    'id_semester' => $idSemester,
+                    'id_kelas' => $setKelas->id,
+                    'catatan' => /* get from request, ortherwise -> */ 'Presensi Semester: ' . Cur_getSemesterNameByID($idSemester) . ', Kelas: ' . Cur_getKelasNameByID($setKelas->id) . ', Tanggal: ' . Carbon_HumanFullDateTimeNow()
+                ];
+                for ($j = 0; $j < count($setKelas->siswa); $j++) {
+                    $setSiswa = $setKelas->siswa[$j];
+                    $getNilai = (new NilaiAkhirService($setSiswa->id, $idSemester))->generate();
+                    $newNilaiAkhir[] = [
+                        'id_nilai' => $newNilaiAkhirGroupId,
+                        'id_semester' => $idSemester,
+                        'id_siswa' => $setSiswa->id,
+                        'nilai_akhir' => Cur_setFormatNilaiAkhir($getNilai['totalNilai'], $getNilai['stringNilai'])
+                    ];
                 }
+                $newNilaiAkhirGroupId++;
             }
-            if (count($dataNilaiTamSiswa)) {
-                for ($k = 0; $k < count($dataNilaiTamSiswa); $k++) {
-                    $nilaitamState += $resKegiatan[$dataNilaiTamSiswa[$k]['id_kegiatan']][$dataNilaiTamSiswa[$k]['nilai']];
-                }
-            }
-            //
-            $newNilaiAkhir[] = ['id_siswa' => strval($idSiswa), 'nilai_akhir' => Cur_formulaNilaiAkhir($presensiState, $nilaitamState)];
-            //
         }
         //
-        $setNilaiAkhirGroup = [
-            'id_semester' => $idSemester,
-            'id_kelas' => $idKelas,
-            'catatan' => /* get from request, ortherwise -> */ 'Presensi Semester: ' . Cur_getSemesterNameByID($idSemester) . ', Kelas: ' . Cur_getKelasNameByID($idKelas) . ', Tanggal: ' . Carbon_HumanFullDateTimeNow()
-        ];
-        $setNilaiAkhir = [];
-        foreach ($newNilaiAkhir as $key => $value) {
-            $setNilaiAkhir[] = [
-                'id_nilai' => $newNilaiAkhirGroupId,
-                'id_semester' => $idSemester,
-                'id_siswa' => $value['id_siswa'],
-                'nilai_akhir' => $value['nilai_akhir']
-            ];
+        foreach (array_chunk($newNilaiAkhirGroup, 10000) as $partNilaiAkhirGroup) {
+            NilaiAkhirGroup::insert($partNilaiAkhirGroup);
         }
-        //
-        NilaiAkhirGroup::insert($setNilaiAkhirGroup);
-        NilaiAkhir::insert($setNilaiAkhir);
+        foreach (array_chunk($newNilaiAkhir, 10000) as $partNilaiAkhir) {
+            NilaiAkhir::insert($partNilaiAkhir);
+        }
         /**
          * 10   *   15  150
          * 8    *   12  96
@@ -81,6 +60,23 @@ class NilaiAkhirSeeder extends Seeder
          * -4   *   12  -48
          *          58
          * 5.38
+         *
+         *
+         */
+
+        /**
+         * keg_id 1 -> avg -> 4 -> /w 4 -> /s = 5mo -> 80      -> 320
+         * keg_id 2 -> avg -> 4 -> /w 1 -> /s = 5mo -> 20      -> 80
+         * keg_id 3 -> avg -> 3 -> /w 5 -> /s = 5mo -> 100     -> 300
+         *
+         *             avg/w -> 35 -> /s = 5mo -> 700
+         *                                 70% -> 490
+         *
+         *             490/7 = 70
+         *
+         * 0 <  70 < 140 < 210 < 280 < 350 < 420 < 490
+         * D    D+   C     C+    B     B+    A
+         *
          *
          *
          */
