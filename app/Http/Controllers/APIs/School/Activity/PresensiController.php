@@ -88,12 +88,14 @@ class PresensiController extends Controller
         }
         if (isset($request->presensiid)) {
             $getPresensi = \App\Models\School\Activity\Presensi::where('id_presensi', $request->presensiid);
-            return response()->json(dataResponse($getPresensi->get()->map->presensiSimpleListMap(), '', 'Presensi: ' . $getPresensi->get()[0]->kegiatan->nama . ', Kelas: ' . Cur_getKelasNameByID($getPresensi->get()[0]->siswa->id_kelas)), 200);
+            return response()->json(dataResponse($getPresensi->get()->map->presensiSimpleListMap(), '', 'Presensi: ' . $getPresensi->get()[0]->presensigroup->kegiatan->nama . ', Kelas: ' . Cur_getKelasNameByID($getPresensi->get()[0]->siswa->id_kelas)), 200);
         }
         if (isset($request->kelasid) || isset($request->siswaid)) {
             $getPresensi = \App\Models\School\Activity\Presensi::query();
             $getPresensi = $getPresensi->where('id_semester', isset($request->smtid) ? $request->smtid : Cur_getActiveIDSemesterNow());
-            $getPresensi = $getPresensi->where('id_kegiatan', $request->kegiatanid);
+            $getPresensi = $getPresensi->whereIn('id_presensi', function ($q) use ($request) {
+                $q->select('id')->from('presensi_groups')->where('id_kegiatan', $request->kegiatanid);
+            });
             if (isset($request->kelasid)) {
                 $getPresensi = $getPresensi->whereIn('id_siswa', function ($q) use ($request) {
                     $q->select('id')->from('siswas')->where('id_kelas', $request->kelasid);

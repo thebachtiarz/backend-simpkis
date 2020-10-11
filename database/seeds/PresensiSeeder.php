@@ -25,12 +25,12 @@ class PresensiSeeder extends Seeder
         $getKegiatan = \App\Models\School\Activity\Kegiatan::getKegiatanPresensi()->get()->map->kegiatanCollectMap();
         //
 
+        $idPresensi = 1;
         for ($i = 0; $i < count($getKetua); $i++) {
-            $idPresensi = 1;
             //
             // presensi kegiatan id 1
             for ($j = 0; $j < $keg01PerSmt; $j++) {
-                $newPresGroup[] = ['id_kegiatan' => '1', 'id_user' => $getKetua[$i]->id_user, 'catatan' => $faker->sentence(), 'approve' => '7'];
+                $newPresGroup[] = ['id_kegiatan' => '1', 'id_user' => $getKetua[$i]->id_user, 'catatan' => $faker->sentence(), 'approve' => Arr_random(['7', '5'])];
                 for ($ja = 0; $ja < count($getKetua[$i]->kelas->siswa); $ja++) {
                     $newPresensi[] = [
                         'id_presensi' => $idPresensi,
@@ -44,7 +44,7 @@ class PresensiSeeder extends Seeder
             //
             // presensi kegiatan id 2
             for ($k = 0; $k < $keg02PerSmt; $k++) {
-                $newPresGroup[] = ['id_kegiatan' => '2', 'id_user' => $getKetua[$i]->id_user, 'catatan' => $faker->sentence(), 'approve' => '7'];
+                $newPresGroup[] = ['id_kegiatan' => '2', 'id_user' => $getKetua[$i]->id_user, 'catatan' => $faker->sentence(), 'approve' => Arr_random(['7', '5'])];
                 for ($ka = 0; $ka < count($getKetua[$i]->kelas->siswa); $ka++) {
                     $newPresensi[] = [
                         'id_presensi' => $idPresensi,
@@ -58,7 +58,7 @@ class PresensiSeeder extends Seeder
             //
             // presensi kegiatan id 3
             for ($l = 0; $l < $keg03PerSmt; $l++) {
-                $newPresGroup[] = ['id_kegiatan' => '3', 'id_user' => $getKetua[$i]->id_user, 'catatan' => $faker->sentence(), 'approve' => '7'];
+                $newPresGroup[] = ['id_kegiatan' => '3', 'id_user' => $getKetua[$i]->id_user, 'catatan' => $faker->sentence(), 'approve' => Arr_random(['7', '5'])];
                 for ($la = 0; $la < count($getKetua[$i]->kelas->siswa); $la++) {
                     $newPresensi[] = [
                         'id_presensi' => $idPresensi,

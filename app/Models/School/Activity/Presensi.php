@@ -14,8 +14,8 @@ class Presensi extends Model
         return [
             'id' => strval($this->id),
             'siswa' => $this->siswa->nama,
-            'kegiatan' => $this->kegiatan->nama,
-            'nilai' => $this->getNilaiPoin($this->kegiatan->nilai, $this->nilai, 'name'),
+            'kegiatan' => $this->presensigroup->kegiatan->nama,
+            'nilai' => $this->getNilaiPoin($this->presensigroup->kegiatan->nilai, $this->nilai, 'name'),
             'dilakukan' => Carbon_HumanDateTime($this->created_at)
         ];
     }
@@ -25,8 +25,8 @@ class Presensi extends Model
         return [
             'id' => strval($this->id),
             'siswa' => $this->siswa->nama,
-            'kegiatan' => $this->kegiatan->nama,
-            'nilai' => $this->getNilaiPoin($this->kegiatan->nilai, $this->nilai, 'name'),
+            'kegiatan' => $this->presensigroup->kegiatan->nama,
+            'nilai' => $this->getNilaiPoin($this->presensigroup->kegiatan->nilai, $this->nilai, 'name'),
             'dilakukan' => Carbon_HumanDateTime($this->created_at),
             'approve' => Atv_convApproveCodeToString($this->presensigroup->approve),
             'catatan' => $this->presensigroup->catatan

@@ -189,6 +189,19 @@ function Atv_setAksesKegiatan($akses)
 }
 
 /**
+ * get akses kegiatan type
+ * for Human
+ *
+ * @param numeric $akses
+ * @return void
+ */
+function Atv_HumanAksesKegiatan($akses)
+{
+    if ($akses == '5') return 'Presensi';
+    elseif ($akses == '7') return 'Tambahan';
+}
+
+/**
  * convert presence approve code to string
  *
  * @param string $approve
