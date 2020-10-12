@@ -83,7 +83,12 @@ class NilaiAkhirController extends Controller
                 });
             }
             if (isset($request->siswaid)) $getNilaiAkhir = $getNilaiAkhir->where('id_siswa', $request->siswaid);
-            return response()->json(dataResponse($getNilaiAkhir->get()->map->nilaiakhirSimpleListMap(), '', $getNilaiAkhir->get()[0]->nilaiakhirgroup->catatan), 200);
+            return response()->json(dataResponse($getNilaiAkhir->get()->map->nilaiakhirSimpleListMap(), '', $getNilaiAkhir->count() ? $getNilaiAkhir->get()[0]->nilaiakhirgroup->catatan : []), 200);
+        } elseif (isset($request->getBy)) {
+            if ($request->getBy == 'smtnow') {
+                $getNilaiAkhirGroup = \App\Models\School\Curriculum\NilaiAkhirGroup::where('id_semester', Cur_getActiveIDSemesterNow());
+                return response()->json(dataResponse($getNilaiAkhirGroup->get()->map->NilaiAkhirGroupSimpleListMap()), 200);
+            }
         }
         return response()->json(errorResponse('Tentukan [id siswa] atau [id kelas] yang akan dicari'), 202);
     }
@@ -131,7 +136,8 @@ class NilaiAkhirController extends Controller
         return Validator($request, [
             'kelasid' => 'nullable|numeric',
             'siswaid' => 'nullable|numeric',
-            'smtid' => 'nullable|numeric'
+            'smtid' => 'nullable|numeric',
+            'getBy' => 'nullable|string|alpha'
         ]);
     }
 
