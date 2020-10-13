@@ -41,7 +41,15 @@ class User extends Authenticatable
 
     public function userInfoMap()
     {
-        return [
+        return User_getStatus($this->userstat->status) == 'ketuakelas' ? [
+            'id' => strval($this->id),
+            'code' => $this->code,
+            'name' => $this->userbio->name,
+            'status' => User_getStatusForHuman($this->userstat->status),
+            'kelas' => Cur_getKelasNameByID($this->ketuakelas->id_kelas),
+            'active' => User_getActiveStatus($this->active),
+            'created_at' => Carbon_HumanDateTime($this->created_at)
+        ] : [
             'id' => strval($this->id),
             'code' => $this->code,
             'name' => $this->userbio->name,

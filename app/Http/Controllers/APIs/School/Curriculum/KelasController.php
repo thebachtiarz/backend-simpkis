@@ -75,6 +75,11 @@ class KelasController extends Controller
             return response()->json(dataResponse($getGraduated->get()->map->kelasSimpleListMap()), 200);
         }
         $getKelas = \App\Models\School\Curriculum\Kelas::getActiveKelas();
+        if ($request->method == 'havenoketuakelas') {
+            $getKelas = $getKelas->whereNotIn('id', function ($q) {
+                $q->select('id_kelas')->from('ketua_kelas');
+            });
+        }
         if ($request->method == 'all') {
             return response()->json(dataResponse($getKelas->withTrashed()->get()->map->kelasSimpleListMap()), 200);
         } elseif ($request->method == 'deleted') {

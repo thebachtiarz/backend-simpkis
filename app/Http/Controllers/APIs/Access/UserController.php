@@ -74,7 +74,7 @@ class UserController extends Controller
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
         if (in_array($request->status, $this->canAllow[User_getStatus(User_checkStatus())])) {
             $getUsers = User::getUsersByStatus($request->status);
-            return response()->json(dataResponse($getUsers->get()->map->userSimpleListMap(), '', 'Total: ' . $getUsers->count() . ' ' . User_getStatusForHuman(User_setStatus($request->status))), 200);
+            return response()->json(dataResponse($getUsers->get()->map->userInfoMap(), '', 'Total: ' . $getUsers->count() . ' ' . User_getStatusForHuman(User_setStatus($request->status))), 200);
         }
         return _throwErrorResponse();
     }
