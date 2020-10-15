@@ -43,7 +43,6 @@ class User extends Authenticatable
     {
         return User_getStatus($this->userstat->status) == 'ketuakelas' ? [
             'id' => strval($this->id),
-            'code' => $this->code,
             'name' => $this->userbio->name,
             'status' => User_getStatusForHuman($this->userstat->status),
             'kelas' => Cur_getKelasNameByID($this->ketuakelas->id_kelas),
@@ -51,7 +50,6 @@ class User extends Authenticatable
             'created_at' => Carbon_HumanDateTime($this->created_at)
         ] : [
             'id' => strval($this->id),
-            'code' => $this->code,
             'name' => $this->userbio->name,
             'status' => User_getStatusForHuman($this->userstat->status),
             'active' => User_getActiveStatus($this->active),
