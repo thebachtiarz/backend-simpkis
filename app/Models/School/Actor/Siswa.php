@@ -16,6 +16,7 @@ class Siswa extends Model
     {
         return [
             'id' => strval($this->id),
+            'nisn' => $this->nisn,
             'nama' => $this->nama,
             'kelas' => Cur_getKelasNameByID($this->id_kelas)
         ];
@@ -27,7 +28,8 @@ class Siswa extends Model
             'id' => strval($this->id),
             'nisn' => $this->nisn,
             'nama' => $this->nama,
-            'kelas' => Cur_getKelasNameByID($this->id_kelas)
+            'kelas' => Cur_getKelasNameByID($this->id_kelas),
+            'kelasid' => $this->id_kelas
         ];
     }
 

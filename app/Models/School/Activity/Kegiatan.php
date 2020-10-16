@@ -30,6 +30,8 @@ class Kegiatan extends Model
             'hari' => Atv_getInfoDayKegiatan($this->hari, true),
             'mulai' => $this->waktu_mulai,
             'selesai' => $this->waktu_selesai,
+            'tipe' => Atv_HumanAksesKegiatan($this->akses),
+            'nilai_rerata' => strval($this->nilai_avg),
             'dibuat' => Carbon_HumanDateTime($this->created_at),
             'diubah' => Carbon_HumanIntervalCreateUpdate($this->created_at, $this->updated_at)
         ];
