@@ -74,7 +74,7 @@ class NilaiAkhirController extends Controller
     {
         $validator = $this->listValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        if (isset($request->kelasid) || isset($request->siswaid)) {
+        if (isset($request->kelasid) || isset($request->siswaid) || isset($request->groupid)) {
             $getNilaiAkhir = \App\Models\School\Curriculum\NilaiAkhir::query();
             $getNilaiAkhir = $getNilaiAkhir->where('id_semester', isset($request->smtid) ? $request->smtid : Cur_getActiveIDSemesterNow());
             if (isset($request->kelasid)) {
@@ -83,6 +83,7 @@ class NilaiAkhirController extends Controller
                 });
             }
             if (isset($request->siswaid)) $getNilaiAkhir = $getNilaiAkhir->where('id_siswa', $request->siswaid);
+            if (isset($request->groupid)) $getNilaiAkhir = $getNilaiAkhir->where('id_nilai', $request->groupid);
             return response()->json(dataResponse($getNilaiAkhir->get()->map->nilaiakhirSimpleListMap(), '', $getNilaiAkhir->count() ? $getNilaiAkhir->get()[0]->nilaiakhirgroup->catatan : []), 200);
         } elseif (isset($request->getBy)) {
             if ($request->getBy == 'smtnow') {
@@ -136,6 +137,7 @@ class NilaiAkhirController extends Controller
         return Validator($request, [
             'kelasid' => 'nullable|numeric',
             'siswaid' => 'nullable|numeric',
+            'groupid' => 'nullable|numeric',
             'smtid' => 'nullable|numeric',
             'getBy' => 'nullable|string|alpha'
         ]);

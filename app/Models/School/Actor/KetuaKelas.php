@@ -12,7 +12,7 @@ class KetuaKelas extends Model
     public function ketuaSimpleListMap()
     {
         return [
-            'id_siswa' => $this->id_siswa,
+            'id' => strval($this->id),
             'nama' => $this->siswa->nama,
             'kelas' => Cur_getKelasNameByID($this->id_kelas)
         ];
@@ -21,9 +21,11 @@ class KetuaKelas extends Model
     public function ketuaSimpleInfoMap()
     {
         return [
-            'id_siswa' => $this->id_siswa,
+            'id' => strval($this->id),
             'nama' => $this->siswa->nama,
+            'siswaid' => strval($this->id_siswa),
             'kelas' => Cur_getKelasNameByID($this->id_kelas),
+            'kelasid' => strval($this->id_kelas),
             'dibuat' => Carbon_HumanDateTime($this->created_at),
             'diubah' => Carbon_HumanIntervalCreateUpdate($this->created_at, $this->updated_at)
         ];

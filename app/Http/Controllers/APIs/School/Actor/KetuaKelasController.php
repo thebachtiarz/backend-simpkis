@@ -98,7 +98,7 @@ class KetuaKelasController extends Controller
         $getKetua = \App\Models\School\Actor\KetuaKelas::query();
         if ($request->_getby == 'siswa') $getKetua = $getKetua->where('id_siswa', $id);
         else $getKetua = $getKetua->where('id_kelas', $id);
-        if ($getKetua->count()) return response()->json(dataResponse($getKetua->get()->map->ketuaSimpleInfoMap()), 200);
+        if ($getKetua->count()) return response()->json(dataResponse($getKetua->get()->map->ketuaSimpleInfoMap()[0]), 200);
         return response()->json(errorResponse('Ketua kelas tidak ditemukan'), 202);
     }
 

@@ -18,7 +18,7 @@ class KegiatanController extends Controller
      */
     public function index()
     {
-        return $this->listKegiatan();
+        return $this->listKegiatan(request());
     }
 
     /**
@@ -72,11 +72,14 @@ class KegiatanController extends Controller
         return User_getStatus(User_checkStatus());
     }
 
-    private function listKegiatan()
+    private function listKegiatan($request)
     {
+        $validator = $this->listValidator($request->all());
+        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
         if (in_array($this->userstat(), array_keys($this->canAllow))) {
             $getKegiatan = \App\Models\School\Activity\Kegiatan::whereIn('akses', $this->canAllow[$this->userstat()]);
             if ($this->userstat() == 'ketuakelas') $getKegiatan->getAvailablePresensiNow();
+            if ($request->tipe) $getKegiatan->where('akses', Atv_setAksesKegiatan($request->tipe));
             if ($getKegiatan->count()) {
                 $getKegiatan = $getKegiatan->get()->map->kegiatanSimpleListMap();
                 return response()->json(dataResponse($getKegiatan), 200);
@@ -153,6 +156,13 @@ class KegiatanController extends Controller
             return response()->json(successResponse('Berhasil menghapus kegiatan'), 201);
         }
         return response()->json(errorResponse('Kegiatan tidak ditemukan'), 202);
+    }
+
+    private function listValidator($request)
+    {
+        return Validator($request, [
+            'tipe' => 'nullable|string|alpha'
+        ]);
     }
 
     private function kegiatanValidator($request)

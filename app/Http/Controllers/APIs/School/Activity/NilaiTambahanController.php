@@ -75,7 +75,7 @@ class NilaiTambahanController extends Controller
             else $getNilaiTambahan = $getNilaiTambahan->where('id_semester', Cur_getActiveIDSemesterNow());
             if (isset($request->kegiatanid)) $getNilaiTambahan = $getNilaiTambahan->where('id_kegiatan', $request->kegiatanid);
             if (isset($request->siswaid)) $getNilaiTambahan = $getNilaiTambahan->where('id_siswa', $request->siswaid);
-            return response()->json(dataResponse($getNilaiTambahan->get()->map->nilaitambahanSimpleListMap(), '', 'Total: ' . $getNilaiTambahan->count() . ' poin kegiatan'), 200);
+            return response()->json(dataResponse($getNilaiTambahan->get()->map->nilaitambahanInfoSimpleMap(), '', 'Total: ' . $getNilaiTambahan->count() . ' poin kegiatan'), 200);
         }
         return response()->json(errorResponse('Tentukan [id siswa] atau [id kegiatan] yang akan dicari'), 202);
     }

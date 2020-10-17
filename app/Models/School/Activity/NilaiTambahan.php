@@ -26,7 +26,10 @@ class NilaiTambahan extends Model
             'semester' => $this->semester->semester,
             'siswa' => $this->siswa->nama,
             'kegiatan' => $this->kegiatan->nama,
-            'nilai' => $this->getNilaiPoin($this->kegiatan->nilai, $this->nilai, 'poin'),
+            'nilai' => [
+                'name' => $this->getNilaiPoin($this->kegiatan->nilai, $this->nilai, 'name'),
+                'poin' => $this->getNilaiPoin($this->kegiatan->nilai, $this->nilai, 'poin')
+            ],
             'dilakukan' => Carbon_HumanDateTime($this->created_at)
         ];
     }

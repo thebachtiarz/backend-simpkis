@@ -14,6 +14,7 @@ class NilaiAkhir extends Model
         return [
             'id' => strval($this->id),
             'nama' => $this->siswa->nama,
+            'nisn' => $this->siswa->nisn,
             'kelas' => Cur_getKelasNameByID($this->siswa->id_kelas),
             'semester' => $this->semester->semester,
             'nilai_akhir' => Arr_unserialize($this->nilai_akhir)
