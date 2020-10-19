@@ -28,6 +28,7 @@ class Kegiatan extends Model
             'nama' => $this->nama,
             'nilai' => $this->getNilai($this->nilai),
             'hari' => Atv_getInfoDayKegiatan($this->hari, true),
+            'haricode' => $this->hari,
             'mulai' => $this->waktu_mulai,
             'selesai' => $this->waktu_selesai,
             'tipe' => Atv_HumanAksesKegiatan($this->akses),
