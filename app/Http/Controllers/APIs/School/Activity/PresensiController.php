@@ -87,8 +87,15 @@ class PresensiController extends Controller
             return response()->json(dataResponse($getPresensiGroup->get()->map->presensigroupSimpleListMap(), '', $message), 200);
         }
         if (isset($request->presensiid)) {
-            $getPresensi = \App\Models\School\Activity\Presensi::where('id_presensi', $request->presensiid);
-            return response()->json(dataResponse($getPresensi->get()->map->presensiSimpleListMap(), '', 'Presensi: ' . $getPresensi->get()[0]->presensigroup->kegiatan->nama . ', Kelas: ' . Cur_getKelasNameByID($getPresensi->get()[0]->siswa->id_kelas)), 200);
+            $getPresensi = \App\Models\School\Activity\PresensiGroup::find($request->presensiid);
+            if ((bool) $getPresensi) {
+                return response()->json(dataResponse($getPresensi->presensi->map->presensiDetailListMap(), '', [
+                    'info' => 'Presensi: ' . $getPresensi->kegiatan->nama . ', Kelas: ' . Cur_getKelasNameByID($getPresensi->presensi[0]->siswa->id_kelas),
+                    'kegiatanid' => strval($getPresensi->kegiatan->id),
+                    'catatan' => $getPresensi->catatan
+                ]), 200);
+            }
+            return response()->json(errorResponse('Presensi tidak ditemukan'), 202);
         }
         if (isset($request->kelasid) || isset($request->siswaid)) {
             $getPresensi = \App\Models\School\Activity\Presensi::query();
@@ -124,7 +131,7 @@ class PresensiController extends Controller
             $newPresensi = [];
             $newPresensiGroup = \App\Models\School\Activity\PresensiGroup::create(['id_kegiatan' => $request->kegiatanid, 'id_user' => auth()->user()->id, 'catatan' => $request->catatan, 'approve' => $approve]);
             foreach ($getDataPresensi as $key => $value)
-                if (in_array($value['nilai'], $kodeKegiatan)) $newPresensi[] = ['id_presensi' => strval($newPresensiGroup->id), 'id_semester' => strval(Cur_getActiveIDSemesterNow()), 'id_siswa' => $value['id_siswa'], 'nilai' => $value['nilai'],];
+                if (in_array($value['nilai'], $kodeKegiatan)) $newPresensi[] = ['id_presensi' => strval($newPresensiGroup->id), 'id_semester' => strval(Cur_getActiveIDSemesterNow()), 'id_siswa' => $value['id_siswa'], 'nilai' => $value['nilai']];
             if (count($newPresensi)) \App\Models\School\Activity\Presensi::insert($newPresensi);
             return response()->json(successResponse('Berhasil melakukan presensi'), 201);
         }
