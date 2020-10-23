@@ -81,7 +81,7 @@ class PresensiController extends Controller
                 $getPresensiGroup = $getPresensiGroup->getUnapprovedPresenceToday();
                 $message = 'Total presensi: ' . $getPresensiGroup->count() . ' belum divalidasi hari ini';
             } else {
-                $getPresensiGroup = $getPresensiGroup->getKetuaKelasPresensiToday(auth()->user()->id);
+                $getPresensiGroup = $getPresensiGroup->getKetuaKelasPresensiToday(auth()->user()->ketuakelas->id_kelas);
                 $message = 'Total: ' . $getPresensiGroup->count() . ' presensi hari ini';
             }
             return response()->json(dataResponse($getPresensiGroup->get()->map->presensigroupSimpleListMap(), '', $message), 200);
