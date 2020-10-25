@@ -97,10 +97,10 @@ class KelasController extends Controller
             $checkGroupKelas = \App\Models\School\Curriculum\KelasGroup::getAvailableGroupKelas($request->tingkat, $request->nama);
             if ($checkGroupKelas->count()) {
                 $getKelasGroupId = $checkGroupKelas->get()[0]->id;
-                \App\Models\School\Curriculum\Kelas::create(['nama' => $request->nama, 'id_group' => $getKelasGroupId, 'status' => Cur_setKelasStatus('active')]);
+                \App\Models\School\Curriculum\Kelas::create(['nama' => $request->nama, 'id_group' => $getKelasGroupId]);
             } else {
-                $newKelasGroup = \App\Models\School\Curriculum\KelasGroup::create(['tingkat' => $request->tingkat, 'nama_group' => Str_pregStringOnly($request->nama)]);
-                \App\Models\School\Curriculum\Kelas::create(['nama' => $request->nama, 'id_group' => $newKelasGroup->id, 'status' => Cur_setKelasStatus('active')]);
+                $newKelasGroup = \App\Models\School\Curriculum\KelasGroup::create(['tingkat' => $request->tingkat, 'nama_group' => Str_pregStringOnly($request->nama), 'status' => Cur_setKelasStatus('active')]);
+                \App\Models\School\Curriculum\Kelas::create(['nama' => $request->nama, 'id_group' => $newKelasGroup->id]);
             }
             return response()->json(successResponse('Kelas berhasil dibuat'), 201);
         }
@@ -169,7 +169,7 @@ class KelasController extends Controller
         return Validator($request, [
             'method' => 'nullable|string|alpha',
             'tingkat' => 'nullable|string|numeric|between:10,12',
-            'searchnama' => 'nullable|string|min:3|regex:/^[a-zA-Z_\s]+$/'
+            'searchnama' => 'nullable|string|min:3|regex:/^[a-zA-Z0-9_\s]+$/'
         ]);
     }
 
