@@ -91,19 +91,23 @@ class SiswaController extends Controller
     {
         $validator = $this->storeValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        $catchSiswa = Arr_collapse(\Maatwebsite\Excel\Facades\Excel::toCollection(new \App\Imports\Siswa\SiswaImport, $request->file('file')));
-        if (!count($catchSiswa)) return response()->json(errorResponse('Data siswa tidak ada!'), 202);
-        $findDuplicate = [];
-        for ($i = 0; $i < count($catchSiswa); $i++) {
-            $checkDuplicate = \App\Models\School\Actor\Siswa::where('nisn', $catchSiswa[$i]['nisn']);
-            if ($checkDuplicate->count()) $findDuplicate[] = $catchSiswa[$i];
-        }
-        if (count($findDuplicate)) return response()->json(dataResponse($findDuplicate, 'error', 'Terdapat duplikasi data: ' . count($findDuplicate) . ' siswa'), 202);
         try {
-            \Maatwebsite\Excel\Facades\Excel::import(new \App\Imports\Siswa\SiswaImport, $request->file('file'));
-            return response()->json(successResponse('Berhasil menambahkan data siswa'), 200);
-        } catch (\Exception $th) {
-            return response()->json(errorResponse('Gagal menambahkan siswa, error: ' . $th->getMessage()), 202);
+            $catchSiswa = Arr_collapse(\Maatwebsite\Excel\Facades\Excel::toCollection(new \App\Imports\Siswa\SiswaImport, $request->file('file')));
+            if (!count($catchSiswa)) return response()->json(errorResponse('Data siswa tidak ada!'), 202);
+            $findDuplicate = [];
+            for ($i = 0; $i < count($catchSiswa); $i++) {
+                $checkDuplicate = \App\Models\School\Actor\Siswa::where('nisn', $catchSiswa[$i]['nisn']);
+                if ($checkDuplicate->count()) $findDuplicate[] = $catchSiswa[$i];
+            }
+            if (count($findDuplicate)) return response()->json(dataResponse($findDuplicate, 'error', 'Terdapat duplikasi data: ' . count($findDuplicate) . ' siswa'), 202);
+            try {
+                \Maatwebsite\Excel\Facades\Excel::import(new \App\Imports\Siswa\SiswaImport, $request->file('file'));
+                return response()->json(successResponse('Berhasil menambahkan data siswa'), 200);
+            } catch (\Exception $th) {
+                return response()->json(errorResponse('Gagal menambahkan siswa, error: ' . $th->getMessage()), 202);
+            }
+        } catch (\Throwable $th) {
+            return response()->json(errorResponse('Format file bermasalah, harap periksa sesuai dengan ketentuan yang telah disediakan'), 202);
         }
     }
 
