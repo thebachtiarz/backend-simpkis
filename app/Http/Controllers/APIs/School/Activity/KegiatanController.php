@@ -123,27 +123,26 @@ class KegiatanController extends Controller
         $validator = $this->kegiatanValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
         $getKegiatan = \App\Models\School\Activity\Kegiatan::find($id);
-        if (((bool) $getKegiatan) && (in_array($this->userstat(), array_keys($this->canAllow)))) {
-            $getAvailableKegiatan = \App\Models\School\Activity\Kegiatan::getAvailableKegiatan($request->nama);
-            if (!$getAvailableKegiatan->count()) {
-                $getReq = Arr_unserialize($request->nilai);
-                $fixNilai = [];
-                foreach ($getReq as $key => $value) {
-                    if (is_numeric($key)) $fixNilai[] = [Str_random(6) => $value];
-                    else $fixNilai[] = [$key => $value];
-                }
-                $getKegiatan->update([
-                    'nama' => $request->nama,
-                    'nilai' => serialize(Arr_collapse($fixNilai)),
-                    'nilai_avg' => isset($request->nilai_avg) ? $request->nilai_avg : 0,
-                    'hari' => Atv_setDayKegiatan($request->hari),
-                    'waktu_mulai' => Carbon_AnyTimeParse($request->mulai),
-                    'waktu_selesai' => Carbon_AnyTimeParse($request->selesai),
-                    'akses' => Atv_setAksesKegiatan($request->akses)
-                ]);
-                return response()->json(successResponse('Berhasil memperbarui kegiatan'), 201);
+        if ((bool) $getKegiatan) {
+            $getReq = Arr_unserialize($request->nilai);
+            $updateNilai = [];
+            $currentNilai = [];
+            $newNilai = [];
+            foreach ($getReq as $key => $value) {
+                if (is_numeric($key)) $newNilai[] = [Str_random(6) => $value];
+                else $currentNilai[] = [$key => $value];
             }
-            return response()->json(errorResponse('Jenis kegiatan [' . $request->nama . '] sudah ada'), 202);
+            $updateNilai = array_merge($currentNilai, $newNilai);
+            $getKegiatan->update([
+                'nama' => $request->nama,
+                'nilai' => serialize(Arr_collapse($updateNilai)),
+                'nilai_avg' => isset($request->nilai_avg) ? $request->nilai_avg : 0,
+                'hari' => Atv_setDayKegiatan($request->hari),
+                'waktu_mulai' => Carbon_AnyTimeParse($request->mulai),
+                'waktu_selesai' => Carbon_AnyTimeParse($request->selesai),
+                'akses' => Atv_setAksesKegiatan($request->akses)
+            ]);
+            return response()->json(successResponse('Berhasil memperbarui kegiatan'), 201);
         }
         return response()->json(errorResponse('Kegiatan tidak ditemukan'), 202);
     }
