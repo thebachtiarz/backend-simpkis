@@ -54,7 +54,8 @@ class NilaiTambahan extends Model
 
     public function getNilaiPoin($data, $key, $value)
     {
-        return count($this->getNilai($data)) ? $this->getNilai($data)[$key][$value] : '';
+        // return count($this->getNilai($data)) ? $this->getNilai($data)[$key][$value] : '';
+        return count($this->getNilai($data)) ? (in_array($key, array_keys($this->getNilai($data))) ? $this->getNilai($data)[$key][$value] : '-') : '';
     }
 
     # scope
