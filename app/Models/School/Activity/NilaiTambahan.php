@@ -26,7 +26,9 @@ class NilaiTambahan extends Model
             'semester' => $this->semester->semester,
             'siswa' => $this->siswa->nama,
             'kegiatan' => $this->kegiatan->nama,
+            'kegiatanid' => strval($this->kegiatan->id),
             'nilai' => [
+                'code' => $this->nilai,
                 'name' => $this->getNilaiPoin($this->kegiatan->nilai, $this->nilai, 'name'),
                 'poin' => $this->getNilaiPoin($this->kegiatan->nilai, $this->nilai, 'poin')
             ],
