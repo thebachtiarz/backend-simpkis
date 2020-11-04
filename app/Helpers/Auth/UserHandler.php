@@ -23,15 +23,12 @@ use App\Models\Auth\User;
  */
 function User_setActiveStatus($status)
 {
-    if ($status == 'active') {
-        return '7';
-    }
-    if ($status == 'suspend') {
-        return '4';
-    }
-    if ($status == 'block') {
-        return '5';
-    }
+    $userCondition = [
+        'active' => '7',
+        'suspend' => '4',
+        'block' => '5'
+    ];
+    return (bool) $status ? $userCondition[$status] : 'black-list';
 }
 
 /**
@@ -43,16 +40,12 @@ function User_setActiveStatus($status)
  */
 function User_getActiveStatus($status)
 {
-    if ($status == '7') {
-        return 'active';
-    }
-    if ($status == '4') {
-        return 'suspend';
-    }
-    if ($status == '5') {
-        return 'block';
-    }
-    return 'black-list';
+    $userCondition = [
+        '7' => 'active',
+        '4' => 'suspend',
+        '5' => 'block'
+    ];
+    return (bool) $status ? $userCondition[$status] : 'black-list';
 }
 
 /**
@@ -123,18 +116,13 @@ function User_getStatusById($id)
  */
 function User_setStatus($status)
 {
-    if ($status == 'admin') {
-        return 'greatadmin';
-    }
-    if ($status == 'kurikulum') {
-        return 'themanager';
-    }
-    if ($status == 'guru') {
-        return 'bestteacher';
-    }
-    if ($status == 'ketuakelas') {
-        return 'goodleader';
-    }
+    $userAny = [
+        'admin' => 'greatadmin',
+        'kurikulum' => 'themanager',
+        'guru' => 'bestteacher',
+        'ketuakelas' => 'goodleader'
+    ];
+    return (bool) $status ? $userAny[$status] : '';
 }
 
 /**
@@ -146,18 +134,13 @@ function User_setStatus($status)
  */
 function User_getStatus($status)
 {
-    if ($status == 'greatadmin') {
-        return 'admin';
-    }
-    if ($status == 'themanager') {
-        return 'kurikulum';
-    }
-    if ($status == 'bestteacher') {
-        return 'guru';
-    }
-    if ($status == 'goodleader') {
-        return 'ketuakelas';
-    }
+    $userAny = [
+        'greatadmin' => 'admin',
+        'themanager' => 'kurikulum',
+        'bestteacher' => 'guru',
+        'goodleader' => 'ketuakelas'
+    ];
+    return (bool) $status ? $userAny[$status] : '';
 }
 
 /**
@@ -169,18 +152,13 @@ function User_getStatus($status)
  */
 function User_getStatusForHuman($status)
 {
-    if ($status == 'greatadmin') {
-        return 'Admin';
-    }
-    if ($status == 'themanager') {
-        return 'Kurikulum';
-    }
-    if ($status == 'bestteacher') {
-        return 'Guru';
-    }
-    if ($status == 'goodleader') {
-        return 'Ketua Kelas';
-    }
+    $userAny = [
+        'greatadmin' => 'Admin',
+        'themanager' => 'Kurikulum',
+        'bestteacher' => 'Guru',
+        'goodleader' => 'Ketua Kelas'
+    ];
+    return (bool) $status ? $userAny[$status] : '';
 }
 
 /**

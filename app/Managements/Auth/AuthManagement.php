@@ -2,7 +2,7 @@
 
 namespace App\Managements\Auth;
 
-use App\Repositories\Auth\UserRepository;
+use App\Repositories\User\UserRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -18,7 +18,7 @@ class AuthManagement
     # Public
     public function getCredential()
     {
-        if (Auth::user()->tokenCan('login:getCred')) {
+        if (Auth::user()->tokenCan('auth:getCred')) {
             $_userData = [
                 'name' => Auth::user()->userbio->name,
                 'status' => User_getStatus(Auth::user()->userstat->status)
@@ -48,7 +48,7 @@ class AuthManagement
 
     public function postLogout($action)
     {
-        if (Auth::user()->tokenCan('login:postLogout')) {
+        if (Auth::user()->tokenCan('auth:postLogout')) {
             if ($action == 'revoke') {
                 if (Auth::user()->tokens()->delete()) return response()->json(successResponse('Successfully Revoke All Logins'), 201);
             } else {

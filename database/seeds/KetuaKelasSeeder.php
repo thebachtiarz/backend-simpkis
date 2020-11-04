@@ -28,7 +28,6 @@ class KetuaKelasSeeder extends Seeder
         for ($i = 0; $i < count($getKelas); $i++) {
             $getRandomCandidate = Siswa::where('id_kelas', $getKelas[$i]->id)->inRandomOrder()->first();
             $moreUser = [
-                'code' => User_createNewCode(),
                 'name' => $getRandomCandidate->nama,
                 'tagname' => strtolower($getRandomCandidate->nisn),
                 'active' => User_setActiveStatus('active'),
@@ -37,7 +36,6 @@ class KetuaKelasSeeder extends Seeder
             $newUser[] = [
                 'username' => Act_formatNewSiswaUsername($moreUser['tagname']),
                 'password' => Act_formatNewSiswaPassword($moreUser['tagname']),
-                'code' => $moreUser['code'],
                 'active' => $moreUser['active']
             ];
             $newUserBiodata[] = [
