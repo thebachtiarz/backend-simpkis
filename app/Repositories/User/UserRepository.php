@@ -19,6 +19,11 @@ class UserRepository
         return $this->User->get();
     }
 
+    public function getLastUserId()
+    {
+        return $this->User->orderByDesc('id')->first('id')->id;
+    }
+
     public function findInfo($id)
     {
         # code...
@@ -40,16 +45,16 @@ class UserRepository
     {
         $getUser = $this->findTrashed($id);
         $_status = $getUser->userstat->status;
-        $getUser->delete();
         if ($_status == 'goodleader') $getUser->ketuakelas()->delete();
+        $getUser->delete();
     }
 
     public function forceDelete($id)
     {
         $getUser = $this->findTrashed($id);
         $_status = $getUser->userstat->status;
-        $getUser->forceDelete();
         if ($_status == 'goodleader') $getUser->ketuakelas()->forceDelete();
+        $getUser->forceDelete();
     }
 
     # Repo
@@ -59,7 +64,8 @@ class UserRepository
             # Admin Access
             'greatadmin' => $this->userAbility([
                 ['key' => 'auth', 'can' => ['*']],
-                ['key' => 'user', 'can' => ['*']]
+                ['key' => 'user', 'can' => ['*']],
+                ['key' => 'ketkel', 'can' => ['create']]
             ]),
             # Kurikulum Access
             'themanager' => $this->userAbility([
@@ -68,9 +74,16 @@ class UserRepository
                 ['key' => 'siswa', 'can' => ['*']]
             ]),
             # Guru Access
-            'bestteacher' => $this->userAbility([]),
+            'bestteacher' => $this->userAbility([
+                ['key' => 'auth', 'can' => ['*']],
+                ['key' => 'user', 'can' => ['create']],
+                ['key' => 'kelas', 'can' => ['get']],
+                ['key' => 'ketkel', 'can' => ['*']]
+            ]),
             # Ketua Kelas Access
-            'goodleader' => $this->userAbility([]),
+            'goodleader' => $this->userAbility([
+                ['key' => 'auth', 'can' => ['*']],
+            ]),
         ];
         return $userCan[$status];
     }
@@ -88,17 +101,18 @@ class UserRepository
             'user' => ['get', 'create', 'show', 'update', 'delete'],
             'kelas' => ['get', 'create', 'show', 'update', 'delete'],
             'siswa' => ['get', 'create', 'show', 'update', 'delete'],
+            'ketkel' => ['get', 'create', 'show', 'update', 'delete'],
         ];
         $arrayCan = [];
         foreach ($request as $key => $rq) {
             if (in_array($rq['key'], array_keys($userAbility))) {
-                if ($rq['can'] == ['*']) {
+                if ($rq['can'][0] == '*') {
                     foreach ($userAbility[$rq['key']] as $key => $uac) {
                         $arrayCan[] = $rq['key'] . ":$uac";
                     }
                 } else {
                     foreach ($rq['can'] as $key => $rqc) {
-                        if (isset($userAbility[$rq['key']][$rqc])) $arrayCan[] = $rq['key'] . ":" . $userAbility[$rq['key']][$rqc];
+                        if (in_array($rqc, $userAbility[$rq['key']])) $arrayCan[] = $rq['key'] . ":" . $rqc;
                     }
                 }
             }

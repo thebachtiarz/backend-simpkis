@@ -2,6 +2,7 @@
 
 namespace App\Managements\Access;
 
+use App\Managements\School\Actor\KetuaKelasManagement;
 use App\Repositories\User\UserRepository;
 use App\Repositories\School\Actor\SiswaRepository;
 use Illuminate\Support\Facades\Auth;
@@ -55,10 +56,8 @@ class UserManagement
                             'status' => User_setStatus($request->status)
                         ]);
                         if ($request->status == 'ketuakelas') {
-                            /**
-                             * gunakan(Services:: KetuaKelasManagement)
-                             * input : id_user, id_siswa
-                             */
+                            $new_uid = (new \App\Repositories\User\UserRepository)->getLastUserId() + 1;
+                            (new KetuaKelasManagement)->ketuakelasStore($new_uid, $request->siswaid);
                         }
                     }, 5);
                     return response()->json(successResponse('Berhasil membuat pengguna baru'), 201);

@@ -17,7 +17,7 @@ class KetuaKelasSeeder extends Seeder
      */
     public function run()
     {
-        $getLastIdUser = User::orderByDesc('id')->first('id')->id;
+        $getLastIdUser = (new \App\Repositories\User\UserRepository)->getLastUserId();
         $getKelas = Kelas::all();
 
         $newUser = [];
