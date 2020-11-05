@@ -36,30 +36,6 @@ class Kelas extends Model
     }
 
     # scope
-    public function scopeGetAvailableKelas($query, $tingkat, $nama)
-    {
-        $query->join('kelas_groups', 'kelas.id_group', '=', 'kelas_groups.id')
-            ->where([['kelas_groups.tingkat', $tingkat], ['nama', $nama]]);
-    }
-
-    public function scopeGetKelasByID($query, $id)
-    {
-        $query->where('id', $id);
-    }
-
-    public function scopeGetActiveKelas($query)
-    {
-        $query->whereIn('id_group', function ($group) {
-            $group->select('id')->from('kelas_groups')->where('status', Cur_setKelasStatus('active'));
-        });
-    }
-
-    public function scopeGetGraduatedKelas($query)
-    {
-        $query->whereIn('id_group', function ($group) {
-            $group->select('id')->from('kelas_groups')->where('status', Cur_setKelasStatus('graduated'));
-        });
-    }
 
     # relation
     public function kelasgroup()

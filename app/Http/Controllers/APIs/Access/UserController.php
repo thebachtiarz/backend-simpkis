@@ -11,7 +11,6 @@ class UserController extends Controller
 
     public function __construct()
     {
-        $this->middleware(['checkrole:admin,guru']);
         $this->UserManage = new UserManagement;
     }
 

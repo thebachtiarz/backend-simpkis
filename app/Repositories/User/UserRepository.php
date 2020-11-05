@@ -55,26 +55,21 @@ class UserRepository
     # Repo
     public function userCan($status)
     {
-        $get = [
-            ['key' => 'auth', 'can' => ['*']],
-            ['key' => 'user', 'can' => ['*']]
-        ];
-        // return $this->userAbility($get);
         $userCan = [
             # Admin Access
-            'greatadmin' => $this->userAbility($get),
+            'greatadmin' => $this->userAbility([
+                ['key' => 'auth', 'can' => ['*']],
+                ['key' => 'user', 'can' => ['*']]
+            ]),
             # Kurikulum Access
-            'themanager' => [
-                'login:getCred', 'login:postLogout'
-            ],
+            'themanager' => $this->userAbility([
+                ['key' => 'auth', 'can' => ['*']],
+                ['key' => 'kelas', 'can' => ['*']]
+            ]),
             # Guru Access
-            'bestteacher' => [
-                'login:getCred', 'login:postLogout'
-            ],
+            'bestteacher' => $this->userAbility([]),
             # Ketua Kelas Access
-            'goodleader' => [
-                'login:getCred', 'login:postLogout'
-            ]
+            'goodleader' => $this->userAbility([]),
         ];
         return $userCan[$status];
     }
@@ -89,7 +84,8 @@ class UserRepository
     {
         $userAbility = [
             'auth' => ['getCred', 'postLogout'],
-            'user' => ['index', 'store', 'show', 'update', 'destroy']
+            'user' => ['get', 'create', 'show', 'update', 'delete'],
+            'kelas' => ['get', 'create', 'show', 'update', 'delete'],
         ];
         $arrayCan = [];
         foreach ($request as $key => $rq) {

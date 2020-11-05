@@ -22,7 +22,7 @@ class UserManagement
     # Public
     public function userList($request)
     {
-        if (Auth::user()->tokenCan('user:index')) {
+        if (Auth::user()->tokenCan('user:get')) {
             $validator = $this->userListValidator($request->all());
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
             if ($this->UserRepo->userAllow($request->status, Auth::user()->userstat->status)) {
@@ -38,7 +38,7 @@ class UserManagement
 
     public function userStore($request)
     {
-        if (Auth::user()->tokenCan('user:store')) {
+        if (Auth::user()->tokenCan('user:create')) {
             $validator = $this->userStoreValidator($request->all());
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
             if ($this->UserRepo->userAllow($request->status, Auth::user()->userstat->status)) {
@@ -121,7 +121,7 @@ class UserManagement
 
     public function userDestory($id, $request)
     {
-        if (Auth::user()->tokenCan('user:destroy')) {
+        if (Auth::user()->tokenCan('user:delete')) {
             $validator = $this->userDestroyValidator($request->all());
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
             $getUser = $this->UserRepo->findTrashed($id);
