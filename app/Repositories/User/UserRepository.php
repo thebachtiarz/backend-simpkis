@@ -71,7 +71,8 @@ class UserRepository
             'themanager' => $this->userAbility([
                 ['key' => 'auth', 'can' => ['*']],
                 ['key' => 'kelas', 'can' => ['*']],
-                ['key' => 'siswa', 'can' => ['*']]
+                ['key' => 'siswa', 'can' => ['*']],
+                ['key' => 'semester', 'can' => ['*']]
             ]),
             # Guru Access
             'bestteacher' => $this->userAbility([
@@ -102,6 +103,7 @@ class UserRepository
             'kelas' => ['get', 'create', 'show', 'update', 'delete'],
             'siswa' => ['get', 'create', 'show', 'update', 'delete'],
             'ketkel' => ['get', 'create', 'show', 'update', 'delete'],
+            'semester' => ['get', 'create', 'show', 'update', 'delete'],
         ];
         $arrayCan = [];
         foreach ($request as $key => $rq) {

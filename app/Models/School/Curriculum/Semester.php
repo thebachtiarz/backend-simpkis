@@ -27,6 +27,11 @@ class Semester extends Model
     }
 
     # scope
+    public function scopeGetSemesterActiveNow($query)
+    {
+        $query->limit(1)->orderByDesc('id');
+    }
+
     public function scopeGetAvailableSemester($query, $thnsmt)
     {
         $query->where('semester', $thnsmt);
