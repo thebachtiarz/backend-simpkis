@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\APIs\School\Actor;
 
 use App\Http\Controllers\Controller;
+use App\Managements\School\Actor\SiswaManagement;
 
 class SiswaController extends Controller
 {
+    protected $SiswaManage;
+
     public function __construct()
     {
-        $this->middleware(['checkrole:kurikulum'])->except(['index', 'show']);
+        $this->SiswaManage = new SiswaManagement;
     }
 
     /**
@@ -18,7 +21,7 @@ class SiswaController extends Controller
      */
     public function index()
     {
-        return $this->listSiswa(request());
+        return $this->SiswaManage->siswaList(request());
     }
 
     /**
@@ -28,7 +31,7 @@ class SiswaController extends Controller
      */
     public function store()
     {
-        return $this->storeSiswa(request());
+        return $this->SiswaManage->siswaStore(request());
     }
 
     /**
@@ -39,7 +42,7 @@ class SiswaController extends Controller
      */
     public function show($id)
     {
-        return $this->showSiswa($id);
+        return $this->SiswaManage->siswaShow($id);
     }
 
     /**
@@ -50,7 +53,7 @@ class SiswaController extends Controller
      */
     public function update($id)
     {
-        return $this->updateSiswa($id, request());
+        return $this->SiswaManage->siswaUpdate($id, request());
     }
 
     /**
@@ -61,138 +64,6 @@ class SiswaController extends Controller
      */
     public function destroy($id)
     {
-        return $this->destroySiswa($id, request());
-    }
-
-    # private -> move to services
-    private function userstat() // move to constructor at services
-    {
-        return User_getStatus(User_checkStatus());
-    }
-
-    private function listSiswa($request)
-    {
-        $validator = $this->listValidator($request->all());
-        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        $getSiswa = \App\Models\School\Actor\Siswa::query();
-        if ($request->method == 'all') $getSiswa->where('id_kelas', $request->kelasid)->withTrashed();
-        elseif ($request->method == 'deleted') $getSiswa->where('id_kelas', $request->kelasid)->onlyTrashed();
-        else {
-            $kelas = $request->kelasid;
-            if ($this->userstat() == 'ketuakelas') $kelas = auth()->user()->ketuakelas->id_kelas;
-            if (isset($request->presensikegiatan)) $getSiswa->GetUnPresensiByKegiatanToday($request->presensikegiatan);
-            if (isset($request->searchname)) $getSiswa->where('nama', 'like', "%$request->searchname%");
-            if (isset($kelas)) $getSiswa->where('id_kelas', $kelas);
-        }
-        return response()->json(dataResponse($getSiswa->get()->map->siswaSimpleListMap()), 200);
-    }
-
-    private function storeSiswa($request)
-    {
-        $validator = $this->storeValidator($request->all());
-        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        try {
-            $catchSiswa = Arr_collapse(\Maatwebsite\Excel\Facades\Excel::toCollection(new \App\Imports\Siswa\SiswaImport, $request->file('file')));
-            if (!count($catchSiswa)) return response()->json(errorResponse('Data siswa tidak ada!'), 202);
-            $findDuplicate = [];
-            for ($i = 0; $i < count($catchSiswa); $i++) {
-                $checkDuplicate = \App\Models\School\Actor\Siswa::where('nisn', $catchSiswa[$i]['nisn']);
-                if ($checkDuplicate->count()) $findDuplicate[] = $catchSiswa[$i];
-            }
-            if (count($findDuplicate)) return response()->json(dataResponse($findDuplicate, 'error', 'Terdapat duplikasi data: ' . count($findDuplicate) . ' siswa'), 202);
-            try {
-                \Maatwebsite\Excel\Facades\Excel::import(new \App\Imports\Siswa\SiswaImport, $request->file('file'));
-                return response()->json(successResponse('Berhasil menambahkan data siswa'), 200);
-            } catch (\Exception $th) {
-                return response()->json(errorResponse('Gagal menambahkan siswa, error: ' . $th->getMessage()), 202);
-            }
-        } catch (\Throwable $th) {
-            return response()->json(errorResponse('Format file bermasalah, harap periksa sesuai dengan ketentuan yang telah disediakan'), 202);
-        }
-    }
-
-    private function showSiswa($id)
-    {
-        $getSiswa = \App\Models\School\Actor\Siswa::withTrashed()->find($id);
-        if ((bool) $getSiswa) {
-            // jika (saya == ketuakelas dan siswa ada pada kelas saya) atau (saya bukan ketuakelas) maka benar
-            if ((($this->userstat() == 'ketuakelas') && ($getSiswa->kelasid == auth()->user()->ketuakelas->kelasid)) || ($this->userstat() != 'ketuakelas'))
-                return response()->json(dataResponse($getSiswa->siswaSimpleInfoMap()), 200);
-        }
-        return response()->json(errorResponse('Siswa tidak ditemukan'), 202);
-    }
-
-    private function updateSiswa($id, $request)
-    {
-        $validator = $this->updateValidator($request->all());
-        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        $getChange = array_filter($request->all());
-        if ((bool) $getChange) {
-            $getSiswa = \App\Models\School\Actor\Siswa::find($id);
-            if ((bool) $getSiswa) {
-                $getChangeKey = array_keys($getChange); // get key from request
-                $oldData = [];
-                for ($i = 0; $i < count($getChangeKey); $i++) array_push($oldData, $getSiswa[$getChangeKey[$i]]);
-                $getSiswa->update($getChange);
-                if ((bool) $getSiswa->ketuakelas && isset($request->nama)) $getSiswa->ketuakelas->user->userbio->update(['name' => $request->nama]);
-                $response = ['oldData' => array_combine($getChangeKey, $oldData), 'newData' => $getChange];
-                return response()->json(dataResponse($response, '', 'Berhasil memperbarui data siswa'), 200);
-            }
-            return response()->json(errorResponse('Siswa tidak ditemukan'), 202);
-        }
-        return response()->json(errorResponse('Silahkan sebutkan apa yang ingin diubah'), 202);
-    }
-
-    private function destroySiswa($id, $request)
-    {
-        $validator = $this->softDeleteValidator($request->all());
-        if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-        $getSiswa = \App\Models\School\Actor\Siswa::where('id', $id);
-        if ($request->method == 'force') $getSiswa->withTrashed();
-        if ($getSiswa->count()) {
-            if ($request->method == 'force') {
-                $getSiswa->forceDelete();
-                return response()->json(successResponse('Berhasil menghapus siswa secara permanen'), 200);
-            } else {
-                $getSiswa->delete();
-                return response()->json(successResponse('Berhasil menghapus siswa'), 200);
-            }
-        }
-        return response()->json(errorResponse('Siswa tidak ditemukan'), 202);
-    }
-
-    private function listValidator($request)
-    {
-        return Validator($request, [
-            'kelasid' => ['nullable', 'numeric', \Illuminate\Validation\Rule::requiredIf(($this->userstat() != 'ketuakelas') && (!isset($request['searchname'])))],
-            'presensikegiatan' => 'nullable|numeric',
-            'searchname' => 'nullable|string|min:3|regex:/^[a-zA-Z_,.\s]+$/',
-            'method' => 'nullable|string|alpha'
-        ], [
-            'kelasid.required' => 'Kelas ID field is required.'
-        ]);
-    }
-
-    private function storeValidator($request)
-    {
-        return Validator($request, [
-            'file' => 'required|file'
-        ]);
-    }
-
-    private function updateValidator($request)
-    {
-        return Validator($request, [
-            'nisn' => 'nullable|numeric|digits_between:10,15',
-            'nama' => 'nullable|string|regex:/^[a-zA-Z_,.\s]+$/',
-            'kelasid' => 'nullable|numeric'
-        ]);
-    }
-
-    private function softDeleteValidator($request)
-    {
-        return Validator($request, [
-            'method' => 'nullable|string|alpha'
-        ]);
+        return $this->SiswaManage->siswaDestory($id, request());
     }
 }

@@ -14,6 +14,11 @@ class SiswaRepository
     }
 
     # Public
+    public function getByKelasId($id)
+    {
+        $this->Siswa->where('id_kelas', $id);
+    }
+
     public function findById($id)
     {
         return $this->Siswa->find($id);

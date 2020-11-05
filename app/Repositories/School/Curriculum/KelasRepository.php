@@ -21,7 +21,7 @@ class KelasRepository
 
     public function create($data)
     {
-        $this->Kelas->create($data);
+        return $this->Kelas->create($data);
     }
 
     # Scope
