@@ -21,9 +21,9 @@ class NilaiAkhirGroup extends Model
     }
 
     # scope
-    public function scopeGetLastNilaiAkhirId($query)
+    public function scopeGetLastNilaiAkhir($query)
     {
-        $query->orderByDesc('id')->first('id')->id;
+        $query->orderByDesc('id');
     }
 
     public function scopeGetAvailableNilaiAkhirGroup($query, $semester, $kelas)
