@@ -73,23 +73,25 @@ class UserRepository
                 ['key' => 'kelas', 'can' => ['*']],
                 ['key' => 'siswa', 'can' => ['*']],
                 ['key' => 'semester', 'can' => ['*']],
-                ['key' => 'nilakh', 'can' => ['get']],
+                ['key' => 'nilakh', 'can' => ['get']]
             ]),
             # Guru Access
             'bestteacher' => $this->userAbility([
                 ['key' => 'auth', 'can' => ['*']],
                 ['key' => 'user', 'can' => ['create']],
                 ['key' => 'kelas', 'can' => ['get']],
+                ['key' => 'siswa', 'can' => ['get']],
                 ['key' => 'ketkel', 'can' => ['*']],
                 ['key' => 'kegiatan', 'can' => ['*']],
                 ['key' => 'niltam', 'can' => ['*']],
                 ['key' => 'presensi', 'can' => ['*']],
-                ['key' => 'nilakh', 'can' => ['*']],
+                ['key' => 'nilakh', 'can' => ['*']]
             ]),
             # Ketua Kelas Access
             'goodleader' => $this->userAbility([
                 ['key' => 'auth', 'can' => ['*']],
                 ['key' => 'kegiatan', 'can' => ['get']],
+                ['key' => 'siswa', 'can' => ['get']],
                 ['key' => 'presensi', 'can' => ['get', 'create']]
             ]),
         ];
