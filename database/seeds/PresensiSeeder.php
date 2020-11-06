@@ -14,9 +14,12 @@ class PresensiSeeder extends Seeder
      */
     public function run(Faker $faker)
     {
-        $keg01PerSmt = 80;
-        $keg02PerSmt = 20;
-        $keg03PerSmt = 100;
+        // $keg01PerSmt = 80;
+        // $keg02PerSmt = 20;
+        // $keg03PerSmt = 100;
+        $keg01PerSmt = 40;
+        $keg02PerSmt = 10;
+        $keg03PerSmt = 50;
         //
         $newPresGroup = [];
         $newPresensi = [];
