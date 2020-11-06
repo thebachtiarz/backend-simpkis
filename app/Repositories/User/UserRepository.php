@@ -79,11 +79,13 @@ class UserRepository
                 ['key' => 'auth', 'can' => ['*']],
                 ['key' => 'user', 'can' => ['create']],
                 ['key' => 'kelas', 'can' => ['get']],
-                ['key' => 'ketkel', 'can' => ['*']]
+                ['key' => 'ketkel', 'can' => ['*']],
+                ['key' => 'kegiatan', 'can' => ['*']]
             ]),
             # Ketua Kelas Access
             'goodleader' => $this->userAbility([
                 ['key' => 'auth', 'can' => ['*']],
+                ['key' => 'kegiatan', 'can' => ['get']]
             ]),
         ];
         return $userCan[$status];
@@ -104,6 +106,7 @@ class UserRepository
             'siswa' => ['get', 'create', 'show', 'update', 'delete'],
             'ketkel' => ['get', 'create', 'show', 'update', 'delete'],
             'semester' => ['get', 'create', 'show', 'update', 'delete'],
+            'kegiatan' => ['get', 'create', 'show', 'update', 'delete'],
         ];
         $arrayCan = [];
         foreach ($request as $key => $rq) {

@@ -127,7 +127,7 @@ class SiswaManagement
     }
 
     # Private
-    public function getStatus()
+    private function getStatus()
     {
         return User_getStatus(Auth::user()->userstat->status);
     }

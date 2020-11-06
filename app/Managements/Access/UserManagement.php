@@ -45,9 +45,11 @@ class UserManagement
             if ($this->UserRepo->userAllow($request->status, Auth::user()->userstat->status)) {
                 try {
                     DB::transaction(function () use ($request) {
+                        $username = $request->siswaid ? Act_formatNewKetuaKelasUsername($this->SiswaRepo->collectById($request->siswaid, 'nisn')) : $request->username;
+                        $password = $request->siswaid ? Act_formatNewKetuaKelasPassword($this->SiswaRepo->collectById($request->siswaid, 'nisn')) : User_encPass($request->password);
                         $name = $request->siswaid ? $this->SiswaRepo->collectById($request->siswaid, 'nama') : $request->name;
                         DB::table('users')->insert([
-                            'username' => $request->username, 'password' => User_encPass($request->password), 'active' => User_setActiveStatus('active')
+                            'username' => $username, 'password' => $password, 'active' => User_setActiveStatus('active')
                         ]);
                         DB::table('user_biodatas')->insert([
                             'name' => ucwords($name)
@@ -56,7 +58,7 @@ class UserManagement
                             'status' => User_setStatus($request->status)
                         ]);
                         if ($request->status == 'ketuakelas') {
-                            $new_uid = (new \App\Repositories\User\UserRepository)->getLastUserId() + 1;
+                            $new_uid = $this->UserRepo->getLastUserId();
                             (new KetuaKelasManagement)->ketuakelasStore($new_uid, $request->siswaid);
                         }
                     }, 5);
@@ -151,8 +153,9 @@ class UserManagement
     private function userStoreValidator($request)
     {
         return Validator::make($request, [
-            'username' => 'required|string|min:8|alpha_num|unique:users,username',
-            'password' => 'required|string|regex:/^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9])(?=.*[!@#$&*()]).{8,})\S$/',
+
+            'username' => 'nullable|string|min:8|alpha_num|unique:users,username|required_without:siswaid',
+            'password' => 'nullable|string|regex:/^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9])(?=.*[!@#$&*()]).{8,})\S$/|required_without:siswaid',
             'name' => 'nullable|string|min:3|regex:/^[a-zA-Z_,.\s]+$/|required_without:siswaid',
             'status' => 'required|string',
             'siswaid' => 'nullable|string|numeric'

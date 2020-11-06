@@ -6,7 +6,6 @@ use App\Models\School\Actor\KetuaKelas;
 use App\Models\School\Actor\Siswa;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\DB;
 
 class KetuaKelasManagement
 {
@@ -32,7 +31,7 @@ class KetuaKelasManagement
         if (Auth::user()->tokenCan('ketkel:create')) {
             $getSiswa = Siswa::find($id_siswa);
             if ((bool) $getSiswa) {
-                DB::table('ketua_kelas')->insert([
+                KetuaKelas::create([
                     'id_siswa' => $id_siswa,
                     'id_kelas' => $getSiswa->id_kelas,
                     'id_user' => $new_uid
@@ -68,7 +67,7 @@ class KetuaKelasManagement
                         $result = ['old_ketua' => $getKetua->siswa->nama, 'new_ketua' => $getSiswa->nama];
                         $getKetua->update(['id_siswa' => $getSiswa->id]);
                         $getKetua->user->userbio->update(['name' => $getSiswa->nama]);
-                        $getKetua->user->update(['username' => Act_formatNewSiswaUsername($getSiswa->nisn), 'password' => Act_formatNewSiswaPassword($getSiswa->nisn)]);
+                        $getKetua->user->update(['username' => Act_formatNewKetuaKelasUsername($getSiswa->nisn), 'password' => Act_formatNewKetuaKelasPassword($getSiswa->nisn)]);
                         return response()->json(dataResponse($result, '', 'Berhasil mengubah ketua kelas'), 200);
                     } catch (\Exception $e) {
                         return response()->json(errorResponse('Gagal melakukan perubahan pada ketua kelas'), 202);

@@ -28,24 +28,24 @@ function Act_getSiswaNameByID($id_siswa)
 }
 
 /**
- * set format new user username
+ * set format new ketua kelas username
  *
  * @param string $username
  * @return void
  */
-function Act_formatNewSiswaUsername($username)
+function Act_formatNewKetuaKelasUsername($username)
 {
     return "u{$username}";
 }
 
 /**
- * set format new user password
+ * set format new ketua kelas password
  * auto hash(ed) by default
  *
  * @param string $password
  * @return void
  */
-function Act_formatNewSiswaPassword($password)
+function Act_formatNewKetuaKelasPassword($password)
 {
     return Hash::make("p{$password}");
 }

@@ -34,8 +34,8 @@ class KetuaKelasSeeder extends Seeder
                 'status' => User_setStatus('ketuakelas')
             ];
             $newUser[] = [
-                'username' => Act_formatNewSiswaUsername($moreUser['tagname']),
-                'password' => Act_formatNewSiswaPassword($moreUser['tagname']),
+                'username' => Act_formatNewKetuaKelasUsername($moreUser['tagname']),
+                'password' => Act_formatNewKetuaKelasPassword($moreUser['tagname']),
                 'active' => $moreUser['active']
             ];
             $newUserBiodata[] = [

@@ -16,7 +16,7 @@ class CreateKetuaKelasTable extends Migration
         Schema::create('ketua_kelas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_siswa')->unique()->constrained('siswas')->cascadeOnDelete();
-            $table->foreignId('id_kelas')->constrained('kelas')->cascadeOnDelete();
+            $table->foreignId('id_kelas')->unique()->constrained('kelas')->cascadeOnDelete();
             $table->foreignId('id_user')->constrained('users')->cascadeOnDelete();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
