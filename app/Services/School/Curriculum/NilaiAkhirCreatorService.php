@@ -32,7 +32,7 @@ class NilaiAkhirCreatorService
 
     private function getNewNilaiAkhirId()
     {
-        return (int) (NilaiAkhirGroup::count() ? (NilaiAkhirGroup::orderByDesc('id')->first('id')->id) : 0) + 1;
+        return (int) (NilaiAkhirGroup::count() ? NilaiAkhirGroup::getLastNilaiAkhirId() : 0) + 1;
     }
 
     private function getActiveKelas()

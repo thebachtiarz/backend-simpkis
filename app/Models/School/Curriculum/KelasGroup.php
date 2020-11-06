@@ -19,6 +19,17 @@ class KelasGroup extends Model
     }
 
     # scope
+    public function scopeSearchKelasGroupByName($query, $nama, $tingkat = '')
+    {
+        $query->where('nama_group', 'like', "%{$nama}%");
+        $query->where('status', Cur_setKelasStatus('active'));
+        if (isset($tingkat)) $query->where('tingkat', $tingkat);
+    }
+
+    public function scopeGetAvailableGroupKelas($query, $tingkat, $nama)
+    {
+        $query->where([['tingkat', $tingkat], ['nama_group', Str_pregStringOnly($nama)]]);
+    }
 
     # relation
     public function kelas()

@@ -72,7 +72,8 @@ class UserRepository
                 ['key' => 'auth', 'can' => ['*']],
                 ['key' => 'kelas', 'can' => ['*']],
                 ['key' => 'siswa', 'can' => ['*']],
-                ['key' => 'semester', 'can' => ['*']]
+                ['key' => 'semester', 'can' => ['*']],
+                ['key' => 'nilakh', 'can' => ['get']],
             ]),
             # Guru Access
             'bestteacher' => $this->userAbility([
@@ -82,7 +83,8 @@ class UserRepository
                 ['key' => 'ketkel', 'can' => ['*']],
                 ['key' => 'kegiatan', 'can' => ['*']],
                 ['key' => 'niltam', 'can' => ['*']],
-                ['key' => 'presensi', 'can' => ['*']]
+                ['key' => 'presensi', 'can' => ['*']],
+                ['key' => 'nilakh', 'can' => ['*']],
             ]),
             # Ketua Kelas Access
             'goodleader' => $this->userAbility([
@@ -112,6 +114,7 @@ class UserRepository
             'kegiatan' => ['get', 'create', 'show', 'update', 'delete'],
             'niltam' => ['get', 'create', 'show', 'update', 'delete'],
             'presensi' => ['get', 'create', 'show', 'update', 'delete'],
+            'nilakh' => ['get', 'create', 'show', 'update', 'delete'],
         ];
         $arrayCan = [];
         foreach ($request as $key => $rq) {
