@@ -17,7 +17,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'username', 'password', 'code', 'active'
+        'username', 'password', 'active'
     ];
 
     /**
@@ -33,7 +33,6 @@ class User extends Authenticatable
     public function userSimpleListMap()
     {
         return [
-            'code' => $this->code,
             'name' => $this->userbio->name,
             'status' => User_getStatusForHuman($this->userstat->status)
         ];

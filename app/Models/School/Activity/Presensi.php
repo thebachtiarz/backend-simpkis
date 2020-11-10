@@ -57,7 +57,6 @@ class Presensi extends Model
         ];
     }
 
-    # private
     public function getNilai($data)
     {
         $getNilai = Arr_unserialize($data);
@@ -66,7 +65,8 @@ class Presensi extends Model
         return $result;
     }
 
-    public function getNilaiPoin($data, $key, $value)
+    # private
+    private function getNilaiPoin($data, $key, $value)
     {
         return count($this->getNilai($data)) ? $this->getNilai($data)[$key][$value] : '';
     }

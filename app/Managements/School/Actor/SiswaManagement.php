@@ -29,11 +29,11 @@ class SiswaManagement
             if ($request->method == 'all') $getSiswa->where('id_kelas', $request->kelasid)->withTrashed();
             elseif ($request->method == 'deleted') $getSiswa->where('id_kelas', $request->kelasid)->onlyTrashed();
             else {
-                $kelas = $request->kelasid;
-                if ($this->getStatus() == 'ketuakelas') $kelas = auth()->user()->ketuakelas->id_kelas;
+                $id_kelas = $request->kelasid;
+                if ($this->getStatus() == 'ketuakelas') $id_kelas = auth()->user()->ketuakelas->id_kelas;
                 if (isset($request->presensikegiatan)) $getSiswa->getUnPresensiByKegiatanToday($request->presensikegiatan);
                 if (isset($request->searchname)) $getSiswa->where('nama', 'like', "%$request->searchname%");
-                if (isset($kelas)) $getSiswa->where('id_kelas', $kelas);
+                if (isset($id_kelas)) $getSiswa->where('id_kelas', $id_kelas);
             }
             return response()->json(dataResponse($getSiswa->get()->map->siswaSimpleListMap()), 200);
         }

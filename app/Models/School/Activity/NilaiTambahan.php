@@ -46,7 +46,7 @@ class NilaiTambahan extends Model
     }
 
     # private
-    public function getNilai($data)
+    private function getNilai($data)
     {
         $getNilai = Arr_unserialize($data);
         $result = [];
@@ -54,7 +54,7 @@ class NilaiTambahan extends Model
         return $result;
     }
 
-    public function getNilaiPoin($data, $key, $value)
+    private function getNilaiPoin($data, $key, $value)
     {
         // return count($this->getNilai($data)) ? $this->getNilai($data)[$key][$value] : '';
         return count($this->getNilai($data)) ? (in_array($key, array_keys($this->getNilai($data))) ? $this->getNilai($data)[$key][$value] : '-') : '';
