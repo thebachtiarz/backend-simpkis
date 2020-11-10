@@ -20,6 +20,7 @@ class PresensiManagement
     # Public
     public function presensiList($request)
     {
+        // return Carbon_DBdatetimeToday();
         if (Auth::user()->tokenCan('presensi:get')) {
             $validator = $this->presensiListValidator($request->all());
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
@@ -37,6 +38,23 @@ class PresensiManagement
                 } else {
                     $getPresensiGroup = $getPresensiGroup->getKetuaKelasPresensiToday(Auth::user()->ketuakelas->id_kelas);
                     $message = 'Total: ' . $getPresensiGroup->count() . ' presensi hari ini';
+                }
+                return response()->json(dataResponse($getPresensiGroup->get()->map->presensigroupSimpleListMap(), '', $message), 200);
+            }
+            /**
+             * get where day
+             * mengambil history dari (presensi wajib (group))
+             * berdasarkan hari
+             */
+            if ($request->getOnly == 'wheredate') {
+                $getPresensiGroup = PresensiGroup::query();
+                $message = '';
+                if ($this->getStatus() == 'guru') {
+                    $getPresensiGroup = $getPresensiGroup->getUnapprovedPresenceByDate($request->date);
+                    $message = 'Total: ' . $getPresensiGroup->count() . ' presensi dilakukan';
+                } else {
+                    $getPresensiGroup = $getPresensiGroup->getKetuaKelasPresensiByDate(Auth::user()->ketuakelas->id_kelas, $request->date);
+                    $message = 'Total: ' . $getPresensiGroup->count() . ' presensi dilakukan';
                 }
                 return response()->json(dataResponse($getPresensiGroup->get()->map->presensigroupSimpleListMap(), '', $message), 200);
             }
@@ -64,11 +82,11 @@ class PresensiManagement
              * berdasarkan id kelas atau id siswa atau keduanya
              */
             if (isset($request->kelasid) || isset($request->siswaid)) {
-                $getPresensi = Presensi::query();
-                $getPresensi = $getPresensi->where('id_semester', isset($request->smtid) ? $request->smtid : Cur_getActiveIDSemesterNow());
-                $getPresensi = $getPresensi->whereIn('id_presensi', function ($q) use ($request) {
-                    $q->select('id')->from('presensi_groups')->where('id_kegiatan', $request->kegiatanid);
-                });
+                $getPresensi = Presensi::query()
+                    ->where('id_semester', isset($request->smtid) ? $request->smtid : Cur_getActiveIDSemesterNow())
+                    ->whereIn('id_presensi', function ($q) use ($request) {
+                        $q->select('id')->from('presensi_groups')->where('id_kegiatan', $request->kegiatanid);
+                    });
                 if (isset($request->kelasid)) {
                     $getPresensi = $getPresensi->whereIn('id_siswa', function ($q) use ($request) {
                         $q->select('id')->from('siswas')->where('id_kelas', $request->kelasid);
@@ -142,7 +160,7 @@ class PresensiManagement
                     $getPresensiGroup = PresensiGroup::find($id);
                     if ((bool) $getPresensiGroup) {
                         $getPresensiGroup->update(['approve' => '7']);
-                        return response()->json(successResponse('Berhasil memverivikasi presensi'), 201);
+                        return response()->json(successResponse('Berhasil menyetujui presensi'), 201);
                     }
                     return response()->json(errorResponse('Kegiatan presensi tidak ditemukan'), 202);
                 }
@@ -193,6 +211,7 @@ class PresensiManagement
     {
         return Validator::make($request, [
             'getOnly' => 'nullable|string|alpha',
+            'date' => 'nullable|date_format:Y-m-d|required_if:getOnly,wheredate',
             'presensiid' => 'nullable|string|numeric|required_without_all:kegiatanid,getOnly',
             'siswaid' => 'nullable|string|numeric',
             'kelasid' => 'nullable|string|numeric',

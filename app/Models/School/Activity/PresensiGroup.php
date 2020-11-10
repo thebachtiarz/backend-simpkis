@@ -35,17 +35,34 @@ class PresensiGroup extends Model
     # scope
     public function scopeGetUnapprovedPresenceToday($query)
     {
-        $query->where([['approve', '5'], ['created_at', '>=', Carbon_DBdatetimeToday()]]);
+        $query->where('approve', '5')->whereDate('created_at', '=', Carbon_DBdatetimeToday());
+    }
+
+    public function scopeGetUnapprovedPresenceByDate($query, $date)
+    {
+        $query->where('approve', '5')->whereDate('created_at', '=', Carbon_DBConvertDateTime($date));
     }
 
     public function scopeGetKetuaKelasPresensiToday($query, $id_kelas)
     {
-        // $query->where([['id_user', $id_user], ['created_at', '>=', Carbon_DBdatetimeToday()]]); // was using id_user (ketua kelas)
         $query->whereIn('id', function ($q) use ($id_kelas) {
             $q->select('id_presensi')
                 ->from('presensis')
                 ->join('siswas', 'presensis.id_siswa', '=', 'siswas.id')
-                ->where([['siswas.id_kelas', $id_kelas], ['presensis.created_at', '>=', Carbon_DBdatetimeToday()]])
+                ->where('siswas.id_kelas', $id_kelas)
+                ->whereDate('presensis.created_at', '=', Carbon_DBdatetimeToday())
+                ->groupBy('presensis.id_presensi');
+        });
+    }
+
+    public function scopeGetKetuaKelasPresensiByDate($query, $id_kelas, $date)
+    {
+        $query->whereIn('id', function ($q) use ($id_kelas, $date) {
+            $q->select('id_presensi')
+                ->from('presensis')
+                ->join('siswas', 'presensis.id_siswa', '=', 'siswas.id')
+                ->where('siswas.id_kelas', $id_kelas)
+                ->whereDate('presensis.created_at', '=', Carbon_DBConvertDateTime($date))
                 ->groupBy('presensis.id_presensi');
         });
     }
