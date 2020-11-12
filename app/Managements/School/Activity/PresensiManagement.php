@@ -6,12 +6,11 @@ use App\Models\School\Activity\PresensiGroup;
 use App\Models\School\Activity\Presensi;
 use App\Models\School\Activity\Kegiatan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 
 class PresensiManagement
 {
-    // protected ;
-
     public function __construct()
     {
         //
@@ -82,17 +81,10 @@ class PresensiManagement
              * berdasarkan id kelas atau id siswa atau keduanya
              */
             if (isset($request->kelasid) || isset($request->siswaid)) {
-                $getPresensi = Presensi::query()
-                    ->where('id_semester', isset($request->smtid) ? $request->smtid : Cur_getActiveIDSemesterNow())
-                    ->whereIn('id_presensi', function ($q) use ($request) {
-                        $q->select('id')->from('presensi_groups')->where('id_kegiatan', $request->kegiatanid);
-                    });
-                if (isset($request->kelasid)) {
-                    $getPresensi = $getPresensi->whereIn('id_siswa', function ($q) use ($request) {
-                        $q->select('id')->from('siswas')->where('id_kelas', $request->kelasid);
-                    });
-                }
-                if (isset($request->siswaid)) $getPresensi = $getPresensi->where('id_siswa', $request->siswaid);
+                $getPresensi = Presensi::where('id_semester', isset($request->smtid) ? $request->smtid : Cur_getActiveIDSemesterNow());
+                if (isset($request->kegiatanid)) $getPresensi = $getPresensi->getByKegiatanId($request->kegiatanid);
+                if (isset($request->kelasid)) $getPresensi = $getPresensi->getByKelasId($request->kelasid);
+                if (isset($request->siswaid)) $getPresensi = $getPresensi->getBySiswaId($request->siswaid);
                 return response()->json(dataResponse($getPresensi->get()->map->presensiSimpleListMap(), '', 'Total: ' . $getPresensi->count() . ' rekap presensi'), 200);
             }
             return response()->json(errorResponse('Tentukan [id siswa] atau [id kelas] yang akan dicari'), 202);
@@ -212,10 +204,10 @@ class PresensiManagement
         return Validator::make($request, [
             'getOnly' => 'nullable|string|alpha',
             'date' => 'nullable|date_format:Y-m-d|required_if:getOnly,wheredate',
-            'presensiid' => 'nullable|string|numeric|required_without_all:kegiatanid,getOnly',
-            'siswaid' => 'nullable|string|numeric',
+            'presensiid' => 'nullable|string|numeric|required_without_all:getOnly,siswaid,kelasid',
+            'siswaid' => ['nullable', 'string', 'numeric', Rule::requiredIf(isset($request['kelasid']))],
             'kelasid' => 'nullable|string|numeric',
-            'kegiatanid' => 'nullable|string|numeric|required_without_all:presensiid,getOnly',
+            'kegiatanid' => 'nullable|string|numeric',
             'smtid' => 'nullable|string|numeric'
         ]);
     }

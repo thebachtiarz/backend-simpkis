@@ -35,12 +35,12 @@ class PresensiGroup extends Model
     # scope
     public function scopeGetUnapprovedPresenceToday($query)
     {
-        $query->where('approve', '5')->whereDate('created_at', '=', Carbon_DBdatetimeToday());
+        $query->where('approve', '5')->whereDate('created_at', Carbon_DBdatetimeToday());
     }
 
     public function scopeGetUnapprovedPresenceByDate($query, $date)
     {
-        $query->where('approve', '5')->whereDate('created_at', '=', Carbon_DBConvertDateTime($date));
+        $query->where('approve', '5')->whereDate('created_at', Carbon_DBConvertDateTime($date));
     }
 
     public function scopeGetKetuaKelasPresensiToday($query, $id_kelas)
@@ -50,7 +50,7 @@ class PresensiGroup extends Model
                 ->from('presensis')
                 ->join('siswas', 'presensis.id_siswa', '=', 'siswas.id')
                 ->where('siswas.id_kelas', $id_kelas)
-                ->whereDate('presensis.created_at', '=', Carbon_DBdatetimeToday())
+                ->whereDate('presensis.created_at', Carbon_DBdatetimeToday())
                 ->groupBy('presensis.id_presensi');
         });
     }
@@ -62,7 +62,7 @@ class PresensiGroup extends Model
                 ->from('presensis')
                 ->join('siswas', 'presensis.id_siswa', '=', 'siswas.id')
                 ->where('siswas.id_kelas', $id_kelas)
-                ->whereDate('presensis.created_at', '=', Carbon_DBConvertDateTime($date))
+                ->whereDate('presensis.created_at', Carbon_DBConvertDateTime($date))
                 ->groupBy('presensis.id_presensi');
         });
     }

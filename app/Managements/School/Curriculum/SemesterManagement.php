@@ -8,8 +8,6 @@ use Illuminate\Support\Facades\Validator;
 
 class SemesterManagement
 {
-    // protected ;
-
     public function __construct()
     {
         //
@@ -36,7 +34,7 @@ class SemesterManagement
             $newSemester = Cur_setNewSemesterFormat($request->tahun, $request->semester);
             $getSemester = Semester::getAvailableSemester($newSemester);
             if (!$getSemester->count()) {
-                Semester::create(['semester' => $newSemester]);
+                Semester::createNewSemester($newSemester);
                 return response()->json(dataResponse(['new_semester' => $newSemester], '', 'Berhasil menambahkan semester baru'), 201);
             }
             return response()->json(errorResponse('Semester sudah ada'), 202);
@@ -63,7 +61,7 @@ class SemesterManagement
             if ((bool) $getSemester) {
                 $oldSemester = $getSemester->semester;
                 $newSemester = Cur_setNewSemesterFormat($request->tahun, $request->semester);
-                $getSemester->update(['semester' => $newSemester]);
+                Semester::updateSemester($id, $newSemester);
                 return response()->json(dataResponse(['old' => $oldSemester, 'new' => $newSemester], '', 'Berhasil memperbarui semester'), 201);
             }
             return response()->json(errorResponse('Semester tidak ditemukan'), 202);

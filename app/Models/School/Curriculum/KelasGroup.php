@@ -31,6 +31,16 @@ class KelasGroup extends Model
         $query->where([['tingkat', $tingkat], ['nama_group', Str_pregStringOnly($nama)]]);
     }
 
+    public function scopeCreateNewKelasGroup($query, $input)
+    {
+        // return because the result is using in KelasManagement->kelasStore
+        return $query->create([
+            'tingkat' => $input->tingkat,
+            'nama_group' => Str_pregStringOnly($input->nama),
+            'status' => Cur_setKelasStatus('active')
+        ]);
+    }
+
     # relation
     public function kelas()
     {

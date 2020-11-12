@@ -37,6 +37,16 @@ class Semester extends Model
         $query->where('semester', $thnsmt);
     }
 
+    public function scopeCreateNewSemester($query, $semester)
+    {
+        $query->create(['semester' => $semester]);
+    }
+
+    public function scopeUpdateSemester($query, $id, $semester)
+    {
+        $query->find($id)->update(['semester' => $semester]);
+    }
+
     # relation
     public function nilaiakhir()
     {

@@ -22,9 +22,9 @@ class KegiatanManagement
             $validator = $this->kegiatanListValidator($request->all());
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
             if (in_array($this->getStatus(), array_keys($this->canAllow))) {
-                $getKegiatan = Kegiatan::whereIn('akses', $this->canAllow[$this->getStatus()]);
+                $getKegiatan = Kegiatan::whereInAllowToAccess($this->canAllow[$this->getStatus()]);
                 if ($this->getStatus() == 'ketuakelas') $getKegiatan->getAvailablePresensiNow();
-                if ($request->tipe) $getKegiatan->where('akses', Atv_setAksesKegiatan($request->tipe));
+                if ($request->tipe) $getKegiatan->whereAccessType($request->tipe);
                 if ($getKegiatan->count()) {
                     $getKegiatan = $getKegiatan->get()->map->kegiatanSimpleListMap();
                     return response()->json(dataResponse($getKegiatan), 200);
@@ -45,15 +45,7 @@ class KegiatanManagement
                 $dataRequest = Arr_unserialize($request->nilai);
                 $newNilai = [];
                 foreach ($dataRequest as $key => $value) $newNilai[] = [Str_random(6) => $value];
-                Kegiatan::create([
-                    'nama' => $request->nama,
-                    'nilai' => serialize(Arr_collapse($newNilai)),
-                    'nilai_avg' => isset($request->nilai_avg) ? $request->nilai_avg : 0,
-                    'hari' => Atv_setDayKegiatan($request->hari),
-                    'waktu_mulai' => Carbon_AnyTimeParse($request->mulai),
-                    'waktu_selesai' => Carbon_AnyTimeParse($request->selesai),
-                    'akses' => Atv_setAksesKegiatan($request->akses)
-                ]);
+                Kegiatan::createNewKegiatan($request, $newNilai);
                 return response()->json(successResponse('Berhasil membuat kegiatan baru'), 201);
             }
             return response()->json(errorResponse('Jenis kegiatan [' . $request->nama . '] sudah ada'), 202);
@@ -88,15 +80,7 @@ class KegiatanManagement
                     else $currentNilai[] = [$key => $value];
                 }
                 $updateNilai = array_merge($currentNilai, $newNilai);
-                $getKegiatan->update([
-                    'nama' => $request->nama,
-                    'nilai' => serialize(Arr_collapse($updateNilai)),
-                    'nilai_avg' => isset($request->nilai_avg) ? $request->nilai_avg : 0,
-                    'hari' => Atv_setDayKegiatan($request->hari),
-                    'waktu_mulai' => Carbon_AnyTimeParse($request->mulai),
-                    'waktu_selesai' => Carbon_AnyTimeParse($request->selesai),
-                    'akses' => Atv_setAksesKegiatan($request->akses)
-                ]);
+                Kegiatan::updateKegiatan($id, $request, $updateNilai);
                 return response()->json(successResponse('Berhasil memperbarui kegiatan'), 201);
             }
             return response()->json(errorResponse('Kegiatan tidak ditemukan'), 202);

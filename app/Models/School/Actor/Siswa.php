@@ -45,6 +45,16 @@ class Siswa extends Model
         });
     }
 
+    public function scopeSearchSiswaByName($query, $searchname)
+    {
+        $query->where('nama', 'like', "%$searchname%");
+    }
+
+    public function scopeGetByKelasId($query, $id_kelas)
+    {
+        $query->where('id_kelas', $id_kelas);
+    }
+
     # relation
     public function ketuakelas()
     {

@@ -2,7 +2,6 @@
 
 namespace App\Managements\School\Actor;
 
-use App\Repositories\School\Actor\SiswaRepository;
 use App\Imports\Siswa\SiswaImport;
 use App\Models\School\Actor\Siswa;
 use Illuminate\Support\Facades\Auth;
@@ -12,11 +11,9 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class SiswaManagement
 {
-    protected $SiswaRepo;
-
     public function __construct()
     {
-        $this->SiswaRepo = new SiswaRepository;
+        //
     }
 
     # Public
@@ -26,14 +23,14 @@ class SiswaManagement
             $validator = $this->siswaListValidator($request->all());
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
             $getSiswa = Siswa::query();
-            if ($request->method == 'all') $getSiswa->where('id_kelas', $request->kelasid)->withTrashed();
-            elseif ($request->method == 'deleted') $getSiswa->where('id_kelas', $request->kelasid)->onlyTrashed();
+            if ($request->method == 'all') $getSiswa->getByKelasId($request->kelasid)->withTrashed();
+            elseif ($request->method == 'deleted') $getSiswa->getByKelasId($request->kelasid)->onlyTrashed();
             else {
                 $id_kelas = $request->kelasid;
                 if ($this->getStatus() == 'ketuakelas') $id_kelas = auth()->user()->ketuakelas->id_kelas;
                 if (isset($request->presensikegiatan)) $getSiswa->getUnPresensiByKegiatanToday($request->presensikegiatan);
-                if (isset($request->searchname)) $getSiswa->where('nama', 'like', "%$request->searchname%");
-                if (isset($id_kelas)) $getSiswa->where('id_kelas', $id_kelas);
+                if (isset($request->searchname)) $getSiswa->searchSiswaByName($request->searchname);
+                if (isset($id_kelas)) $getSiswa->getByKelasId($id_kelas);
             }
             return response()->json(dataResponse($getSiswa->get()->map->siswaSimpleListMap()), 200);
         }

@@ -107,6 +107,43 @@ class Kegiatan extends Model
         });
     }
 
+    public function scopeWhereInAllowToAccess($query, $arrAccess)
+    {
+        $query->whereIn('akses', $arrAccess);
+    }
+
+    public function scopeWhereAccessType($query, $type)
+    {
+        $query->where('akses', Atv_setAksesKegiatan($type));
+    }
+
+    public function scopeCreateNewKegiatan($query, $input, $nilai_poin)
+    {
+        $query->create([
+            'nama' => $input->nama,
+            'nilai' => serialize(Arr_collapse($nilai_poin)),
+            'nilai_avg' => isset($input->nilai_avg) ? $input->nilai_avg : 0,
+            'hari' => Atv_setDayKegiatan($input->hari),
+            'waktu_mulai' => Carbon_AnyTimeParse($input->mulai),
+            'waktu_selesai' => Carbon_AnyTimeParse($input->selesai),
+            'akses' => Atv_setAksesKegiatan($input->akses)
+        ]);
+    }
+
+    public function scopeUpdateKegiatan($query, $id, $input, $update_nilai)
+    {
+        $query->find($id)
+            ->update([
+                'nama' => $input->nama,
+                'nilai' => serialize(Arr_collapse($update_nilai)),
+                'nilai_avg' => isset($input->nilai_avg) ? $input->nilai_avg : 0,
+                'hari' => Atv_setDayKegiatan($input->hari),
+                'waktu_mulai' => Carbon_AnyTimeParse($input->mulai),
+                'waktu_selesai' => Carbon_AnyTimeParse($input->selesai),
+                'akses' => Atv_setAksesKegiatan($input->akses)
+            ]);
+    }
+
     # relation
     public function presensi()
     {

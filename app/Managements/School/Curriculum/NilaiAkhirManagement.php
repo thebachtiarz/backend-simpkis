@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\Validator;
 
 class NilaiAkhirManagement
 {
-    // protected ;
-
     public function __construct()
     {
         //
@@ -28,15 +26,10 @@ class NilaiAkhirManagement
              * berdasarkan id kelas / id siswa / id nilai akhir (group)
              */
             if (isset($request->kelasid) || isset($request->siswaid) || isset($request->groupid)) {
-                $getNilaiAkhir = NilaiAkhir::query();
-                $getNilaiAkhir = $getNilaiAkhir->where('id_semester', isset($request->smtid) ? $request->smtid : Cur_getActiveIDSemesterNow());
-                if (isset($request->kelasid)) {
-                    $getNilaiAkhir = $getNilaiAkhir->whereIn('id_siswa', function ($q) use ($request) {
-                        $q->select('id')->from('siswas')->where('id_kelas', $request->kelasid);
-                    });
-                }
-                if (isset($request->siswaid)) $getNilaiAkhir = $getNilaiAkhir->where('id_siswa', $request->siswaid);
-                if (isset($request->groupid)) $getNilaiAkhir = $getNilaiAkhir->where('id_nilai', $request->groupid);
+                $getNilaiAkhir = NilaiAkhir::where('id_semester', isset($request->smtid) ? $request->smtid : Cur_getActiveIDSemesterNow());
+                if (isset($request->kelasid)) $getNilaiAkhir = $getNilaiAkhir->getByKelasId($request->kelasid);
+                if (isset($request->siswaid)) $getNilaiAkhir = $getNilaiAkhir->getBySiswaId($request->siswaid);
+                if (isset($request->groupid)) $getNilaiAkhir = $getNilaiAkhir->getByGroupId($request->groupid);
                 return response()->json(dataResponse($getNilaiAkhir->get()->map->nilaiakhirSimpleListMap(), '', $getNilaiAkhir->count() ? $getNilaiAkhir->get()[0]->nilaiakhirgroup->catatan : []), 200);
             } elseif (isset($request->getBy)) {
                 /**
@@ -44,7 +37,7 @@ class NilaiAkhirManagement
                  * berdasarkan semester sekarang
                  */
                 if ($request->getBy == 'smtnow') {
-                    $getNilaiAkhirGroup = NilaiAkhirGroup::where('id_semester', Cur_getActiveIDSemesterNow());
+                    $getNilaiAkhirGroup = NilaiAkhirGroup::getBySemesterNow();
                     return response()->json(dataResponse($getNilaiAkhirGroup->get()->map->NilaiAkhirGroupSimpleListMap()), 200);
                 }
             }

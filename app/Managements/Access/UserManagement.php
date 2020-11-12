@@ -3,6 +3,8 @@
 namespace App\Managements\Access;
 
 use App\Managements\School\Actor\KetuaKelasManagement;
+use App\Models\Auth\User;
+use App\Models\School\Actor\Siswa;
 use App\Repositories\User\UserRepository;
 use App\Repositories\School\Actor\SiswaRepository;
 use Illuminate\Support\Facades\Auth;
@@ -27,7 +29,7 @@ class UserManagement
             $validator = $this->userListValidator($request->all());
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
             if ($this->UserRepo->userAllow($request->status, Auth::user()->userstat->status)) {
-                $getUsers = $this->UserRepo->getUsersByStatus($request->status);
+                $getUsers = User::getUsersByStatus($request->status);
                 $_data = $getUsers->get()->map->userInfoMap();
                 $_status = '';
                 $_message = 'Total: ' . $getUsers->count() . ' ' . User_getStatusForHuman(User_setStatus($request->status));
@@ -44,15 +46,24 @@ class UserManagement
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
             if ($this->UserRepo->userAllow($request->status, Auth::user()->userstat->status)) {
                 try {
+                    $checkUser = User::getAvailableByUsername($request->username);
+                    if ($checkUser->count()) throw new \Exception("Pengguna sudah ada", 1);
                     DB::transaction(function () use ($request) {
-                        $username = $request->siswaid ? Act_formatNewKetuaKelasUsername($this->SiswaRepo->collectById($request->siswaid, 'nisn')) : $request->username;
-                        $password = $request->siswaid ? Act_formatNewKetuaKelasPassword($this->SiswaRepo->collectById($request->siswaid, 'nisn')) : User_encPass($request->password);
-                        $name = $request->siswaid ? $this->SiswaRepo->collectById($request->siswaid, 'nama') : $request->name;
+                        $username = $request->username;
+                        $password = User_encPass($request->password);
+                        $fullname = $request->name;
+                        if (isset($request->siswaid)) {
+                            $getSiswa = Siswa::find($request->siswaid);
+                            if (!(bool) $getSiswa) throw new \Exception("Siswa tidak ditemukan", 2);
+                            $username = Act_formatNewKetuaKelasUsername($getSiswa->nisn);
+                            $password = Act_formatNewKetuaKelasPassword($getSiswa->nisn);
+                            $fullname = $getSiswa->nama;
+                        }
                         DB::table('users')->insert([
                             'username' => $username, 'password' => $password, 'active' => User_setActiveStatus('active')
                         ]);
                         DB::table('user_biodatas')->insert([
-                            'name' => ucwords($name)
+                            'name' => ucwords($fullname)
                         ]);
                         DB::table('user_statuses')->insert([
                             'status' => User_setStatus($request->status)
@@ -75,9 +86,9 @@ class UserManagement
     public function userShow($id)
     {
         if (Auth::user()->tokenCan('user:show')) {
-            $getUser = $this->UserRepo->findTrashed($id);
-            $userStatus = (bool) $getUser ? User_getStatus($getUser->userstat->status) : '';
-            if ($this->UserRepo->userAllow($userStatus, Auth::user()->userstat->status)) {
+            $getUser = User::withTrashed()->find($id);
+            $getUserStatus = (bool) $getUser ? User_getStatus($getUser->userstat->status) : '';
+            if ($this->UserRepo->userAllow($getUserStatus, Auth::user()->userstat->status)) {
                 return response()->json(dataResponse($getUser->userInfoMap()), 200);
             }
             return response()->json(errorResponse('Anda tidak diperkenankan untuk melihat pengguna ini'), 202);
@@ -90,9 +101,9 @@ class UserManagement
         if (Auth::user()->tokenCan('user:update')) {
             $validator = $this->userUpdateValidator($request->all());
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-            $getUser = $this->UserRepo->findTrashed($id);
-            $userStatus = (bool) $getUser ? User_getStatus($getUser->userstat->status) : '';
-            if ($this->UserRepo->userAllow($userStatus, Auth::user()->userstat->status)) {
+            $getUser = User::withTrashed()->find($id);
+            $getUserStatus = (bool) $getUser ? User_getStatus($getUser->userstat->status) : '';
+            if ($this->UserRepo->userAllow($getUserStatus, Auth::user()->userstat->status)) {
                 $getChange = array_filter($request->all());
                 if ((bool) $getChange) {
                     try {
@@ -100,11 +111,11 @@ class UserManagement
                         $oldData = [];
                         if (isset($request->name)) {
                             array_push($oldData, $getUser->userbio->name);
-                            $getUser->userbio->update(['name' => $request->name]);
+                            $getUser->userbio()->update(['name' => $request->name]);
                         }
                         if (isset($request->status) && $this->UserRepo->userAllow($request->status, Auth::user()->userstat->status)) {
                             array_push($oldData, User_getStatusForHuman($getUser->userstat->status));
-                            $getUser->userstat->update(['status' => User_setStatus($request->status)]);
+                            $getUser->userstat()->update(['status' => User_setStatus($request->status)]);
                             $getChange['status'] = User_getStatusForHuman(User_setStatus($request->status));
                         }
                         $response = ['oldData' => array_combine($getChangeKey, $oldData), 'newData' => $getChange];
@@ -125,14 +136,19 @@ class UserManagement
         if (Auth::user()->tokenCan('user:delete')) {
             $validator = $this->userDestroyValidator($request->all());
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-            $getUser = $this->UserRepo->findTrashed($id);
-            $userStatus = (bool) $getUser ? User_getStatus($getUser->userstat->status) : '';
-            if ($this->UserRepo->userAllow($userStatus, Auth::user()->userstat->status)) {
+            $getUser = ($request->method == 'force') ? User::withTrashed()->find($id) : User::find($id);
+            $getUserStatus = (bool) $getUser ? $getUser->userstat->status : '';
+            if ($this->UserRepo->userAllow(User_getStatus($getUserStatus), Auth::user()->userstat->status)) {
                 if ($request->method == 'force') {
-                    $this->UserRepo->forceDelete($id);
+                    if (($getUserStatus == User_setStatus('ketuakelas') && (bool) $getUser->ketuakelas)) $getUser->ketuakelas->delete();
+                    $getUser->userbio->delete();
+                    $getUser->userstat->delete();
+                    $getUser->forceDelete();
                     return response()->json(successResponse('Berhasil menghapus pengguna secara permanen'), 200);
+                } else {
+                    if (($getUserStatus == User_setStatus('ketuakelas') && (bool) $getUser->ketuakelas)) $getUser->ketuakelas->delete();
+                    $getUser->delete();
                 }
-                $this->UserRepo->delete($id);
                 return response()->json(successResponse('Berhasil menghapus pengguna'), 200);
             }
             return response()->json(errorResponse('Anda tidak diperkenankan untuk menghapus pengguna ini'), 202);

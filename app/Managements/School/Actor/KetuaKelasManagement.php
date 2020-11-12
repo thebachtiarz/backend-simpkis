@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\Validator;
 
 class KetuaKelasManagement
 {
-    // protected ;
-
     public function __construct()
     {
         //
@@ -30,13 +28,7 @@ class KetuaKelasManagement
     {
         if (Auth::user()->tokenCan('ketkel:create')) {
             $getSiswa = Siswa::find($id_siswa);
-            if ((bool) $getSiswa) {
-                KetuaKelas::create([
-                    'id_siswa' => $id_siswa,
-                    'id_kelas' => $getSiswa->id_kelas,
-                    'id_user' => $new_uid
-                ]);
-            }
+            if ((bool) $getSiswa) KetuaKelas::createNewKetuaKelas($id_siswa, $getSiswa->id_kelas, $new_uid);
         }
         return _throwErrorResponse();
     }

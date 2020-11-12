@@ -2,20 +2,16 @@
 
 namespace App\Managements\School\Curriculum;
 
-use App\Repositories\School\Curriculum\KelasGroupRepository;
-use App\Repositories\School\Curriculum\KelasRepository;
+use App\Models\School\Curriculum\KelasGroup;
+use App\Models\School\Curriculum\Kelas;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class KelasManagement
 {
-    protected $KelasRepo;
-    protected $KelasGroupRepo;
-
     public function __construct()
     {
-        $this->KelasRepo = new KelasRepository;
-        $this->KelasGroupRepo = new KelasGroupRepository;
+        //
     }
 
     # Public
@@ -25,18 +21,16 @@ class KelasManagement
             $validator = $this->kelasListValidator($request->all());
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
             if ($request->method == 'searchgroup') {
-                $getKelasGroup = $this->KelasGroupRepo->searchKelasGroupByName($request->searchnama, $request->tingkat);
+                $getKelasGroup = KelasGroup::searchKelasGroupByName($request->searchnama, $request->tingkat);
                 return response()->json(dataResponse($getKelasGroup->get()->map->kelasgroupSimpleListMap()), 200);
             }
             if ($request->method == 'graduated') {
-                $getGraduated = $this->KelasRepo->getGraduatedKelas();
+                $getGraduated = Kelas::getGraduatedKelas();
                 return response()->json(dataResponse($getGraduated->get()->map->kelasSimpleListMap()), 200);
             }
-            $getKelas = $this->KelasRepo->getActiveKelas();
+            $getKelas = Kelas::getActiveKelas();
             if ($request->method == 'havenoketuakelas') {
-                $getKelas = $getKelas->whereNotIn('id', function ($q) {
-                    $q->select('id_kelas')->from('ketua_kelas');
-                });
+                $getKelas = $getKelas->getHaveNoKetuaKelas();
             }
             if ($request->method == 'all') {
                 return response()->json(dataResponse($getKelas->withTrashed()->get()->map->kelasSimpleListMap()), 200);
@@ -53,15 +47,15 @@ class KelasManagement
         if (Auth::user()->tokenCan('kelas:create')) {
             $validator = $this->kelasStoreValidator($request->all());
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-            $checkAvailable = $this->KelasRepo->getAvailableKelas($request->tingkat, $request->nama)->count();
+            $checkAvailable = Kelas::getAvailableKelas($request->tingkat, $request->nama)->count();
             if (!$checkAvailable) {
-                $checkGroupKelas = $this->KelasGroupRepo->getAvailableGroupKelas($request->tingkat, $request->nama);
+                $checkGroupKelas = KelasGroup::getAvailableGroupKelas($request->tingkat, $request->nama);
                 if ($checkGroupKelas->count()) {
                     $getKelasGroupId = $checkGroupKelas->get()[0]->id;
-                    $this->KelasRepo->create(['nama' => $request->nama, 'id_group' => $getKelasGroupId]);
+                    Kelas::createNewKelas($request, $getKelasGroupId);
                 } else {
-                    $newKelasGroup = $this->KelasGroupRepo->create(['tingkat' => $request->tingkat, 'nama_group' => Str_pregStringOnly($request->nama), 'status' => Cur_setKelasStatus('active')]);
-                    $this->KelasRepo->create(['nama' => $request->nama, 'id_group' => $newKelasGroup->id]);
+                    $newKelasGroup = KelasGroup::createNewKelasGroup($request);
+                    Kelas::createNewKelas($request, $newKelasGroup->id);
                 }
                 return response()->json(successResponse('Kelas berhasil dibuat'), 201);
             }
@@ -73,7 +67,7 @@ class KelasManagement
     public function kelasShow($id)
     {
         if (Auth::user()->tokenCan('kelas:show')) {
-            $getKelas = $this->KelasRepo->findById($id);
+            $getKelas = Kelas::find($id);
             return (bool) $getKelas
                 ? response()->json(dataResponse($getKelas->kelasFullInfoMap()), 200)
                 : response()->json(errorResponse('Kelas tidak ditemukan'), 202);
@@ -87,7 +81,7 @@ class KelasManagement
             $validator = $this->kelasUpdateValidator($request->all());
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
             if (isset($request->updateTingkat)) {
-                $getKelasGroup = $this->KelasGroupRepo->findById($id);
+                $getKelasGroup = KelasGroup::find($id);
                 if ((bool) $getKelasGroup) {
                     $tingkatNow = $getKelasGroup->tingkat;
                     $tingkatNew = '';
@@ -107,7 +101,7 @@ class KelasManagement
                 }
                 return response()->json(errorResponse('Group kelas tidak ditemukan'), 202);
             }
-            $getKelas = $this->KelasRepo->findById($id);
+            $getKelas = Kelas::find($id);
             if ((bool) $getKelas) {
                 $getKelas->update(['nama' => $request->nama]);
                 return response()->json(successResponse('Berhasil memperbarui kelas'), 201);
@@ -122,13 +116,13 @@ class KelasManagement
         if (Auth::user()->tokenCan('kelas:delete')) {
             $validator = $this->kelasDestoryValidator($request->all());
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-            $getKelas = $this->KelasRepo->findById($id);
+            $getKelas = Kelas::find($id);
             if ($getKelas->count()) {
                 if ($request->method == 'force') {
-                    $getKelas->forceDelete($id);
+                    $getKelas->forceDelete();
                     return response()->json(successResponse('Berhasil menghapus kelas secara permanen'), 200);
                 } else {
-                    $getKelas->delete($id);
+                    $getKelas->delete();
                     return response()->json(successResponse('Berhasil menghapus kelas'), 200);
                 }
             }

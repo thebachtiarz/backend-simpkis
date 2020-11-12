@@ -66,6 +66,31 @@ class NilaiTambahan extends Model
         $query->where('id_semester', $id_semester);
     }
 
+    public function scopeGetBySemesterId($query, $id_semester = '')
+    {
+        $query->where('id_semester', isset($id_semester) ? $id_semester : Cur_getActiveIDSemesterNow());
+    }
+
+    public function scopeGetByKegiatanId($query, $id_kegiatan)
+    {
+        $query->where('id_kegiatan', $id_kegiatan);
+    }
+
+    public function scopeGetBySiswaId($query, $id_siswa)
+    {
+        $query->where('id_siswa', $id_siswa);
+    }
+
+    public function scopeCreateNewNilaiTambahan($query, $input)
+    {
+        $query->create(['id_semester' => Cur_getActiveIDSemesterNow(), 'id_siswa' => $input->siswaid, 'id_kegiatan' => $input->kegiatanid, 'nilai' => $input->nilai]);
+    }
+
+    public function scopeUpdateNilaiTambahan($query, $id, $input)
+    {
+        $query->find($id)->update(['id_kegiatan' => $input->kegiatanid, 'nilai' => $input->nilai]);
+    }
+
     # relation
     public function semester()
     {

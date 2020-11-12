@@ -80,6 +80,25 @@ class Presensi extends Model
         });
     }
 
+    public function scopeGetByKegiatanId($query, $id_kegiatan)
+    {
+        $query->whereIn('id_presensi', function ($q) use ($id_kegiatan) {
+            $q->select('id')->from('presensi_groups')->where('id_kegiatan', $id_kegiatan);
+        });
+    }
+
+    public function scopeGetByKelasId($query, $id_kelas)
+    {
+        $query->whereIn('id_siswa', function ($q) use ($id_kelas) {
+            $q->select('id')->from('siswas')->where('id_kelas', $id_kelas);
+        });
+    }
+
+    public function scopeGetBySiswaId($query, $id_siswa)
+    {
+        $query->where('id_siswa', $id_siswa);
+    }
+
     # relation
     public function presensigroup()
     {

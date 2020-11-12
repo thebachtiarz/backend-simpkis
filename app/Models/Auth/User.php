@@ -57,6 +57,11 @@ class User extends Authenticatable
     }
 
     # scope
+    public function scopeGetAvailableByUsername($query, $username)
+    {
+        $query->where('username', $username);
+    }
+
     public function scopeGetUsersByStatus($query, $status)
     {
         $query->select('users.*')->join('user_statuses', 'users.id', '=', 'user_statuses.id')->where('status', User_setStatus($status));

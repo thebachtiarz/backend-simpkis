@@ -42,6 +42,13 @@ class Kelas extends Model
             ->where([['kelas_groups.tingkat', $tingkat], ['nama', $nama]]);
     }
 
+    public function scopeGetHaveNoKetuaKelas($query)
+    {
+        $query->whereNotIn('id', function ($q) {
+            $q->select('id_kelas')->from('ketua_kelas');
+        });
+    }
+
     public function scopeGetKelasByID($query, $id)
     {
         $query->where('id', $id);
@@ -59,6 +66,11 @@ class Kelas extends Model
         $query->whereIn('id_group', function ($group) {
             $group->select('id')->from('kelas_groups')->where('status', Cur_setKelasStatus('graduated'));
         });
+    }
+
+    public function scopeCreateNewKelas($query, $input, $id_group)
+    {
+        $query->create(['nama' => $input->nama, 'id_group' => $id_group]);
     }
 
     # relation

@@ -52,6 +52,23 @@ class NilaiAkhir extends Model
         $query->where('id_semester', Cur_getActiveIDSemesterNow());
     }
 
+    public function scopeGetByKelasId($query, $id_kelas)
+    {
+        $query->whereIn('id_siswa', function ($q) use ($id_kelas) {
+            $q->select('id')->from('siswas')->where('id_kelas', $id_kelas);
+        });
+    }
+
+    public function scopeGetBySiswaId($query, $id_siswa)
+    {
+        $query->where('id_siswa', $id_siswa);
+    }
+
+    public function scopeGetByGroupId($query, $id_group)
+    {
+        $query->where('id_nilai', $id_group);
+    }
+
     # relation
     public function nilaiakhirgroup()
     {

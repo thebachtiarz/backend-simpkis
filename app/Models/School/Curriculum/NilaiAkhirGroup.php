@@ -26,6 +26,11 @@ class NilaiAkhirGroup extends Model
         $query->orderByDesc('id');
     }
 
+    public function scopeGetBySemesterNow($query)
+    {
+        $query->where('id_semester', Cur_getActiveIDSemesterNow());
+    }
+
     public function scopeGetAvailableNilaiAkhirGroup($query, $semester, $kelas)
     {
         $query->where([['id_semester', $semester], ['id_kelas', $kelas]]);

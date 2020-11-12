@@ -31,6 +31,12 @@ class KetuaKelas extends Model
         ];
     }
 
+    # scope
+    public function scopeCreateNewKetuaKelas($query, $id_siswa, $id_kelas, $id_user)
+    {
+        $query->create(['id_siswa' => $id_siswa, 'id_kelas' => $id_kelas, 'id_user' => $id_user]);
+    }
+
     # relation
     public function kelas()
     {
