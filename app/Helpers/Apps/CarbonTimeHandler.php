@@ -12,10 +12,27 @@ use Illuminate\Support\Carbon;
 
 /** */
 
+/**
+ * set locale date time language
+ *
+ * @return String
+ */
+function setLocales(): String
+{
+    return env('CARBON_SETLOCALE', 'id_ID');
+}
+
+/**
+ * get atom time format
+ *
+ * @param datetime $datetime
+ * @return void
+ */
 function Carbon_atomConvertDateTime($datetime)
 {
     return Carbon::parse($datetime)->format('Y-m-d\TH:i:s.uP');
 }
+
 /**
  * convert datetime
  * for DB
@@ -69,7 +86,7 @@ function Carbon_DBDayNumOfWeek($date = '')
 function Carbon_HumanDayNameOfWeek($date = '', $locale = false)
 {
     $day = Carbon::create(carbon::getDays()[$date]);
-    if ($locale) $day->locale('id_ID');
+    if ($locale) $day->setLocale(setLocales());
     return $day->dayName;
 }
 
@@ -104,7 +121,8 @@ function Carbon_AnyTimeNow()
  */
 function Carbon_HumanFullDateTimeNow()
 {
-    return Carbon::now()->format('l, d F Y H:i:s');
+    Carbon::setLocale(setLocales());
+    return Carbon::now()->isoFormat('dddd, D MMMM YYYY, HH:mm:ss');
 }
 
 /**
@@ -116,7 +134,8 @@ function Carbon_HumanFullDateTimeNow()
  */
 function Carbon_HumanFullDateTime($datetime)
 {
-    return Carbon::parse($datetime)->format('l, d F Y H:i:s');
+    Carbon::setLocale(setLocales());
+    return Carbon::parse($datetime)->isoFormat('dddd, D MMMM YYYY, HH:mm:ss');
 }
 
 /**
@@ -188,7 +207,8 @@ function Carbon_HumanDateParse($datetime)
  */
 function Carbon_HumanDateSimpleDisplayParse($datetime = '')
 {
-    return Carbon::parse($datetime ? $datetime : Carbon_DBtimeNow())->format('D, M j');
+    Carbon::setLocale(setLocales());
+    return Carbon::parse($datetime ? $datetime : Carbon_DBtimeNow())->isoFormat('ddd, MMM D');
 }
 
 /**
@@ -200,6 +220,7 @@ function Carbon_HumanDateSimpleDisplayParse($datetime = '')
  */
 function Carbon_HumanIntervalDateTime($datetime)
 {
+    Carbon::setLocale(setLocales());
     return Carbon::parse($datetime)->diffForHumans();
 }
 
@@ -212,7 +233,7 @@ function Carbon_HumanIntervalDateTime($datetime)
  */
 function Carbon_HumanIntervalCreateUpdate($date_created, $date_updated)
 {
-    return Carbon_AnyConvDateToTimestamp($date_updated) > Carbon_AnyConvDateToTimestamp($date_created) ? Carbon_HumanIntervalDateTime($date_updated) : 'Never';
+    return Carbon_AnyConvDateToTimestamp($date_updated) > Carbon_AnyConvDateToTimestamp($date_created) ? Carbon_HumanIntervalDateTime($date_updated) : '-';
 }
 
 /**
@@ -236,13 +257,14 @@ function Carbon_AnyConvDateToTimestamp($datetime)
  */
 function Carbon_HumanRangeDateTimeDuration($start, $end)
 {
+    Carbon::setLocale(setLocales());
     $checkStart = Carbon_DBDateParse($start);
     $checkEnd = Carbon_DBDateParse($end);
     // if date is today, then return date only in first
     if ($checkStart == $checkEnd) {
-        return Carbon::parse($start)->format('l, d F Y') . '. ' . Carbon::parse($start)->format('H:i') . ' - ' . Carbon::parse($end)->format('H:i');
+        return Carbon::parse($start)->isoFormat('dddd, D MMMM YYYY') . '. ' . Carbon::parse($start)->isoFormat('HH:mm') . ' - ' . Carbon::parse($end)->isoFormat('HH:mm');
     } else {
-        return Carbon::parse($start)->format('l, d F Y H:i') . ' - ' . Carbon::parse($end)->format('l, d F Y H:i');
+        return Carbon::parse($start)->isoFormat('dddd, D MMMM YYYY HH:mm') . ' - ' . Carbon::parse($end)->isoFormat('dddd, D MMMM YYYY HH:mm');
     }
 }
 
