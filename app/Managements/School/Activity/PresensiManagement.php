@@ -143,7 +143,7 @@ class PresensiManagement
         if (Auth::user()->tokenCan('presensi:update')) {
             $validator = $this->presensiUpdateValidator($request->all());
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-            if (isset($request->_update)) {
+            if ($request->has('_update')) {
                 /**
                  * proses guru melakukan approve pada presensi wajib (group)
                  * berdasarkan id presensi (group)
@@ -156,13 +156,23 @@ class PresensiManagement
                     }
                     return response()->json(errorResponse('Kegiatan presensi tidak ditemukan'), 202);
                 }
+                if ($request->_update == 'groupupdate') {
+                    $getPresensiGroup = PresensiGroup::find($id);
+                    if ((bool) $getPresensiGroup) {
+                        // $getPresensiGroup->update(['approve' => '7']);
+                        // return Carbon_atomConvertDateTime(Carbon_DBtimeNow());
+                        return $getPresensiGroup->presensi;
+                        return response()->json(successResponse('Berhasil menyetujui presensi'), 201);
+                    }
+                    return response()->json(errorResponse('Kegiatan presensi tidak ditemukan'), 202);
+                }
             } else {
                 /**
                  * melakukan update perubahan nilai poin pada presensi wajib
                  * berdasarkan id presensi
                  */
                 $getPresensi = Presensi::find($id);
-                $getKegiatan = Kegiatan::find((bool) $getPresensi ? $getPresensi->id_kegiatan : '');
+                $getKegiatan = Kegiatan::find((bool) $getPresensi ? $getPresensi->presensigroup->id_kegiatan : '');
                 if (((bool) $getPresensi) && ((bool) $getKegiatan)) {
                     $getNilaiData = Arr_unserialize($getKegiatan->nilai);
                     $getKegiatanKey = in_array($request->nilai, array_keys($getNilaiData));
@@ -225,7 +235,8 @@ class PresensiManagement
     {
         return Validator::make($request, [
             'nilai' => 'nullable|string|alpha_num|size:6|required_without:_update',
-            '_update' => 'nullable|string|alpha'
+            '_update' => 'nullable|string|alpha',
+            'presensidata' => 'nullable|string|required_if:_update,groupupdate'
         ]);
     }
 }

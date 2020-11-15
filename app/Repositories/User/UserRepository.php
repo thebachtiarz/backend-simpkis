@@ -62,13 +62,15 @@ class UserRepository
     {
         $userCan = [
             # Admin Access
-            'greatadmin' => $this->userAbility([
+            'admin' => $this->userAbility([
                 ['key' => 'auth', 'can' => ['*']],
                 ['key' => 'user', 'can' => ['*']],
+                ['key' => 'kelas', 'can' => ['get']],
+                ['key' => 'siswa', 'can' => ['get']],
                 ['key' => 'ketkel', 'can' => ['create']]
             ]),
             # Kurikulum Access
-            'themanager' => $this->userAbility([
+            'kurikulum' => $this->userAbility([
                 ['key' => 'auth', 'can' => ['*']],
                 ['key' => 'kelas', 'can' => ['*']],
                 ['key' => 'siswa', 'can' => ['*']],
@@ -76,7 +78,7 @@ class UserRepository
                 ['key' => 'nilakh', 'can' => ['get']]
             ]),
             # Guru Access
-            'bestteacher' => $this->userAbility([
+            'guru' => $this->userAbility([
                 ['key' => 'auth', 'can' => ['*']],
                 ['key' => 'user', 'can' => ['create']],
                 ['key' => 'kelas', 'can' => ['get']],
@@ -88,14 +90,14 @@ class UserRepository
                 ['key' => 'nilakh', 'can' => ['*']]
             ]),
             # Ketua Kelas Access
-            'goodleader' => $this->userAbility([
+            'ketuakelas' => $this->userAbility([
                 ['key' => 'auth', 'can' => ['*']],
                 ['key' => 'kegiatan', 'can' => ['get']],
                 ['key' => 'siswa', 'can' => ['get']],
                 ['key' => 'presensi', 'can' => ['get', 'create']]
             ]),
         ];
-        return $userCan[$status];
+        return $userCan[User_getStatus($status)];
     }
 
     public function userAllow($request, $status)
@@ -127,7 +129,7 @@ class UserRepository
                     }
                 } else {
                     foreach ($rq['can'] as $key => $rqc) {
-                        if (in_array($rqc, $userAbility[$rq['key']])) $arrayCan[] = $rq['key'] . ":" . $rqc;
+                        if (in_array($rqc, $userAbility[$rq['key']])) $arrayCan[] = $rq['key'] . ":$rqc";
                     }
                 }
             }

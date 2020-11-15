@@ -15,7 +15,10 @@ class Presensi extends Model
             'id' => strval($this->id),
             'siswa' => $this->siswa->nama,
             'kegiatan' => $this->presensigroup->kegiatan->nama,
-            'nilai' => $this->getNilaiPoin($this->presensigroup->kegiatan->nilai, $this->nilai, 'name'),
+            'nilai' => [
+                'name' => $this->getNilaiPoin($this->presensigroup->kegiatan->nilai, $this->nilai, 'name'),
+                'poin' => $this->getNilaiPoin($this->presensigroup->kegiatan->nilai, $this->nilai, 'poin')
+            ],
             'dilakukan' => Carbon_HumanDateTime($this->created_at)
         ];
     }
@@ -41,7 +44,13 @@ class Presensi extends Model
             'id' => strval($this->id),
             'siswa' => $this->siswa->nama,
             'kegiatan' => $this->presensigroup->kegiatan->nama,
-            'nilai' => $this->getNilaiPoin($this->presensigroup->kegiatan->nilai, $this->nilai, 'name'),
+            'kegiatanid' => strval($this->presensigroup->kegiatan->id),
+            'nilai' => [
+                'name' => $this->getNilaiPoin($this->presensigroup->kegiatan->nilai, $this->nilai, 'name'),
+                'poin' => $this->getNilaiPoin($this->presensigroup->kegiatan->nilai, $this->nilai, 'poin'),
+                'code' => $this->nilai
+            ],
+            'semester' => $this->semester->semester,
             'dilakukan' => Carbon_HumanDateTime($this->created_at),
             'approve' => Atv_convApproveCodeToString($this->presensigroup->approve),
             'catatan' => $this->presensigroup->catatan
