@@ -159,10 +159,33 @@ class PresensiManagement
                 if ($request->_update == 'groupupdate') {
                     $getPresensiGroup = PresensiGroup::find($id);
                     if ((bool) $getPresensiGroup) {
-                        // $getPresensiGroup->update(['approve' => '7']);
-                        // return Carbon_atomConvertDateTime(Carbon_DBtimeNow());
-                        return $getPresensiGroup->presensi;
-                        return response()->json(successResponse('Berhasil menyetujui presensi'), 201);
+                        $presensiUpdate = Arr_unserialize($request->presensidata);
+                        $presensiOrigin = $getPresensiGroup->presensi;
+                        $getUpdatedPresensi = [];
+                        $getDeletedPresensi = [];
+                        //
+                        for ($i = 0; $i < $presensiOrigin->count(); $i++) {
+                            // filter untuk mengecek presensi yang tidak dihapus
+                            if (in_array($presensiOrigin[$i]['id'], array_keys($presensiUpdate))) {
+                                /**
+                                 * filter apakah terdapat perubahan nilai pada presensi
+                                 * ambil hanya yang terdapat perubahan
+                                 */
+                                if ($presensiOrigin[$i]['nilai'] != $presensiUpdate[$presensiOrigin[$i]['id']])
+                                    $getUpdatedPresensi[$presensiOrigin[$i]['id']] = $presensiUpdate[$presensiOrigin[$i]['id']];
+                            }
+                            // filter untuk mengecek presensi yang dihapus
+                            else $getDeletedPresensi[] = $presensiOrigin[$i]['id'];
+                        }
+                        try {
+                            foreach ($getUpdatedPresensi as $key => $value)
+                                Presensi::find($key)->update(['nilai' => $value]);
+                            Presensi::whereIn('id', $getDeletedPresensi)->delete();
+                            $getPresensiGroup->update(['approve' => '7']);
+                            return response()->json(successResponse('Berhasil memperbarui dan menyetujui presensi'), 201);
+                        } catch (\Throwable $th) {
+                            return response()->json(dataResponse(['error' => $th->getMessage()], 'error', 'Terdapat kesalahan dalam proses'), 202);
+                        }
                     }
                     return response()->json(errorResponse('Kegiatan presensi tidak ditemukan'), 202);
                 }
