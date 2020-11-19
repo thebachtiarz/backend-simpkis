@@ -184,7 +184,7 @@ class PresensiManagement
                             $getPresensiGroup->update(['approve' => '7']);
                             return response()->json(successResponse('Berhasil memperbarui dan menyetujui presensi'), 201);
                         } catch (\Throwable $th) {
-                            return response()->json(dataResponse(['error' => $th->getMessage()], 'error', 'Terdapat kesalahan dalam proses'), 202);
+                            return response()->json(dataResponse(['error' => $th->getCode()], 'error', 'Terdapat kesalahan dalam proses'), 202);
                         }
                     }
                     return response()->json(errorResponse('Kegiatan presensi tidak ditemukan'), 202);

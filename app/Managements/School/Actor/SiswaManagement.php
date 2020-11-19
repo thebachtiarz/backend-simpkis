@@ -83,17 +83,21 @@ class SiswaManagement
         if (Auth::user()->tokenCan('siswa:update')) {
             $validator = $this->siswaUpdateValidator($request->all());
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-            $getChange = array_filter($request->all());
-            if ((bool) $getChange) {
+            $getChanges = $validator->validated();
+            if ((bool) $getChanges) {
                 $getSiswa = Siswa::find($id);
                 if ((bool) $getSiswa) {
-                    $getChangeKey = array_keys($getChange); // get key from request
-                    $oldData = [];
-                    for ($i = 0; $i < count($getChangeKey); $i++) array_push($oldData, $getSiswa[$getChangeKey[$i]]);
-                    $getSiswa->update($getChange);
-                    if ((bool) $getSiswa->ketuakelas && isset($request->nama)) $getSiswa->ketuakelas->user->userbio->update(['name' => $request->nama]);
-                    $response = ['oldData' => array_combine($getChangeKey, $oldData), 'newData' => $getChange];
-                    return response()->json(dataResponse($response, '', 'Berhasil memperbarui data siswa'), 200);
+                    if (array_key_exists('kelasid', $getChanges)) {
+                        $getChanges['id_kelas'] = $getChanges['kelasid'];
+                        unset($getChanges['kelasid']);
+                    }
+                    try {
+                        $getSiswa->update($getChanges);
+                        if ((bool) $getSiswa->ketuakelas && isset($request->nama)) $getSiswa->ketuakelas->user->userbio->update(['name' => $request->nama]);
+                        return response()->json(successResponse('Berhasil memperbarui data siswa'), 200);
+                    } catch (\Throwable $th) {
+                        return response()->json(dataResponse(['error' => $th->getCode()], 'error', 'Gagal memperbarui data siswa'), 202);
+                    }
                 }
                 return response()->json(errorResponse('Siswa tidak ditemukan'), 202);
             }

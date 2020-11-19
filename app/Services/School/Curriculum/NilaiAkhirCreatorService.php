@@ -75,9 +75,9 @@ class NilaiAkhirCreatorService
                 NilaiAkhirGroup::insert($partNilaiAkhirGroup);
             foreach (array_chunk($this->finalNilaiAkhir, 10000) as $partNilaiAkhir)
                 NilaiAkhir::insert($partNilaiAkhir);
-            $this->responseResult = successResponse('Berhasil memproses seluruh nilai akhir');
+            $this->responseResult = successResponse('Berhasil memproses nilai akhir');
         } catch (\Throwable $th) {
-            $this->responseResult = errorResponse($th->getMessage());
+            $this->responseResult = dataResponse(['error' => $th->getCode()], 'error', 'Gagal memproses nilai akhir');
         }
     }
 }
