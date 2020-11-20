@@ -20,6 +20,13 @@ class KelasManagement
         if (Auth::user()->tokenCan('kelas:get')) {
             $validator = $this->kelasListValidator($request->all());
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
+            if ($request->method == 'getgroup') {
+                $getKelasGroup = KelasGroup::query();
+                if ($request->groupstatus == 'all') $getKelasGroup = $getKelasGroup->get()->map->kelasgroupSimpleListMap();
+                elseif ($request->groupstatus == 'graduated') $getKelasGroup = $getKelasGroup->getGraduatedKelas()->get()->map->kelasgroupSimpleListMap();
+                else $getKelasGroup = $getKelasGroup->getActiveKelas()->get()->map->kelasgroupSimpleListMap();
+                return response()->json(dataResponse($getKelasGroup), 200);
+            }
             if ($request->method == 'searchgroup') {
                 $getKelasGroup = KelasGroup::searchKelasGroupByName($request->searchnama, $request->tingkat);
                 return response()->json(dataResponse($getKelasGroup->get()->map->kelasgroupSimpleListMap()), 200);
@@ -29,14 +36,9 @@ class KelasManagement
                 return response()->json(dataResponse($getGraduated->get()->map->kelasSimpleListMap()), 200);
             }
             $getKelas = Kelas::getActiveKelas();
-            if ($request->method == 'havenoketuakelas') {
-                $getKelas = $getKelas->getHaveNoKetuaKelas();
-            }
-            if ($request->method == 'all') {
-                return response()->json(dataResponse($getKelas->withTrashed()->get()->map->kelasSimpleListMap()), 200);
-            } elseif ($request->method == 'deleted') {
-                return response()->json(dataResponse($getKelas->onlyTrashed()->get()->map->kelasSimpleListMap()), 200);
-            }
+            if ($request->method == 'havenoketuakelas') $getKelas = $getKelas->getHaveNoKetuaKelas();
+            if ($request->method == 'all') $getKelas = $getKelas->withTrashed();
+            if ($request->method == 'deleted') $getKelas = $getKelas->onlyTrashed();
             return response()->json(dataResponse($getKelas->get()->map->kelasSimpleListMap()), 200);
         }
         return _throwErrorResponse();
@@ -96,7 +98,7 @@ class KelasManagement
                     }
                     if (isset($tingkatNew)) {
                         $getKelasGroup->update(['tingkat' => $tingkatNew]);
-                        return response()->json(successResponse($message), 201);
+                        return response()->json(dataResponse($getKelasGroup->kelasgroupSimpleListMap(), '', $message), 201);
                     }
                 }
                 return response()->json(errorResponse('Group kelas tidak ditemukan'), 202);
@@ -138,6 +140,7 @@ class KelasManagement
     {
         return Validator::make($request, [
             'method' => 'nullable|string|alpha',
+            'groupstatus' => 'nullable|string|required_if:method,getgroup',
             'tingkat' => 'nullable|string|numeric|between:10,12',
             'searchnama' => 'nullable|string|min:3|regex:/^[a-zA-Z0-9_\s]+$/'
         ]);

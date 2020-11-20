@@ -29,7 +29,8 @@ class Siswa extends Model
             'nisn' => $this->nisn,
             'nama' => $this->nama,
             'kelas' => Cur_getKelasNameByID($this->id_kelas),
-            'kelasid' => $this->id_kelas
+            'kelasid' => strval($this->id_kelas),
+            'diperbarui' => Carbon_HumanIntervalCreateUpdate($this->created_at, $this->updated_at)
         ];
     }
 

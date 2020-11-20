@@ -14,7 +14,10 @@ class KelasGroup extends Model
         return [
             'id' => strval($this->id),
             'tingkat' => $this->tingkat,
-            'nama' => $this->nama_group
+            'nama' => $this->nama_group,
+            'status' => ucfirst(Cur_getKelasStatus($this->status)),
+            'jmlkelas' => strval($this->kelas->count()),
+            'diperbarui' => Carbon_HumanIntervalCreateUpdate($this->created_at, $this->updated_at)
         ];
     }
 
@@ -41,9 +44,19 @@ class KelasGroup extends Model
         ]);
     }
 
+    public function scopeGetActiveKelas($query)
+    {
+        $query->where('status', Cur_setKelasStatus('active'));
+    }
+
+    public function scopeGetGraduatedKelas($query)
+    {
+        $query->where('status', Cur_setKelasStatus('graduated'));
+    }
+
     # relation
     public function kelas()
     {
-        return $this->hasMany(Kelas::class, 'id', 'id_group');
+        return $this->hasMany(Kelas::class, 'id_group', 'id');
     }
 }
