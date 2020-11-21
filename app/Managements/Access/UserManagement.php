@@ -30,7 +30,7 @@ class UserManagement
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
             if ($this->UserRepo->userAllow($request->status, Auth::user()->userstat->status)) {
                 $getUsers = User::getUsersByStatus($request->status);
-                $_data = $getUsers->get()->map->userInfoMap();
+                $_data = $getUsers->get()->map->userSimpleListMap();
                 $_status = '';
                 $_message = 'Total: ' . $getUsers->count() . ' ' . User_getStatusForHuman(User_setStatus($request->status));
                 return response()->json(dataResponse($_data, $_status, $_message), 200);
@@ -89,7 +89,7 @@ class UserManagement
             $getUser = User::withTrashed()->find($id);
             $getUserStatus = (bool) $getUser ? User_getStatus($getUser->userstat->status) : '';
             if ($this->UserRepo->userAllow($getUserStatus, Auth::user()->userstat->status)) {
-                return response()->json(dataResponse($getUser->userInfoMap()), 200);
+                return response()->json(dataResponse($getUser->userSimpleInfoMap()), 200);
             }
             return response()->json(errorResponse('Anda tidak diperkenankan untuk melihat pengguna ini'), 202);
         }
@@ -112,12 +112,19 @@ class UserManagement
                         if (isset($request->name)) {
                             array_push($oldData, $getUser->userbio->name);
                             $getUser->userbio()->update(['name' => $request->name]);
+                            $getChange['name'] = $request->name;
                         }
                         if (isset($request->status) && $this->UserRepo->userAllow($request->status, Auth::user()->userstat->status)) {
                             array_push($oldData, User_getStatusForHuman($getUser->userstat->status));
                             $getUser->userstat()->update(['status' => User_setStatus($request->status)]);
                             $getChange['status'] = User_getStatusForHuman(User_setStatus($request->status));
                         }
+                        if (isset($request->active)) {
+                            array_push($oldData, $getUser->active);
+                            $getUser->update(['active' => User_setActiveStatus($request->active)]);
+                            $getChange['active'] = ucfirst($request->active);
+                        }
+                        $getUser->touch(); // updating user's updated_at
                         $response = ['oldData' => array_combine($getChangeKey, $oldData), 'newData' => $getChange];
                         return response()->json(dataResponse($response, '', 'Berhasil memperbarui data pengguna'), 201);
                     } catch (\Exception $e) {
@@ -182,7 +189,8 @@ class UserManagement
     {
         return Validator::make($request, [
             'name' => 'nullable|string|min:3|regex:/^[a-zA-Z_,.\s]+$/',
-            'status' => 'nullable|string'
+            'status' => 'nullable|alpha',
+            'active' => 'nullable|alpha'
         ]);
     }
 

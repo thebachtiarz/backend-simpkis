@@ -33,26 +33,25 @@ class User extends Authenticatable
     public function userSimpleListMap()
     {
         return [
-            'name' => $this->userbio->name,
-            'status' => User_getStatusForHuman($this->userstat->status)
+            'id' => strval($this->id),
+            'nama' => $this->userbio->name,
+            'status' => User_getStatusForHuman($this->userstat->status),
+            'kondisi' => User_getActiveStatus($this->active),
+            'kelas' => User_getStatus($this->userstat->status) == 'ketuakelas' ? Cur_getKelasNameByID($this->ketuakelas->id_kelas) : '',
         ];
     }
 
-    public function userInfoMap()
+    public function userSimpleInfoMap()
     {
-        return User_getStatus($this->userstat->status) == 'ketuakelas' ? [
+        return [
             'id' => strval($this->id),
-            'name' => $this->userbio->name,
+            'nama' => $this->userbio->name,
             'status' => User_getStatusForHuman($this->userstat->status),
-            'kelas' => Cur_getKelasNameByID($this->ketuakelas->id_kelas),
-            'active' => User_getActiveStatus($this->active),
-            'created_at' => Carbon_HumanDateTime($this->created_at)
-        ] : [
-            'id' => strval($this->id),
-            'name' => $this->userbio->name,
-            'status' => User_getStatusForHuman($this->userstat->status),
-            'active' => User_getActiveStatus($this->active),
-            'created_at' => Carbon_HumanDateTime($this->created_at)
+            'status_slug' => User_getStatus($this->userstat->status),
+            'kelas' => User_getStatus($this->userstat->status) == 'ketuakelas' ? Cur_getKelasNameByID($this->ketuakelas->id_kelas) : '',
+            'kondisi' => User_getActiveStatus($this->active),
+            'dibuat' => Carbon_HumanDateTime($this->created_at),
+            'diperbarui' => Carbon_HumanIntervalCreateUpdate($this->created_at, $this->updated_at)
         ];
     }
 
