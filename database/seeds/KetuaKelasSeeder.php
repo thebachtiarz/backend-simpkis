@@ -36,18 +36,26 @@ class KetuaKelasSeeder extends Seeder
             $newUser[] = [
                 'username' => Act_formatNewKetuaKelasUsername($moreUser['tagname']),
                 'password' => Act_formatNewKetuaKelasPassword($moreUser['tagname']),
-                'active' => $moreUser['active']
+                'active' => $moreUser['active'],
+                'created_at' => Carbon_DBtimeNow(),
+                'updated_at' => Carbon_DBtimeNow()
             ];
             $newUserBiodata[] = [
-                'name' => $moreUser['name']
+                'name' => $moreUser['name'],
+                'created_at' => Carbon_DBtimeNow(),
+                'updated_at' => Carbon_DBtimeNow()
             ];
             $newUserStatus[] = [
-                'status' => $moreUser['status']
+                'status' => $moreUser['status'],
+                'created_at' => Carbon_DBtimeNow(),
+                'updated_at' => Carbon_DBtimeNow()
             ];
             $newKetua[] = [
                 'id_siswa' => strval($getRandomCandidate->id),
                 'id_kelas' => strval($getRandomCandidate->id_kelas),
-                'id_user' => strval($getLastIdUser + ($i + 1))
+                'id_user' => strval($getLastIdUser + ($i + 1)),
+                'created_at' => Carbon_DBtimeNow(),
+                'updated_at' => Carbon_DBtimeNow()
             ];
         }
 

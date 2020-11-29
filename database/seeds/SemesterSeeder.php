@@ -14,8 +14,16 @@ class SemesterSeeder extends Seeder
     {
         $newSemester = [];
         for ($i = 2015; $i <= date("Y"); $i++) {
-            $newSemester[] = ['semester' => Cur_setNewSemesterFormat(($i - 1), '2')];
-            $newSemester[] = ['semester' => Cur_setNewSemesterFormat($i, '1')];
+            $newSemester[] = [
+                'semester' => Cur_setNewSemesterFormat(($i - 1), '2'),
+                'created_at' => Carbon_DBtimeNow(),
+                'updated_at' => Carbon_DBtimeNow()
+            ];
+            $newSemester[] = [
+                'semester' => Cur_setNewSemesterFormat($i, '1'),
+                'created_at' => Carbon_DBtimeNow(),
+                'updated_at' => Carbon_DBtimeNow()
+            ];
         }
         Semester::insert($newSemester);
     }

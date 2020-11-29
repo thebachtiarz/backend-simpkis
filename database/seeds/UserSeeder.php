@@ -22,15 +22,27 @@ class UserSeeder extends Seeder
         ]);
 
         $user = $users->map(function ($data) {
-            return ['username' => $data['username'], 'password' => $data['password'], 'active' => $data['active']];
+            return [
+                'username' => $data['username'], 'password' => $data['password'], 'active' => $data['active'],
+                'created_at' => Carbon_DBtimeNow(),
+                'updated_at' => Carbon_DBtimeNow()
+            ];
         })->all();
 
         $biodata = $users->map(function ($data) {
-            return ['name' => $data['name']];
+            return [
+                'name' => $data['name'],
+                'created_at' => Carbon_DBtimeNow(),
+                'updated_at' => Carbon_DBtimeNow()
+            ];
         })->all();
 
         $status = $users->map(function ($data) {
-            return ['status' => $data['status']];
+            return [
+                'status' => $data['status'],
+                'created_at' => Carbon_DBtimeNow(),
+                'updated_at' => Carbon_DBtimeNow()
+            ];
         })->all();
 
         User::insert($user);

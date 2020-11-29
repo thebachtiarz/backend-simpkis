@@ -25,6 +25,7 @@ class KegiatanManagement
                 $getKegiatan = Kegiatan::whereInAllowToAccess($this->canAllow[$this->getStatus()]);
                 if ($this->getStatus() == 'ketuakelas') $getKegiatan->getAvailablePresensiNow();
                 if ($request->tipe) $getKegiatan->whereAccessType($request->tipe);
+                $getKegiatan = $getKegiatan->withOrderAccess();
                 if ($getKegiatan->count()) {
                     $getKegiatan = $getKegiatan->get()->map->kegiatanSimpleListMap();
                     return response()->json(dataResponse($getKegiatan), 200);

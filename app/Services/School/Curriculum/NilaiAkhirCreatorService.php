@@ -49,7 +49,9 @@ class NilaiAkhirCreatorService
                 $this->finalNilaiAkhirGroup[] = [
                     'id_semester' => $this->id_semester,
                     'id_kelas' => $setKelas->id,
-                    'catatan' => 'Presensi Semester: ' . Cur_getSemesterNameByID($this->id_semester) . ', Kelas: ' . Cur_getKelasNameByID($setKelas->id) . ', Tanggal: ' . Carbon_HumanFullDateTimeNow()
+                    'catatan' => 'Presensi Semester: ' . Cur_getSemesterNameByID($this->id_semester) . ', Kelas: ' . Cur_getKelasNameByID($setKelas->id) . ', Tanggal: ' . Carbon_HumanFullDateTimeNow(),
+                    'created_at' => Carbon_DBtimeNow(),
+                    'updated_at' => Carbon_DBtimeNow()
                 ];
                 for ($j = 0; $j < count($setKelas->siswa); $j++) {
                     $setSiswa = $setKelas->siswa[$j];
@@ -58,7 +60,9 @@ class NilaiAkhirCreatorService
                         'id_nilai' => $this->newNilaiAkhirGroupId,
                         'id_semester' => $this->id_semester,
                         'id_siswa' => $setSiswa->id,
-                        'nilai_akhir' => Cur_setFormatNilaiAkhir($getNilai['totalNilai'], $getNilai['stringNilai'])
+                        'nilai_akhir' => Cur_setFormatNilaiAkhir($getNilai['totalNilai'], $getNilai['stringNilai']),
+                        'created_at' => Carbon_DBtimeNow(),
+                        'updated_at' => Carbon_DBtimeNow()
                     ];
                 }
                 $this->newNilaiAkhirGroupId++;

@@ -18,7 +18,9 @@ class KelasGroupSeeder extends Seeder
             $kelasGroup[] = [
                 'tingkat' => strval(Arr_random(['10', '11', '12'])),
                 'nama_group' => $kelasName[$i],
-                'status' => Cur_setKelasStatus('active')
+                'status' => Cur_setKelasStatus('active'),
+                'created_at' => Carbon_DBtimeNow(),
+                'updated_at' => Carbon_DBtimeNow()
             ];
         }
         KelasGroup::insert($kelasGroup);

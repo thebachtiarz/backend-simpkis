@@ -119,8 +119,8 @@ class PresensiManagement
                  * terdapat pada poin nilai kegiatan
                  */
                 foreach ($getDataPresensi as $key => $value)
-                    if (in_array($value['nilai'], $kodeKegiatan)) $newPresensi[] = ['id_presensi' => strval($newPresensiGroup->id), 'id_semester' => strval(Cur_getActiveIDSemesterNow()), 'id_siswa' => $value['id_siswa'], 'nilai' => $value['nilai']];
-                if (count($newPresensi)) Presensi::insert($newPresensi);
+                    if (in_array($value['nilai'], $kodeKegiatan)) $newPresensi[] = ['id_semester' => strval(Cur_getActiveIDSemesterNow()), 'id_siswa' => $value['id_siswa'], 'nilai' => $value['nilai']];
+                if (count($newPresensi)) PresensiGroup::find($newPresensiGroup->id)->presensi()->createMany($newPresensi);
                 return response()->json(successResponse('Berhasil melakukan presensi'), 201);
             }
             return response()->json(errorResponse('Kegiatan tidak ditemukan'), 202);

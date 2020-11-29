@@ -95,10 +95,11 @@ class SemesterManagement
     private function semesterValidator($request)
     {
         return Validator::make($request, [
-            'tahun' => ['nullable', 'string', 'numeric', 'digits_between:4,4', 'required_with:semester,tahun'],
-            'semester' => ['nullable', 'string', 'numeric', 'between:1,2', 'required_with:tahun,semester']
+            'tahun' => 'nullable|numeric|digits_between:4,4|between:1970,2070|required_with:semester,tahun',
+            'semester' => 'nullable|numeric|between:1,2|required_with:tahun,semester'
         ], [
             'tahun.digits_between' => 'Isikan tahun yang benar (4 digit)',
+            'tahun.between' => 'Tahun hanya dari 1970 - 2070',
             'semester.between' => 'Kode semester yang benar (1 => Ganjil, 2 => Genap)'
         ]);
     }

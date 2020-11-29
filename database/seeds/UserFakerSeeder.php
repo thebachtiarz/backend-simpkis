@@ -30,13 +30,19 @@ class UserFakerSeeder extends Seeder
                 'username' => 'u' . $moreUser['tagname'],
                 'password' => User_encPass('p' . $moreUser['tagname']),
                 'code' => $moreUser['code'],
-                'active' => $moreUser['active']
+                'active' => $moreUser['active'],
+                'created_at' => Carbon_DBtimeNow(),
+                'updated_at' => Carbon_DBtimeNow()
             ];
             $newUserBiodata[] = [
-                'name' => $moreUser['name']
+                'name' => $moreUser['name'],
+                'created_at' => Carbon_DBtimeNow(),
+                'updated_at' => Carbon_DBtimeNow()
             ];
             $newUserStatus[] = [
-                'status' => $moreUser['status']
+                'status' => $moreUser['status'],
+                'created_at' => Carbon_DBtimeNow(),
+                'updated_at' => Carbon_DBtimeNow()
             ];
         }
         foreach (array_chunk($newUser, 10000) as $setUser) {

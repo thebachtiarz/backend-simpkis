@@ -26,7 +26,9 @@ class NilaiTambahanSeeder extends Seeder
                 'id_siswa' => Arr_random($getIdSiswa),
                 'id_kegiatan' => $randKegiatan,
                 // if an error in array_search below, just ignore it, it's happen because dumb php-intelephense when debugging
-                'nilai' => Arr_random(Arr_pluck($getKegiatan[array_search($randKegiatan, $getIdKegiatan)]['nilai'], 'code'))
+                'nilai' => Arr_random(Arr_pluck($getKegiatan[array_search($randKegiatan, $getIdKegiatan)]['nilai'], 'code')),
+                'created_at' => Carbon_DBtimeNow(),
+                'updated_at' => Carbon_DBtimeNow()
             ];
         }
         NilaiTambahan::insert($newNilaiTambahan);

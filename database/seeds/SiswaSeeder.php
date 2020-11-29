@@ -24,7 +24,9 @@ class SiswaSeeder extends Seeder
                 $newSiswa[] = [
                     'nisn' => $nisn,
                     'nama' => $faker->name,
-                    'id_kelas' => $getKelas[$i]->id
+                    'id_kelas' => $getKelas[$i]->id,
+                    'created_at' => Carbon_DBtimeNow(),
+                    'updated_at' => Carbon_DBtimeNow()
                 ];
                 $nisn++;
             }

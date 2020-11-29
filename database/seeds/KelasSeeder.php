@@ -19,7 +19,9 @@ class KelasSeeder extends Seeder
             for ($j = 1; $j <= 3; $j++) {
                 $newKelas[] = [
                     'nama' => $kelasGroup[$i]['nama_group'] . ' ' . $j,
-                    'id_group' => $kelasGroup[$i]['id']
+                    'id_group' => $kelasGroup[$i]['id'],
+                    'created_at' => Carbon_DBtimeNow(),
+                    'updated_at' => Carbon_DBtimeNow()
                 ];
             }
         }

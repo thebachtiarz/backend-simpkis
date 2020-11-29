@@ -144,6 +144,11 @@ class Kegiatan extends Model
             ]);
     }
 
+    public function scopeWithOrderAccess($query)
+    {
+        $query->orderBy('akses');
+    }
+
     # relation
     public function presensi()
     {

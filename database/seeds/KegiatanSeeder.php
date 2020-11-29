@@ -26,7 +26,9 @@ class KegiatanSeeder extends Seeder
                 'hari' => Atv_setDayKegiatan('all'),
                 'waktu_mulai' => Carbon_AnyTimeParse('11:30'),
                 'waktu_selesai' => Carbon_AnyTimeParse('13:00'),
-                'akses' => Atv_setAksesKegiatan('presensi')
+                'akses' => Atv_setAksesKegiatan('presensi'),
+                'created_at' => Carbon_DBtimeNow(),
+                'updated_at' => Carbon_DBtimeNow()
             ],
             [
                 'nama' => 'Sholat Jumat',
@@ -40,7 +42,9 @@ class KegiatanSeeder extends Seeder
                 'hari' => Atv_setDayKegiatan('fri'),
                 'waktu_mulai' => Carbon_AnyTimeParse('11:30'),
                 'waktu_selesai' => Carbon_AnyTimeParse('13:00'),
-                'akses' => Atv_setAksesKegiatan('presensi')
+                'akses' => Atv_setAksesKegiatan('presensi'),
+                'created_at' => Carbon_DBtimeNow(),
+                'updated_at' => Carbon_DBtimeNow()
             ],
             [
                 'nama' => 'Sholat Dhuha',
@@ -54,7 +58,9 @@ class KegiatanSeeder extends Seeder
                 'hari' => Atv_setDayKegiatan('all'),
                 'waktu_mulai' => Carbon_AnyTimeParse('09:00'),
                 'waktu_selesai' => Carbon_AnyTimeParse('10:30'),
-                'akses' => Atv_setAksesKegiatan('presensi')
+                'akses' => Atv_setAksesKegiatan('presensi'),
+                'created_at' => Carbon_DBtimeNow(),
+                'updated_at' => Carbon_DBtimeNow()
             ],
             [
                 'nama' => 'Membersihkan Musholla',
@@ -67,7 +73,9 @@ class KegiatanSeeder extends Seeder
                 'hari' => Atv_setDayKegiatan('all'),
                 'waktu_mulai' => Carbon_AnyTimeParse(),
                 'waktu_selesai' => Carbon_AnyTimeParse(),
-                'akses' => Atv_setAksesKegiatan('tambahan')
+                'akses' => Atv_setAksesKegiatan('tambahan'),
+                'created_at' => Carbon_DBtimeNow(),
+                'updated_at' => Carbon_DBtimeNow()
             ],
             [
                 'nama' => 'Jumat Mengaji',
@@ -80,7 +88,9 @@ class KegiatanSeeder extends Seeder
                 'hari' => Atv_setDayKegiatan('fri'),
                 'waktu_mulai' => Carbon_AnyTimeParse('11:00'),
                 'waktu_selesai' => Carbon_AnyTimeParse('13:00'),
-                'akses' => Atv_setAksesKegiatan('tambahan')
+                'akses' => Atv_setAksesKegiatan('tambahan'),
+                'created_at' => Carbon_DBtimeNow(),
+                'updated_at' => Carbon_DBtimeNow()
             ],
             [
                 'nama' => 'Khotbah Jumat',
@@ -93,7 +103,9 @@ class KegiatanSeeder extends Seeder
                 'hari' => Atv_setDayKegiatan('fri'),
                 'waktu_mulai' => Carbon_AnyTimeParse('11:00'),
                 'waktu_selesai' => Carbon_AnyTimeParse('13:00'),
-                'akses' => Atv_setAksesKegiatan('tambahan')
+                'akses' => Atv_setAksesKegiatan('tambahan'),
+                'created_at' => Carbon_DBtimeNow(),
+                'updated_at' => Carbon_DBtimeNow()
             ]
         ];
         Kegiatan::insert($newKegiatan);
