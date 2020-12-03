@@ -11,7 +11,6 @@ class KegiatanController extends Controller
 
     public function __construct()
     {
-        $this->middleware(['checkrole:guru'])->except(['index', 'show']);
         $this->KegiatanManage = new KegiatanManagement;
     }
 

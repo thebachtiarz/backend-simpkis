@@ -15,9 +15,9 @@
  *
  * @param string $msg
  * @param array ...$response_data
- * @return void
+ * @return array
  */
-function successResponse($msg, ...$response_data)
+function successResponse($msg, ...$response_data): array
 {
     return ['status' => 'success', 'message' => $msg, 'response_data' => $response_data];
 }
@@ -26,9 +26,9 @@ function successResponse($msg, ...$response_data)
  * response info
  *
  * @param string $msg
- * @return void
+ * @return array
  */
-function infoResponse($msg)
+function infoResponse($msg): array
 {
     return ['status' => 'info', 'message' => $msg];
 }
@@ -37,9 +37,9 @@ function infoResponse($msg)
  * response error
  *
  * @param string $msg
- * @return void
+ * @return array
  */
-function errorResponse($msg)
+function errorResponse($msg): array
 {
     return ['status' => 'error', 'message' => $msg];
 }
@@ -50,9 +50,9 @@ function errorResponse($msg)
  * @param string $stat
  * @param string $msg
  * @param array ...$response_data
- * @return void
+ * @return array
  */
-function customResponse($stat, $msg, ...$response_data)
+function customResponse($stat, $msg, ...$response_data): array
 {
     return ['status' => $stat, 'message' => $msg, 'response_data' => $response_data];
 }
@@ -64,9 +64,9 @@ function customResponse($stat, $msg, ...$response_data)
  * @param string $stat
  * @param string $msg
  * @param string $time
- * @return void
+ * @return array
  */
-function dataResponse($response_data, $stat = '', $msg = '', $time = '')
+function dataResponse($response_data, $stat = '', $msg = '', $time = ''): array
 {
     return [
         'status' => $stat ? $stat : 'success',
@@ -78,8 +78,12 @@ function dataResponse($response_data, $stat = '', $msg = '', $time = '')
 
 /**
  * response json error status
+ *
+ * @param string $message
+ * @param string $code
+ * @return object
  */
-function _throwErrorResponse($message = '', $code = '')
+function _throwErrorResponse($message = '', $code = ''): object
 {
     $setMsg = $message ? $message : "Sorry, you cant find anything here";
     $setCode = $code ? $code : "404";

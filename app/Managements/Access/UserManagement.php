@@ -47,35 +47,28 @@ class UserManagement
             if ($this->UserRepo->userAllow($request->status, Auth::user()->userstat->status)) {
                 try {
                     $checkUser = User::getAvailableByUsername($request->username);
-                    if ($checkUser->count()) throw new \Exception("Pengguna sudah ada", 1);
-                    DB::transaction(function () use ($request) {
-                        $username = $request->username;
-                        $password = User_encPass($request->password);
-                        $fullname = $request->name;
-                        if (isset($request->siswaid)) {
-                            $getSiswa = Siswa::find($request->siswaid);
-                            if (!(bool) $getSiswa) throw new \Exception("Siswa tidak ditemukan", 2);
-                            $username = Act_formatNewKetuaKelasUsername($getSiswa->nisn);
-                            $password = Act_formatNewKetuaKelasPassword($getSiswa->nisn);
-                            $fullname = $getSiswa->nama;
-                        }
-                        DB::table('users')->insert([
-                            'username' => $username, 'password' => $password, 'active' => User_setActiveStatus('active')
-                        ]);
-                        DB::table('user_biodatas')->insert([
-                            'name' => ucwords($fullname)
-                        ]);
-                        DB::table('user_statuses')->insert([
-                            'status' => User_setStatus($request->status)
-                        ]);
-                        if ($request->status == 'ketuakelas') {
-                            $new_uid = $this->UserRepo->getLastUserId();
-                            (new KetuaKelasManagement)->ketuakelasStore($new_uid, $request->siswaid);
-                        }
-                    }, 5);
+                    if ($checkUser->count()) throw new \Exception("Pengguna sudah ada", 23000);
+                    $username = $request->username;
+                    $password = User_encPass($request->password);
+                    $fullname = $request->name;
+                    if (isset($request->siswaid)) {
+                        $getSiswa = Siswa::find($request->siswaid);
+                        if (!(bool) $getSiswa) throw new \Exception("Siswa tidak ditemukan", 404);
+                        $username = Act_formatNewKetuaKelasUsername($getSiswa->nisn);
+                        $password = Act_formatNewKetuaKelasPassword($getSiswa->nisn);
+                        $fullname = $getSiswa->nama;
+                    }
+                    // @ start
+                    $new_user = User::create(['username' => $username, 'password' => $password, 'active' => User_setActiveStatus('active')]);
+                    User::find($new_user->id)->userbio()->create(['name' => ucwords($fullname)]);
+                    User::find($new_user->id)->userstat()->create(['status' => User_setStatus($request->status)]);
+                    if ($request->status == 'ketuakelas') {
+                        (new KetuaKelasManagement)->ketuakelasStore($new_user->id, $request->siswaid);
+                    }
+                    // @ finish
                     return response()->json(successResponse('Berhasil membuat pengguna baru'), 201);
                 } catch (\Exception $e) {
-                    return response()->json(errorResponse('Gagal membuat pengguna baru, silahkan coba kembali'), 202);
+                    return response()->json(dataResponse(['code' => $e->getCode()], 'error', $e->getMessage()), 202);
                 }
             }
             return response()->json(errorResponse('Anda tidak diperkenankan untuk membuat pengguna ini'), 202);
@@ -176,9 +169,8 @@ class UserManagement
     private function userStoreValidator($request)
     {
         return Validator::make($request, [
-
-            'username' => 'nullable|string|min:8|alpha_num|unique:users,username|required_without:siswaid',
-            'password' => 'nullable|string|regex:/^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9])(?=.*[!@#$&*()]).{8,})\S$/|required_without:siswaid',
+            'username' => 'nullable|string|min:8|alpha_num|required_without:siswaid',
+            'password' => 'nullable|string|regex:/^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9])(?=.*[^0-9a-zA-Z]).{8,})\S$/|required_without:siswaid',
             'name' => 'nullable|string|min:3|regex:/^[a-zA-Z_,.\s]+$/|required_without:siswaid',
             'status' => 'required|string',
             'siswaid' => 'nullable|string|numeric'

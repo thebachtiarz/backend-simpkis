@@ -30,7 +30,7 @@ class AuthManagement
 
     public function postLogin($request)
     {
-        $validator = $this->loginValidator($request);
+        $validator = $this->loginValidator($request->all());
         if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
         if (Auth::attempt(request(['username', 'password']))) {
             if (User_isActive(Auth::user()->id)) {
@@ -46,10 +46,10 @@ class AuthManagement
         return response()->json(errorResponse('Account not found !'), 202);
     }
 
-    public function postLogout($action)
+    public function postLogout($request)
     {
         if (Auth::user()->tokenCan('auth:postLogout')) {
-            if ($action == 'revoke') {
+            if ($request->_action == 'revoke') {
                 if (Auth::user()->tokens()->delete()) return response()->json(successResponse('Successfully Revoke All Logins'), 201);
             } else {
                 if (Auth::user()->currentAccessToken()->delete()) return response()->json(successResponse('Successfully Logout'), 201);

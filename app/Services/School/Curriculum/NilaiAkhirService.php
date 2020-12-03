@@ -65,7 +65,6 @@ class NilaiAkhirService
     {
         if (count($this->data_presensi))
             for ($i = 0; $i < count($this->data_presensi); $i++)
-                // $this->stateNilaiPresensi += $this->data_kegiatan[$this->data_presensi[$i]->presensigroup->id_kegiatan][$this->data_presensi[$i]->nilai];
                 $this->stateNilaiPresensi += in_array($this->data_presensi[$i]->nilai, array_keys($this->data_kegiatan[$this->data_presensi[$i]->presensigroup->id_kegiatan])) ?
                     $this->data_kegiatan[$this->data_presensi[$i]->presensigroup->id_kegiatan][$this->data_presensi[$i]->nilai] : 0;
     }
@@ -74,7 +73,6 @@ class NilaiAkhirService
     {
         if (count($this->data_nilaitambahan))
             for ($i = 0; $i < count($this->data_nilaitambahan); $i++)
-                // $this->stateNilaiTambahan += $this->data_kegiatan[$this->data_nilaitambahan[$i]->id_kegiatan][$this->data_nilaitambahan[$i]->nilai];
                 $this->stateNilaiTambahan += in_array($this->data_nilaitambahan[$i]->nilai, array_keys($this->data_kegiatan[$this->data_nilaitambahan[$i]->id_kegiatan])) ?
                     $this->data_kegiatan[$this->data_nilaitambahan[$i]->id_kegiatan][$this->data_nilaitambahan[$i]->nilai] : 0;
     }

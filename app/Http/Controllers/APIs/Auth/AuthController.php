@@ -17,12 +17,12 @@ class AuthController extends Controller
 
     public function login()
     {
-        return $this->AuthMng->postLogin(request()->all());
+        return $this->AuthMng->postLogin(request());
     }
 
     public function logout()
     {
-        return $this->AuthMng->postLogout(request('_action'));
+        return $this->AuthMng->postLogout(request());
     }
 
     public function credential()

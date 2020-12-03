@@ -19,7 +19,6 @@ class PresensiManagement
     # Public
     public function presensiList($request)
     {
-        // return Carbon_DBdatetimeToday();
         if (Auth::user()->tokenCan('presensi:get')) {
             $validator = $this->presensiListValidator($request->all());
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
@@ -179,12 +178,14 @@ class PresensiManagement
                         }
                         try {
                             foreach ($getUpdatedPresensi as $key => $value)
+                                // loop update based from key (id)
                                 Presensi::find($key)->update(['nilai' => $value]);
+                            // delete many where in (id)
                             Presensi::whereIn('id', $getDeletedPresensi)->delete();
                             $getPresensiGroup->update(['approve' => '7']);
                             return response()->json(successResponse('Berhasil memperbarui dan menyetujui presensi'), 201);
                         } catch (\Throwable $th) {
-                            return response()->json(dataResponse(['error' => $th->getCode()], 'error', 'Terdapat kesalahan dalam proses'), 202);
+                            return response()->json(dataResponse(['code' => $th->getCode()], 'error', 'Terdapat kesalahan dalam proses'), 202);
                         }
                     }
                     return response()->json(errorResponse('Kegiatan presensi tidak ditemukan'), 202);

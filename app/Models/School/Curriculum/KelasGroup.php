@@ -36,7 +36,6 @@ class KelasGroup extends Model
 
     public function scopeCreateNewKelasGroup($query, $input)
     {
-        // return because the result is using in KelasManagement->kelasStore
         return $query->create([
             'tingkat' => $input->tingkat,
             'nama_group' => Str_pregStringOnly($input->nama),

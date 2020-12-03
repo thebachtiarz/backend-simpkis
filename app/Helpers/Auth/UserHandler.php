@@ -28,7 +28,7 @@ function User_setActiveStatus($status)
         'suspend' => '4',
         'block' => '5'
     ];
-    return (bool) $status ? $userCondition[$status] : 'black-list';
+    return (bool) $status ? $userCondition[$status] : '9';
 }
 
 /**

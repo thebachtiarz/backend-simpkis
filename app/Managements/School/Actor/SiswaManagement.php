@@ -43,22 +43,18 @@ class SiswaManagement
             $validator = $this->siswaStoreValidator($request->all());
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
             try {
-                $catchSiswa = Arr_collapse(Excel::toCollection(new SiswaImport, $request->file('file')));
+                $catchSiswa = Arr_collapse(Excel::toArray(new SiswaImport, $request->file('file')));
                 if (!count($catchSiswa)) return response()->json(errorResponse('Data siswa tidak ada!'), 202);
-                $findDuplicate = [];
-                for ($i = 0; $i < count($catchSiswa); $i++) {
-                    $checkDuplicate = Siswa::where('nisn', $catchSiswa[$i]['nisn']);
-                    if ($checkDuplicate->count()) $findDuplicate[] = $catchSiswa[$i];
-                }
+                $findDuplicate = Siswa::select(['nisn', 'nama', 'id_kelas'])->whereIn('nisn', array_column($catchSiswa, 'nisn'))->get();
                 if (count($findDuplicate)) return response()->json(dataResponse($findDuplicate, 'error', 'Terdapat duplikasi data: ' . count($findDuplicate) . ' siswa'), 202);
                 try {
                     Excel::import(new SiswaImport, $request->file('file'));
                     return response()->json(successResponse('Berhasil menambahkan data siswa'), 200);
                 } catch (\Exception $th) {
-                    return response()->json(errorResponse('Gagal menambahkan siswa, error: coba periksa kelas'), 202);
+                    return response()->json(dataResponse(['code' => $th->getCode()], 'error', 'Gagal menambahkan siswa, error: coba periksa kelas'), 202);
                 }
             } catch (\Throwable $th) {
-                return response()->json(errorResponse('Format file bermasalah, harap periksa sesuai dengan ketentuan yang telah disediakan'), 202);
+                return response()->json(dataResponse(['code' => $th->getCode()], 'error', 'Format file bermasalah, harap periksa sesuai dengan ketentuan yang telah disediakan'), 202);
             }
         }
         return _throwErrorResponse();
@@ -69,7 +65,12 @@ class SiswaManagement
         if (Auth::user()->tokenCan('siswa:show')) {
             $getSiswa = Siswa::withTrashed()->find($id);
             if ((bool) $getSiswa) {
-                // jika (saya == ketuakelas dan siswa ada pada kelas saya) atau (saya bukan ketuakelas) maka benar
+                /**
+                 * jika saya == ketuakelas && siswa yang saya cari memiliki kelas yang sama dengan saya
+                 * atau
+                 * saya != ketuakelas
+                 * maka benar
+                 */
                 if ((($this->getStatus() == 'ketuakelas') && ($getSiswa->kelasid == auth()->user()->ketuakelas->kelasid)) || ($this->getStatus() != 'ketuakelas'))
                     return response()->json(dataResponse($getSiswa->siswaSimpleInfoMap()), 200);
             }
@@ -96,7 +97,7 @@ class SiswaManagement
                         if ((bool) $getSiswa->ketuakelas && isset($request->nama)) $getSiswa->ketuakelas->user->userbio->update(['name' => $request->nama]);
                         return response()->json(successResponse('Berhasil memperbarui data siswa'), 200);
                     } catch (\Throwable $th) {
-                        return response()->json(dataResponse(['error' => $th->getCode()], 'error', 'Gagal memperbarui data siswa'), 202);
+                        return response()->json(dataResponse(['code' => $th->getCode()], 'error', 'Gagal memperbarui data siswa'), 202);
                     }
                 }
                 return response()->json(errorResponse('Siswa tidak ditemukan'), 202);

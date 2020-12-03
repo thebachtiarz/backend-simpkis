@@ -81,7 +81,7 @@ class NilaiAkhirCreatorService
                 NilaiAkhir::insert($partNilaiAkhir);
             $this->responseResult = successResponse('Berhasil memproses nilai akhir');
         } catch (\Throwable $th) {
-            $this->responseResult = dataResponse(['error' => $th->getCode()], 'error', 'Gagal memproses nilai akhir');
+            $this->responseResult = dataResponse(['code' => $th->getCode()], 'error', 'Gagal memproses nilai akhir');
         }
     }
 }

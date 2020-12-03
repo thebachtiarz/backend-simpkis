@@ -67,6 +67,11 @@ class PresensiGroup extends Model
         });
     }
 
+    public function scopeSetApprove($query, $id)
+    {
+        return $query->update(['id' => $id, 'approve' => '7']);
+    }
+
     # relation
     public function presensi()
     {
