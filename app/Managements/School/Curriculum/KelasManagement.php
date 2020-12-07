@@ -9,11 +9,6 @@ use Illuminate\Support\Facades\Validator;
 
 class KelasManagement
 {
-    public function __construct()
-    {
-        //
-    }
-
     # Public
     public function kelasList($request)
     {

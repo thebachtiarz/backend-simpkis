@@ -8,28 +8,19 @@ use Illuminate\Support\Facades\Validator;
 
 class KegiatanManagement
 {
-    protected $canAllow;
-
-    public function __construct()
-    {
-        $this->canAllow = ['guru' => ['7', '5'], 'ketuakelas' => ['5']];
-    }
-
     # Public
     public function kegiatanList($request)
     {
         if (Auth::user()->tokenCan('kegiatan:get')) {
             $validator = $this->kegiatanListValidator($request->all());
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-            if (in_array($this->getStatus(), array_keys($this->canAllow))) {
-                $getKegiatan = Kegiatan::whereInAllowToAccess($this->canAllow[$this->getStatus()]);
-                if ($this->getStatus() == 'ketuakelas') $getKegiatan->getAvailablePresensiNow();
-                if ($request->tipe) $getKegiatan->whereAccessType($request->tipe);
-                $getKegiatan = $getKegiatan->withOrderAccess();
-                if ($getKegiatan->count()) {
-                    $getKegiatan = $getKegiatan->get()->map->kegiatanSimpleListMap();
-                    return response()->json(dataResponse($getKegiatan), 200);
-                }
+            $getKegiatan = Kegiatan::whereInAllowToAccess($this->getStatus());
+            if ($this->getStatus() == 'ketuakelas') $getKegiatan->getAvailablePresensiNow();
+            if ($request->tipe) $getKegiatan->whereAccessType($request->tipe);
+            $getKegiatan = $getKegiatan->withOrderAccess();
+            if ($getKegiatan->count()) {
+                $getKegiatan = $getKegiatan->get()->map->kegiatanSimpleListMap();
+                return response()->json(dataResponse($getKegiatan), 200);
             }
             return response()->json(errorResponse('Kegiatan tidak ditemukan'), 202);
         }
@@ -58,7 +49,7 @@ class KegiatanManagement
     {
         if (Auth::user()->tokenCan('kegiatan:show')) {
             $getKegiatan = Kegiatan::find($id);
-            if (((bool) $getKegiatan) && (in_array($this->getStatus(), array_keys($this->canAllow))))
+            if ((bool) $getKegiatan)
                 return response()->json(dataResponse($getKegiatan->kegiatanSimpleInfoMap()), 200);
             return response()->json(errorResponse('Kegiatan tidak ditemukan'), 202);
         }

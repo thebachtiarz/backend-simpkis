@@ -10,11 +10,6 @@ use Illuminate\Support\Facades\Validator;
 
 class NilaiAkhirManagement
 {
-    public function __construct()
-    {
-        //
-    }
-
     # Public
     public function nilaiAkhirList($request)
     {
@@ -78,7 +73,6 @@ class NilaiAkhirManagement
     public function nilaiAkhirUpdate($id, $request)
     {
         if (Auth::user()->tokenCan('nilakh:update')) {
-            // waitt!!, yang mau di update apanya? kan udah fix nilainya :P
             return response()->json(successResponse('waitt!!, yang mau di update apanya? kan udah fix nilainya :P'), 200);
         }
         return _throwErrorResponse();

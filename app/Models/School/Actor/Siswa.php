@@ -59,7 +59,7 @@ class Siswa extends Model
     # relation
     public function ketuakelas()
     {
-        return $this->hasOne(KetuaKelas::class, 'id_siswa');
+        return $this->hasOne(\App\Models\School\Actor\KetuaKelas::class, 'id_siswa');
     }
 
     public function kelas()

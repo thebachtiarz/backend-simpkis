@@ -85,7 +85,7 @@ function dataResponse($response_data, $stat = '', $msg = '', $time = ''): array
  */
 function _throwErrorResponse($message = '', $code = ''): object
 {
-    $setMsg = $message ? $message : "Sorry, you cant find anything here";
-    $setCode = $code ? $code : "404";
+    $setMsg = $message ? $message : "Sorry, you don't have access here";
+    $setCode = $code ? $code : "403";
     return response()->json(errorResponse($setMsg), $setCode);
 }

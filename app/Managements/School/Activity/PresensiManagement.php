@@ -11,11 +11,6 @@ use Illuminate\Support\Facades\Validator;
 
 class PresensiManagement
 {
-    public function __construct()
-    {
-        //
-    }
-
     # Public
     public function presensiList($request)
     {
@@ -144,7 +139,7 @@ class PresensiManagement
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
             if ($request->has('_update')) {
                 /**
-                 * proses guru melakukan approve pada presensi wajib (group)
+                 * proses approve pada presensi wajib (group)
                  * berdasarkan id presensi (group)
                  */
                 if ($request->_update == 'approve') {
@@ -155,6 +150,11 @@ class PresensiManagement
                     }
                     return response()->json(errorResponse('Kegiatan presensi tidak ditemukan'), 202);
                 }
+                /**
+                 * proses update nilai poin presensi wajib
+                 * -> update selesai lalu approve presensi (group)
+                 * berdasarkan id presensi (group)
+                 */
                 if ($request->_update == 'groupupdate') {
                     $getPresensiGroup = PresensiGroup::find($id);
                     if ((bool) $getPresensiGroup) {
@@ -162,7 +162,10 @@ class PresensiManagement
                         $presensiOrigin = $getPresensiGroup->presensi;
                         $getUpdatedPresensi = [];
                         $getDeletedPresensi = [];
-                        //
+                        /**
+                         * proses melakukan pengecekan terhadap perubahan presensi
+                         * berdasarkan data presensi origin pada database
+                         */
                         for ($i = 0; $i < $presensiOrigin->count(); $i++) {
                             // filter untuk mengecek presensi yang tidak dihapus
                             if (in_array($presensiOrigin[$i]['id'], array_keys($presensiUpdate))) {
@@ -176,6 +179,10 @@ class PresensiManagement
                             // filter untuk mengecek presensi yang dihapus
                             else $getDeletedPresensi[] = $presensiOrigin[$i]['id'];
                         }
+                        /**
+                         * proses perubahan data pada database
+                         * berdasarkan hasil pengolahan
+                         */
                         try {
                             foreach ($getUpdatedPresensi as $key => $value)
                                 // loop update based from key (id)

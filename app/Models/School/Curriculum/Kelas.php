@@ -76,7 +76,7 @@ class Kelas extends Model
     # relation
     public function kelasgroup()
     {
-        return $this->belongsTo(KelasGroup::class, 'id_group', 'id');
+        return $this->belongsTo(\App\Models\School\Curriculum\KelasGroup::class, 'id_group', 'id');
     }
 
     public function ketuakelas()

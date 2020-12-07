@@ -56,6 +56,6 @@ class KelasGroup extends Model
     # relation
     public function kelas()
     {
-        return $this->hasMany(Kelas::class, 'id_group', 'id');
+        return $this->hasMany(\App\Models\School\Curriculum\Kelas::class, 'id_group', 'id');
     }
 }

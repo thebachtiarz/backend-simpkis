@@ -72,12 +72,12 @@ class NilaiAkhir extends Model
     # relation
     public function nilaiakhirgroup()
     {
-        return $this->belongsTo(NilaiAkhirGroup::class, 'id_nilai');
+        return $this->belongsTo(\App\Models\School\Curriculum\NilaiAkhirGroup::class, 'id_nilai');
     }
 
     public function semester()
     {
-        return $this->belongsTo(Semester::class, 'id_semester');
+        return $this->belongsTo(\App\Models\School\Curriculum\Semester::class, 'id_semester');
     }
 
     public function siswa()

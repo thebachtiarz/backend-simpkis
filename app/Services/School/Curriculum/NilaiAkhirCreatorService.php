@@ -74,7 +74,7 @@ class NilaiAkhirCreatorService
     {
         try {
             if ((!count($this->finalNilaiAkhirGroup)) || (!count($this->finalNilaiAkhir)))
-                throw new \Exception('Tidak ada nilai akhir yang diproses', 2);
+                throw new \Exception('Tidak ada nilai akhir yang diproses', 404);
             foreach (array_chunk($this->finalNilaiAkhirGroup, 10000) as $partNilaiAkhirGroup)
                 NilaiAkhirGroup::insert($partNilaiAkhirGroup);
             foreach (array_chunk($this->finalNilaiAkhir, 10000) as $partNilaiAkhir)

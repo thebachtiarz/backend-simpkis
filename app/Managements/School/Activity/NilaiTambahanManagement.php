@@ -10,11 +10,6 @@ use Illuminate\Support\Facades\Validator;
 
 class NilaiTambahanManagement
 {
-    public function __construct()
-    {
-        //
-    }
-
     # Public
     public function nilaiTambahanList($request)
     {

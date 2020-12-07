@@ -6,20 +6,17 @@ use App\Managements\School\Actor\KetuaKelasManagement;
 use App\Models\Auth\User;
 use App\Models\School\Actor\Siswa;
 use App\Repositories\User\UserRepository;
-use App\Repositories\School\Actor\SiswaRepository;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class UserManagement
 {
     protected $UserRepo;
-    protected $SiswaRepo;
 
     public function __construct()
     {
         $this->UserRepo = new UserRepository;
-        $this->SiswaRepo = new SiswaRepository;
     }
 
     # Public
@@ -59,6 +56,7 @@ class UserManagement
                         $fullname = $getSiswa->nama;
                     }
                     // @ start
+                    DB::beginTransaction();
                     $new_user = User::create(['username' => $username, 'password' => $password, 'active' => User_setActiveStatus('active')]);
                     User::find($new_user->id)->userbio()->create(['name' => ucwords($fullname)]);
                     User::find($new_user->id)->userstat()->create(['status' => User_setStatus($request->status)]);
@@ -66,8 +64,10 @@ class UserManagement
                         (new KetuaKelasManagement)->ketuakelasStore($new_user->id, $request->siswaid);
                     }
                     // @ finish
+                    DB::commit();
                     return response()->json(successResponse('Berhasil membuat pengguna baru'), 201);
                 } catch (\Exception $e) {
+                    DB::rollback();
                     return response()->json(dataResponse(['code' => $e->getCode()], 'error', $e->getMessage()), 202);
                 }
             }

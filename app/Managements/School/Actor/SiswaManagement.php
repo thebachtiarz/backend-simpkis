@@ -11,11 +11,6 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class SiswaManagement
 {
-    public function __construct()
-    {
-        //
-    }
-
     # Public
     public function siswaList($request)
     {
@@ -27,7 +22,7 @@ class SiswaManagement
             elseif ($request->method == 'deleted') $getSiswa->getByKelasId($request->kelasid)->onlyTrashed();
             else {
                 $id_kelas = $request->kelasid;
-                if ($this->getStatus() == 'ketuakelas') $id_kelas = auth()->user()->ketuakelas->id_kelas;
+                if ($this->getStatus() == 'ketuakelas') $id_kelas = Auth::user()->ketuakelas->id_kelas;
                 if (isset($request->presensikegiatan)) $getSiswa->getUnPresensiByKegiatanToday($request->presensikegiatan);
                 if (isset($request->searchname)) $getSiswa->searchSiswaByName($request->searchname);
                 if (isset($id_kelas)) $getSiswa->getByKelasId($id_kelas);
@@ -71,7 +66,7 @@ class SiswaManagement
                  * saya != ketuakelas
                  * maka benar
                  */
-                if ((($this->getStatus() == 'ketuakelas') && ($getSiswa->kelasid == auth()->user()->ketuakelas->kelasid)) || ($this->getStatus() != 'ketuakelas'))
+                if ((($this->getStatus() == 'ketuakelas') && ($getSiswa->kelasid == Auth::user()->ketuakelas->kelasid)) || ($this->getStatus() != 'ketuakelas'))
                     return response()->json(dataResponse($getSiswa->siswaSimpleInfoMap()), 200);
             }
             return response()->json(errorResponse('Siswa tidak ditemukan'), 202);

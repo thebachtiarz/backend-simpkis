@@ -8,11 +8,6 @@ use Illuminate\Support\Facades\Validator;
 
 class SemesterManagement
 {
-    public function __construct()
-    {
-        //
-    }
-
     # Public
     public function semesterList($request)
     {

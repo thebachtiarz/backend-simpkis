@@ -39,6 +39,6 @@ class NilaiAkhirGroup extends Model
     # relation
     public function nilaiakhir()
     {
-        return $this->hasMany(NilaiAkhir::class, 'id_nilai');
+        return $this->hasMany(\App\Models\School\Curriculum\NilaiAkhir::class, 'id_nilai');
     }
 }

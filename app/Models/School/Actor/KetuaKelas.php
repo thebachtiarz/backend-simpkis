@@ -45,7 +45,7 @@ class KetuaKelas extends Model
 
     public function siswa()
     {
-        return $this->belongsTo(Siswa::class, 'id_siswa');
+        return $this->belongsTo(\App\Models\School\Actor\Siswa::class, 'id_siswa');
     }
 
     public function user()

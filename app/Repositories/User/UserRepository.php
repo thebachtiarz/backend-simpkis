@@ -24,11 +24,6 @@ class UserRepository
         return $this->User->orderByDesc('id')->first('id')->id;
     }
 
-    public function findInfo($id)
-    {
-        # code...
-    }
-
     # Scope
     public function getUsersByStatus($status)
     {
@@ -124,13 +119,11 @@ class UserRepository
         foreach ($request as $key => $rq) {
             if (in_array($rq['key'], array_keys($userAbility))) {
                 if ($rq['can'][0] == '*') {
-                    foreach ($userAbility[$rq['key']] as $key => $uac) {
+                    foreach ($userAbility[$rq['key']] as $key => $uac)
                         $arrayCan[] = $rq['key'] . ":$uac";
-                    }
                 } else {
-                    foreach ($rq['can'] as $key => $rqc) {
+                    foreach ($rq['can'] as $key => $rqc)
                         if (in_array($rqc, $userAbility[$rq['key']])) $arrayCan[] = $rq['key'] . ":$rqc";
-                    }
                 }
             }
         }

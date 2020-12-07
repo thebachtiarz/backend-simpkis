@@ -56,7 +56,6 @@ class NilaiTambahan extends Model
 
     private function getNilaiPoin($data, $key, $value)
     {
-        // return count($this->getNilai($data)) ? $this->getNilai($data)[$key][$value] : '';
         return count($this->getNilai($data)) ? (in_array($key, array_keys($this->getNilai($data))) ? $this->getNilai($data)[$key][$value] : '-') : '';
     }
 
@@ -99,7 +98,7 @@ class NilaiTambahan extends Model
 
     public function kegiatan()
     {
-        return $this->belongsTo(Kegiatan::class, 'id_kegiatan');
+        return $this->belongsTo(\App\Models\School\Activity\Kegiatan::class, 'id_kegiatan');
     }
 
     public function siswa()

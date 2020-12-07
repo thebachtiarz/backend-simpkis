@@ -9,11 +9,6 @@ use Illuminate\Support\Facades\Validator;
 
 class KetuaKelasManagement
 {
-    public function __construct()
-    {
-        //
-    }
-
     # Public
     public function ketuakelasList()
     {
@@ -53,7 +48,7 @@ class KetuaKelasManagement
             if ((bool) $getKetua) {
                 // cari siswa untuk menjadi ketua kelas baru
                 $getSiswa = Siswa::find($request->idSiswa);
-                // jika siswa yang dicari ada dan siswa juga dari kelas tersebut maka benar
+                // jika siswa yang dicari ada, dan siswa juga dari kelas tersebut maka benar
                 if (((bool) $getSiswa) && ($getKetua->id_kelas == $getSiswa->id_kelas)) {
                     try {
                         $result = ['old_ketua' => $getKetua->siswa->nama, 'new_ketua' => $getSiswa->nama];
