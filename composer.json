@@ -1,6 +1,7 @@
 {
     "name": "thebachtiarz/backend-simpkis",
     "type": "project",
+    "version": "v7.5.2",
     "description": "Presence Management Information System for Student Worship Activities.",
     "keywords": [
         "framework",
