@@ -19,9 +19,9 @@ use App\Models\Auth\User;
  * for database
  *
  * @param string $status
- * @return void
+ * @return string
  */
-function User_setActiveStatus($status)
+function User_setActiveStatus($status): string
 {
     $userCondition = [
         'active' => '7',
@@ -35,10 +35,10 @@ function User_setActiveStatus($status)
  * get user status active
  * for human
  *
- * @param string $status
- * @return void
+ * @param numeric $status
+ * @return string
  */
-function User_getActiveStatus($status)
+function User_getActiveStatus($status): string
 {
     $userCondition = [
         '7' => 'active',
@@ -51,10 +51,10 @@ function User_getActiveStatus($status)
 /**
  * get user active by id
  *
- * @param int $id
- * @return void
+ * @param numeric $id
+ * @return string
  */
-function User_getActiveStatusById($id)
+function User_getActiveStatusById($id): string
 {
     $user = User::find($id);
     return (bool) $user ? $user->active : null;
@@ -62,12 +62,11 @@ function User_getActiveStatusById($id)
 
 /**
  * get user status active condition
- * boolean
  *
- * @param int $id
- * @return void
+ * @param numeric $id
+ * @return boolean
  */
-function User_isActive($id)
+function User_isActive($id): bool
 {
     $user = User::find($id);
     return ((bool) $user && ($user->active == User_setActiveStatus('active'))) ? true : false;
@@ -76,10 +75,10 @@ function User_isActive($id)
 /**
  * get user name by id
  *
- * @param string $id
- * @return void
+ * @param numeric $id
+ * @return string
  */
-function User_getNameById($id)
+function User_getNameById($id): string
 {
     $user = User::find($id);
     return (bool) $user ? $user->userbio->name : null;
@@ -88,9 +87,9 @@ function User_getNameById($id)
 /**
  * check status user
  *
- * @return void
+ * @return string
  */
-function User_checkStatus()
+function User_checkStatus(): string
 {
     return auth()->user()->userstat->status;
 }
@@ -98,10 +97,10 @@ function User_checkStatus()
 /**
  * get user status by id
  *
- * @param string $id
- * @return void
+ * @param numeric $id
+ * @return string
  */
-function User_getStatusById($id)
+function User_getStatusById($id): string
 {
     $user = User::find($id);
     return (bool) $user ? $user->userstat->status : null;
@@ -112,9 +111,9 @@ function User_getStatusById($id)
  * for DB
  *
  * @param string $status
- * @return void
+ * @return string
  */
-function User_setStatus($status)
+function User_setStatus($status): string
 {
     $userAny = [
         'admin' => 'greatadmin',
@@ -130,9 +129,9 @@ function User_setStatus($status)
  * for Human
  *
  * @param string $status
- * @return void
+ * @return string
  */
-function User_getStatus($status)
+function User_getStatus($status): string
 {
     $userAny = [
         'greatadmin' => 'admin',
@@ -148,9 +147,9 @@ function User_getStatus($status)
  * convert for Human
  *
  * @param string $status
- * @return void
+ * @return string
  */
-function User_getStatusForHuman($status)
+function User_getStatusForHuman($status): string
 {
     $userAny = [
         'greatadmin' => 'Admin',
@@ -164,9 +163,9 @@ function User_getStatusForHuman($status)
 /**
  * create new user code
  *
- * @return void
+ * @return string
  */
-function User_createNewCode()
+function User_createNewCode(): string
 {
     return Str_random(64);
 }
@@ -175,9 +174,9 @@ function User_createNewCode()
  * create bcrypt password
  *
  * @param string $password
- * @return void
+ * @return string
  */
-function User_encPass($password)
+function User_encPass($password): string
 {
     return Hash::make($password);
 }

@@ -14,15 +14,16 @@
 /**
  * handler template theme asset
  *
- * @return void
+ * @return string
  */
 # online version
-function online_asset()
+function online_asset(): string
 {
     return 'http://bachtiars.com/AdminLTE-3.0.2/';
 }
+
 # offline version
-function offline_asset()
+function offline_asset(): string
 {
     return asset('AdminLTE-3.0.2');
 }
@@ -30,9 +31,9 @@ function offline_asset()
 /**
  * icon apps
  *
- * @return void
+ * @return string
  */
-function apps_icon()
+function apps_icon(): string
 {
     return online_asset() . '/dist/img/AdminLTELogo.png';
 }
@@ -41,9 +42,9 @@ function apps_icon()
  * default url
  * user profile image
  *
- * @return void
+ * @return string
  */
-function default_url_user_image()
+function default_url_user_image(): string
 {
     return '/files/image/profile/users/';
 }
@@ -51,9 +52,9 @@ function default_url_user_image()
 /**
  * default user image
  *
- * @return void
+ * @return string
  */
-function default_user_image()
+function default_user_image(): string
 {
     return '/files/image/profile/default.jpg';
 }
@@ -61,9 +62,9 @@ function default_user_image()
 /**
  * get ip address client
  *
- * @return void
+ * @return string
  */
-function getClientIpAddress()
+function getClientIpAddress(): string
 {
     return request()->ip();
 }

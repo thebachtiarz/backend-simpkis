@@ -16,10 +16,10 @@ use Illuminate\Support\Str;
 /**
  * create custom amount random string
  *
- * @param int $rand_amount
- * @return void
+ * @param integer $rand_amount
+ * @return string
  */
-function Str_random($rand_amount)
+function Str_random($rand_amount): string
 {
     return Str::random($rand_amount);
 }
@@ -28,9 +28,9 @@ function Str_random($rand_amount)
  * filter a sentence into string only
  *
  * @param string $sentence
- * @return void
+ * @return string
  */
-function Str_pregStringOnly($sentence)
+function Str_pregStringOnly($sentence): string
 {
     return preg_replace("/[^A-Za-z?![:space:]]/", '', $sentence);
 }

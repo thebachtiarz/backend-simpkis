@@ -19,9 +19,9 @@ use App\Models\School\Activity\PresensiGroup;
  * ! get repository kegiatan all
  * for DB processing
  *
- * @return void
+ * @return object
  */
-function Atv_getRepoKegiatanAll()
+function Atv_getRepoKegiatanAll(): object
 {
     return cache()->remember('repo-kegiatan-all', (60 * 60 * 2/* 2 hours */), function () {
         return Kegiatan::all()->map->kegiatanResourceMap();
@@ -32,9 +32,9 @@ function Atv_getRepoKegiatanAll()
  * ! get repository kegiatan presensi
  * for DB processing
  *
- * @return void
+ * @return object
  */
-function Atv_getRepoKegiatanPresensi()
+function Atv_getRepoKegiatanPresensi(): object
 {
     return cache()->remember('repo-kegiatan-presensi', (60 * 60 * 2/* 2 hours */), function () {
         return Kegiatan::getKegiatanPresensi()->get()->map->kegiatanResourceMap();
@@ -45,9 +45,9 @@ function Atv_getRepoKegiatanPresensi()
  * ! get repository kegiatan tambahan
  * for DB processing
  *
- * @return void
+ * @return object
  */
-function Atv_getRepoKegiatanTambahan()
+function Atv_getRepoKegiatanTambahan(): object
 {
     return cache()->remember('repo-kegiatan-tambahan', (60 * 60 * 2/* 2 hours */), function () {
         return Kegiatan::getKegiatanTambahan()->get()->map->kegiatanResourceMap();
@@ -58,9 +58,9 @@ function Atv_getRepoKegiatanTambahan()
  * ! get resources data kegiatan all
  * for DB processing
  *
- * @return void
+ * @return array
  */
-function Atv_getKegiatanResource()
+function Atv_getKegiatanResource(): array
 {
     $data = Atv_getRepoKegiatanAll();
     $result = [];
@@ -74,9 +74,9 @@ function Atv_getKegiatanResource()
  * ! get resources data kegiatan presensi
  * for DB processing
  *
- * @return void
+ * @return array
  */
-function Atv_getKegiatanPresensiResource()
+function Atv_getKegiatanPresensiResource(): array
 {
     $data = Atv_getRepoKegiatanPresensi();
     $result = [];
@@ -90,9 +90,9 @@ function Atv_getKegiatanPresensiResource()
  * ! get resources data kegiatan tambahan
  * for DB processing
  *
- * @return void
+ * @return array
  */
-function Atv_getKegiatanTambahanResource()
+function Atv_getKegiatanTambahanResource(): array
 {
     $data = Atv_getRepoKegiatanTambahan();
     $result = [];
@@ -106,9 +106,9 @@ function Atv_getKegiatanTambahanResource()
  * ! get resources kegiatan presensi average nilai
  * for DB processing
  *
- * @return void
+ * @return array
  */
-function Atv_getPresensiAvgNilai()
+function Atv_getPresensiAvgNilai(): array
 {
     $resPresensi = Atv_getRepoKegiatanPresensi();
     $arrPresensiNilai = [];
@@ -128,9 +128,9 @@ function Atv_getPresensiAvgNilai()
  * for DB processing
  *
  * @param string $id_semester
- * @return void
+ * @return array
  */
-function Atv_getPresensiResource($id_semester)
+function Atv_getPresensiResource($id_semester): array
 {
     $data = Presensi::getPresensiResource($id_semester)->get()->map->presensiResourceMap();
     $result = [];
@@ -145,9 +145,9 @@ function Atv_getPresensiResource($id_semester)
  * for DB processing
  *
  * @param string $id_semester
- * @return void
+ * @return array
  */
-function Atv_getNilaiTambahanResource($id_semester)
+function Atv_getNilaiTambahanResource($id_semester): array
 {
     $data = NilaiTambahan::getNilaiTambahanResource($id_semester)->get()->map->nilaitambahanResourceMap();
     $result = [];
@@ -163,9 +163,9 @@ function Atv_getNilaiTambahanResource($id_semester)
  * @param string $day
  * @param time $time_start
  * @param time $time_end
- * @return void
+ * @return boolean
  */
-function Atv_boolPresensiTimeAllowed($day, $time_start, $time_end)
+function Atv_boolPresensiTimeAllowed($day, $time_start, $time_end): bool
 {
     $result = false;
     // jika 'all' maka hanya boleh hari senin sampai jumat, atau hari yang ditentukan diluar itu
@@ -180,9 +180,9 @@ function Atv_boolPresensiTimeAllowed($day, $time_start, $time_end)
  * note: if [5 => [Presensi Wajib Ibadah], 7 => [Nilai Tambahan]]
  *
  * @param string $akses
- * @return void
+ * @return string
  */
-function Atv_setAksesKegiatan($akses)
+function Atv_setAksesKegiatan($akses): string
 {
     if ($akses == 'presensi') return '5';
     elseif ($akses == 'tambahan') return '7';
@@ -193,9 +193,9 @@ function Atv_setAksesKegiatan($akses)
  * for Human
  *
  * @param numeric $akses
- * @return void
+ * @return string
  */
-function Atv_HumanAksesKegiatan($akses)
+function Atv_HumanAksesKegiatan($akses): string
 {
     if ($akses == '5') return 'Presensi';
     elseif ($akses == '7') return 'Tambahan';
@@ -205,9 +205,9 @@ function Atv_HumanAksesKegiatan($akses)
  * convert presence approve code to string
  *
  * @param string $approve
- * @return void
+ * @return string
  */
-function Atv_convApproveCodeToString($approve)
+function Atv_convApproveCodeToString($approve): string
 {
     return $approve == '7' ? 'Sudah' : 'Belum';
 }
@@ -215,9 +215,9 @@ function Atv_convApproveCodeToString($approve)
 /**
  * get last id presensi group
  *
- * @return void
+ * @return integer
  */
-function Atv_getLastIdPresensi()
+function Atv_getLastIdPresensi(): int
 {
     return PresensiGroup::orderByDesc('id')->first('id')->id;
 }
@@ -227,9 +227,9 @@ function Atv_getLastIdPresensi()
  * ex: mon (use: shortEnglishDayOfWeek)
  *
  * @param string $day
- * @return void
+ * @return string
  */
-function Atv_setDayKegiatan($day)
+function Atv_setDayKegiatan($day): string
 {
     $result = '';
     if ($day == 'mon') $result = '1';
@@ -247,9 +247,9 @@ function Atv_setDayKegiatan($day)
  *
  * @param numeric $day
  * @param boolean $locale
- * @return void
+ * @return string
  */
-function Atv_getInfoDayKegiatan($day, $locale = false)
+function Atv_getInfoDayKegiatan($day, $locale = false): string
 {
     if ($day == '*') return $locale ? 'Setiap hari' : 'Every day';
     else return Carbon_HumanDayNameOfWeek($day, $locale);

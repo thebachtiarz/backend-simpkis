@@ -15,9 +15,9 @@ use Illuminate\Support\Carbon;
 /**
  * set locale date time language
  *
- * @return String
+ * @return string
  */
-function setLocales(): String
+function setLocales(): string
 {
     return env('CARBON_SETLOCALE', 'id_ID');
 }
@@ -26,9 +26,9 @@ function setLocales(): String
  * get atom time format
  *
  * @param datetime $datetime
- * @return void
+ * @return string
  */
-function Carbon_atomConvertDateTime($datetime)
+function Carbon_atomConvertDateTime($datetime): string
 {
     return Carbon::parse($datetime)->format('Y-m-d\TH:i:s.uP');
 }
@@ -37,10 +37,10 @@ function Carbon_atomConvertDateTime($datetime)
  * convert datetime
  * for DB
  *
- * @param date $datetime
- * @return void
+ * @param datetime $datetime
+ * @return string
  */
-function Carbon_DBConvertDateTime($datetime)
+function Carbon_DBConvertDateTime($datetime): string
 {
     return Carbon::parse($datetime)->toDateTimeString();
 }
@@ -49,9 +49,9 @@ function Carbon_DBConvertDateTime($datetime)
  * get date time now
  * for DB
  *
- * @return void
+ * @return string
  */
-function Carbon_DBtimeNow()
+function Carbon_DBtimeNow(): string
 {
     return Carbon::now()->toDateTimeString();
 }
@@ -60,9 +60,9 @@ function Carbon_DBtimeNow()
  * get date time today
  * for DB
  *
- * @return void
+ * @return string
  */
-function Carbon_DBdatetimeToday()
+function Carbon_DBdatetimeToday(): string
 {
     return Carbon::today()->toDateTimeString();
 }
@@ -70,9 +70,10 @@ function Carbon_DBdatetimeToday()
 /**
  * get day of week in number
  *
- * @return void
+ * @param datetime $date
+ * @return string
  */
-function Carbon_DBDayNumOfWeek($date = '')
+function Carbon_DBDayNumOfWeek($date = ''): string
 {
     return Carbon::parse($date)->dayOfWeekIso;
 }
@@ -80,10 +81,11 @@ function Carbon_DBDayNumOfWeek($date = '')
 /**
  * get day of week in name
  *
+ * @param datetime $date
  * @param boolean $locale
- * @return void
+ * @return string
  */
-function Carbon_HumanDayNameOfWeek($date = '', $locale = false)
+function Carbon_HumanDayNameOfWeek($date = '', $locale = false): string
 {
     $day = Carbon::create(carbon::getDays()[$date]);
     if ($locale) $day->setLocale(setLocales());
@@ -93,9 +95,9 @@ function Carbon_HumanDayNameOfWeek($date = '', $locale = false)
 /**
  * check if today is work day
  *
- * @return void
+ * @return string
  */
-function Carbon_IsWorkDayNow()
+function Carbon_IsWorkDayNow(): string
 {
     $result = false;
     $getNumDayNow = Carbon::today()->dayOfWeekIso;
@@ -106,9 +108,9 @@ function Carbon_IsWorkDayNow()
 /**
  * get time now
  *
- * @return void
+ * @return string
  */
-function Carbon_AnyTimeNow()
+function Carbon_AnyTimeNow(): string
 {
     return Carbon::now()->toTimeString();
 }
@@ -117,9 +119,9 @@ function Carbon_AnyTimeNow()
  * get full date time now
  * for human
  *
- * @return void
+ * @return string
  */
-function Carbon_HumanFullDateTimeNow()
+function Carbon_HumanFullDateTimeNow(): string
 {
     Carbon::setLocale(setLocales());
     return Carbon::now()->isoFormat('dddd, D MMMM YYYY, HH:mm:ss');
@@ -129,10 +131,10 @@ function Carbon_HumanFullDateTimeNow()
  * parse full date time
  * for human
  *
- * @param date $datetime
- * @return void
+ * @param datetime $datetime
+ * @return string
  */
-function Carbon_HumanFullDateTime($datetime)
+function Carbon_HumanFullDateTime($datetime): string
 {
     Carbon::setLocale(setLocales());
     return Carbon::parse($datetime)->isoFormat('dddd, D MMMM YYYY, HH:mm:ss');
@@ -142,10 +144,10 @@ function Carbon_HumanFullDateTime($datetime)
  * parse date time
  * for human
  *
- * @param date $datetime
- * @return void
+ * @param datetime $datetime
+ * @return string
  */
-function Carbon_HumanDateTime($datetime)
+function Carbon_HumanDateTime($datetime): string
 {
     return Carbon::parse($datetime)->format('d F Y H:i:s');
 }
@@ -154,10 +156,10 @@ function Carbon_HumanDateTime($datetime)
  * convert date time to date only
  * for DB
  *
- * @param date $datetime
- * @return void
+ * @param datetime $datetime
+ * @return string
  */
-function Carbon_DBDateParse($datetime)
+function Carbon_DBDateParse($datetime): string
 {
     return Carbon::parse($datetime)->format('Y-m-d');
 }
@@ -166,10 +168,10 @@ function Carbon_DBDateParse($datetime)
  * convert date time to date only
  * for Any
  *
- * @param date $datetime
- * @return void
+ * @param datetime $datetime
+ * @return string
  */
-function Carbon_AnyDateParse($datetime)
+function Carbon_AnyDateParse($datetime): string
 {
     return Carbon::parse($datetime)->format('Ymd');
 }
@@ -179,9 +181,9 @@ function Carbon_AnyDateParse($datetime)
  * ex: 09:30
  *
  * @param numeric $time
- * @return void
+ * @return string
  */
-function Carbon_AnyTimeParse($time = '')
+function Carbon_AnyTimeParse($time = ''): string
 {
     return Carbon::parse($time ? $time : '00:00')->toTimeString();
 }
@@ -190,10 +192,10 @@ function Carbon_AnyTimeParse($time = '')
  * convert datetime to date only
  * for Human
  *
- * @param date $datetime
- * @return void
+ * @param datetime $datetime
+ * @return string
  */
-function Carbon_HumanDateParse($datetime)
+function Carbon_HumanDateParse($datetime): string
 {
     return Carbon::parse($datetime ? $datetime : Carbon_DBdatetimeToday())->format('d F Y');
 }
@@ -202,10 +204,10 @@ function Carbon_HumanDateParse($datetime)
  * convert datetime to display simple date
  * for Human
  *
- * @param date $datetime
- * @return void
+ * @param datetime $datetime
+ * @return string
  */
-function Carbon_HumanDateSimpleDisplayParse($datetime = '')
+function Carbon_HumanDateSimpleDisplayParse($datetime = ''): string
 {
     Carbon::setLocale(setLocales());
     return Carbon::parse($datetime ? $datetime : Carbon_DBtimeNow())->isoFormat('ddd, MMM D');
@@ -215,10 +217,10 @@ function Carbon_HumanDateSimpleDisplayParse($datetime = '')
  * convert date time to interval time
  * for Human
  *
- * @param date $datetime
- * @return void
+ * @param datetime $datetime
+ * @return string
  */
-function Carbon_HumanIntervalDateTime($datetime)
+function Carbon_HumanIntervalDateTime($datetime): string
 {
     Carbon::setLocale(setLocales());
     return Carbon::parse($datetime)->diffForHumans();
@@ -229,9 +231,9 @@ function Carbon_HumanIntervalDateTime($datetime)
  *
  * @param datetime $date_created
  * @param datetime $date_updated
- * @return void
+ * @return string
  */
-function Carbon_HumanIntervalCreateUpdate($date_created, $date_updated)
+function Carbon_HumanIntervalCreateUpdate($date_created, $date_updated): string
 {
     return Carbon_AnyConvDateToTimestamp($date_updated) > Carbon_AnyConvDateToTimestamp($date_created) ? Carbon_HumanIntervalDateTime($date_updated) : '-';
 }
@@ -239,10 +241,10 @@ function Carbon_HumanIntervalCreateUpdate($date_created, $date_updated)
 /**
  * convert date time to timestamp
  *
- * @param date $datetime
- * @return void
+ * @param datetime $datetime
+ * @return string
  */
-function Carbon_AnyConvDateToTimestamp($datetime)
+function Carbon_AnyConvDateToTimestamp($datetime): string
 {
     return Carbon::parse($datetime)->timestamp;
 }
@@ -251,11 +253,11 @@ function Carbon_AnyConvDateToTimestamp($datetime)
  * get range date time
  * for Human
  *
- * @param date $start
- * @param date $end
- * @return void
+ * @param datetime $start
+ * @param datetime $end
+ * @return string
  */
-function Carbon_HumanRangeDateTimeDuration($start, $end)
+function Carbon_HumanRangeDateTimeDuration($start, $end): string
 {
     Carbon::setLocale(setLocales());
     $checkStart = Carbon_DBDateParse($start);
@@ -271,11 +273,11 @@ function Carbon_HumanRangeDateTimeDuration($start, $end)
 /**
  * get date yesterday by specified date
  *
- * @param date $datetime
+ * @param datetime $datetime
  * @param integer $days
- * @return void
+ * @return string
  */
-function Carbon_DateSubYesterday($datetime, $days = 1)
+function Carbon_DateSubYesterday($datetime, $days = 1): string
 {
     return Carbon::parse($datetime)->subDay($days)->toDateTimeString();
 }
@@ -284,9 +286,9 @@ function Carbon_DateSubYesterday($datetime, $days = 1)
  * get range date yesterday by today
  *
  * @param string $rangedate
- * @return void
+ * @return string
  */
-function Carbon_RangeDateYesterday($rangedate)
+function Carbon_RangeDateYesterday($rangedate): string
 {
     if ($rangedate == 'today') {
         return Carbon_dateSubYesterday(Carbon_DBdatetimeToday(), 0);

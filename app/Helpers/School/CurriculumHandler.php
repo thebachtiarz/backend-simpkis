@@ -19,9 +19,9 @@ use App\Models\School\Curriculum\Semester;
  *
  * @param float $totalNilai
  * @param string $stringNilai
- * @return void
+ * @return string
  */
-function Cur_setFormatNilaiAkhir($totalNilai, $stringNilai)
+function Cur_setFormatNilaiAkhir($totalNilai, $stringNilai): string
 {
     return serialize(['total' => $totalNilai, 'string' => $stringNilai]);
 }
@@ -30,9 +30,9 @@ function Cur_setFormatNilaiAkhir($totalNilai, $stringNilai)
  * get semester name by id semester
  *
  * @param string $id_semester
- * @return void
+ * @return string
  */
-function Cur_getSemesterNameByID($id_semester)
+function Cur_getSemesterNameByID($id_semester): string
 {
     $getSemester = Semester::find($id_semester);
     return (bool) $getSemester ? "{$getSemester->semester}" : 'Semester tidak ditemukan';
@@ -42,9 +42,9 @@ function Cur_getSemesterNameByID($id_semester)
  * get kelas name by id kelas
  *
  * @param string $id_kelas
- * @return void
+ * @return string
  */
-function Cur_getKelasNameByID($id_kelas)
+function Cur_getKelasNameByID($id_kelas): string
 {
     $getKelas = Kelas::find($id_kelas);
     return (bool) $getKelas ? "{$getKelas->kelasgroup->tingkat} - {$getKelas->nama}" : 'Kelas tidak ditemukan';
@@ -55,9 +55,9 @@ function Cur_getKelasNameByID($id_kelas)
  *
  * @param string $year
  * @param string $code_semester
- * @return void
+ * @return string
  */
-function Cur_setNewSemesterFormat($year = '', $code_semester = '')
+function Cur_setNewSemesterFormat($year = '', $code_semester = ''): string
 {
     $tahun = isset($year) ? $year : date('Y');
     $semester = isset($code_semester) ? Cur_convSemesterByCode($code_semester) : Cur_getSemesterNow();
@@ -69,9 +69,9 @@ function Cur_setNewSemesterFormat($year = '', $code_semester = '')
  * convert semester code to string
  *
  * @param string $code_semester
- * @return void
+ * @return string
  */
-function Cur_convSemesterByCode($code_semester)
+function Cur_convSemesterByCode($code_semester): string
 {
     if ($code_semester == '1') return 'Ganjil';
     if ($code_semester == '2') return 'Genap';
@@ -80,20 +80,20 @@ function Cur_convSemesterByCode($code_semester)
 /**
  * generate semester string now
  *
- * @return void
+ * @return string
  */
-function Cur_getSemesterNow()
+function Cur_getSemesterNow(): string
 {
     $monthNow = date('n');
     return (($monthNow >= 1) && ($monthNow <= 7)) ? Cur_convSemesterByCode('2') : Cur_convSemesterByCode('1');
 }
 
 /**
- * get active semester now
+ * get active semester id now
  *
- * @return void
+ * @return integer
  */
-function Cur_getActiveIDSemesterNow()
+function Cur_getActiveIDSemesterNow(): int
 {
     return Semester::orderByDesc('id')->first('id')->id;
 }
@@ -101,9 +101,9 @@ function Cur_getActiveIDSemesterNow()
 /**
  * set format for kelas lulus by today
  *
- * @return void
+ * @return string
  */
-function Cur_formatKelasLulus()
+function Cur_formatKelasLulus(): string
 {
     return '(L-' . Carbon_AnyDateParse(Carbon_DBdatetimeToday()) . ')';
 }
@@ -112,9 +112,9 @@ function Cur_formatKelasLulus()
  * set status kelas
  *
  * @param string $status
- * @return void
+ * @return string
  */
-function Cur_setKelasStatus($status)
+function Cur_setKelasStatus($status): string
 {
     if ($status == 'active') {
         return '7';
@@ -127,9 +127,9 @@ function Cur_setKelasStatus($status)
  * get status kelas
  *
  * @param numeric $status
- * @return void
+ * @return string
  */
-function Cur_getKelasStatus($status)
+function Cur_getKelasStatus($status): string
 {
     if ($status == '7') {
         return 'active';

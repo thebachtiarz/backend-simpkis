@@ -19,9 +19,9 @@ use App\Models\School\Actor\Siswa;
  * get siswa name by id
  *
  * @param string $id_siswa
- * @return void
+ * @return string
  */
-function Act_getSiswaNameByID($id_siswa)
+function Act_getSiswaNameByID($id_siswa): string
 {
     $getSiswa = Siswa::find($id_siswa);
     return (bool) $getSiswa ? $getSiswa->nama : '';
@@ -31,9 +31,9 @@ function Act_getSiswaNameByID($id_siswa)
  * set format new ketua kelas username
  *
  * @param string $username
- * @return void
+ * @return string
  */
-function Act_formatNewKetuaKelasUsername($username)
+function Act_formatNewKetuaKelasUsername($username): string
 {
     return "u{$username}";
 }
@@ -43,9 +43,9 @@ function Act_formatNewKetuaKelasUsername($username)
  * auto hash(ed) by default
  *
  * @param string $password
- * @return void
+ * @return string
  */
-function Act_formatNewKetuaKelasPassword($password)
+function Act_formatNewKetuaKelasPassword($password): string
 {
     return Hash::make("p{$password}");
 }

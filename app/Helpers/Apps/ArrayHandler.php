@@ -17,9 +17,9 @@ use Illuminate\Support\Arr;
  * get random element from array data
  *
  * @param array $array_data
- * @return void
+ * @return string
  */
-function Arr_random($array_data)
+function Arr_random($array_data): string
 {
     return Arr::random($array_data);
 }
@@ -30,9 +30,9 @@ function Arr_random($array_data)
  *
  * @param array $array_data
  * @param string $key
- * @return void
+ * @return array
  */
-function Arr_pluck($array_data, $key)
+function Arr_pluck($array_data, $key): array
 {
     return Arr::pluck($array_data, $key);
 }
@@ -41,9 +41,9 @@ function Arr_pluck($array_data, $key)
  * collapse an array into slim version
  *
  * @param array $array_data
- * @return void
+ * @return array
  */
-function Arr_collapse($array_data)
+function Arr_collapse($array_data): array
 {
     return Arr::collapse($array_data);
 }
@@ -52,9 +52,9 @@ function Arr_collapse($array_data)
  * unserialize without error
  *
  * @param string $data
- * @return void
+ * @return array
  */
-function Arr_unserialize($data)
+function Arr_unserialize($data): array
 {
     try {
         return unserialize($data);
