@@ -8,7 +8,7 @@ class Kegiatan extends Model
 {
     protected $fillable = ['nama', 'nilai', 'nilai_avg', 'hari', 'waktu_mulai', 'waktu_selesai', 'akses'];
 
-    private $canAllow = ['guru' => ['7', '5'], 'ketuakelas' => ['5']];
+    private const canAllow = ['guru' => ['7', '5'], 'ketuakelas' => ['5']];
 
     # map
     public function kegiatanSimpleListMap()
@@ -111,7 +111,7 @@ class Kegiatan extends Model
 
     public function scopeWhereInAllowToAccess($query, $status)
     {
-        $query->whereIn('akses', $this->canAllow[$status]);
+        $query->whereIn('akses', self::canAllow[$status]);
     }
 
     public function scopeWhereAccessType($query, $type)

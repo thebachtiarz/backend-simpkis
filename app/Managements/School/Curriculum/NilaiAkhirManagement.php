@@ -46,13 +46,10 @@ class NilaiAkhirManagement
         if (Auth::user()->tokenCan('nilakh:create')) {
             $validator = $this->nilaiAkhirStoreValidator($request->all());
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
-            $semester = isset($request->smtid) ? $request->smtid : Cur_getActiveIDSemesterNow();
             /**
              * proses melakukan perhitungan nilai akhir
-             * berdasarkan semester yang ditentukan
-             * pada semester ini atau pilihan
              */
-            $processNilaiAkhir = (new NilaiAkhirCreatorService($semester))->result();
+            $processNilaiAkhir = NilaiAkhirCreatorService::runProcessNilaiAkhir();
             return response()->json($processNilaiAkhir, 200);
         }
         return _throwErrorResponse();

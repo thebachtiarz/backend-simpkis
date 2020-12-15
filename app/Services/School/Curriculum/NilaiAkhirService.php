@@ -11,11 +11,22 @@ class NilaiAkhirService
     protected $stateNilaiPresensi, $stateNilaiTambahan = 0;
     protected $totalNilaiAkhir, $stringNilaiAkhir;
 
-    public function __construct($id_siswa, $id_semester)
+    public function __construct()
     {
-        $this->id_siswa = $id_siswa;
-        $this->id_semester = $id_semester;
-        $this->data_siswa = $this->getSiswa($id_siswa);
+        $this->id_semester = Cur_getActiveIDSemesterNow();
+    }
+
+    // public
+    public function generate()
+    {
+        $this->runService();
+        return $this->getResult();
+    }
+
+    # private
+    private function runService()
+    {
+        $this->data_siswa = $this->getSiswa($this->id_siswa);
         $this->data_presensi = $this->getPresensi();
         $this->data_nilaitambahan = $this->getNilaiTambahan();
         $this->data_kegiatan = $this->getKegiatan();
@@ -26,7 +37,7 @@ class NilaiAkhirService
         $this->stringNilaiAkhir = $this->setStringNilaiAkhir();
     }
 
-    public function generate()
+    private function getResult()
     {
         return [
             'id_siswa' => $this->id_siswa,
@@ -37,7 +48,6 @@ class NilaiAkhirService
         ];
     }
 
-    # private
     private function getSiswa($id_siswa)
     {
         return Siswa::find($id_siswa);
@@ -114,6 +124,28 @@ class NilaiAkhirService
             ];
         }
         return Arr_collapse($dataPresensiStaticString);
+    }
+
+    /**
+     * Set the value of id_siswa
+     *
+     * @return  self
+     */
+    public function setIdSiswa($id_siswa)
+    {
+        $this->id_siswa = $id_siswa;
+        return $this;
+    }
+
+    /**
+     * Set the value of id_semester
+     *
+     * @return  self
+     */
+    public function setIdSemester($id_semester)
+    {
+        $this->id_semester = $id_semester;
+        return $this;
     }
 }
 

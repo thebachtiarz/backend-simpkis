@@ -73,5 +73,12 @@ Route::get('/test/web/{id}', function ($id) {
     // return collect($data)->where('presensigroup.id_kegiatan', 1);
     //
     // return (new \App\Services\School\Curriculum\NilaiAkhirService($id, Cur_getActiveIDSemesterNow()))->generate();
-    return (new \App\Services\School\Curriculum\NilaiAkhirCreatorService(Cur_getActiveIDSemesterNow()))->result();
+    // return (new \App\Services\School\Curriculum\NilaiAkhirCreatorService(Cur_getActiveIDSemesterNow()))->result();
+    // return (new \App\Services\School\Curriculum\NilaiAkhirCreatorService())->result();
+    // return \App\Services\School\Curriculum\NilaiAkhirCreatorService::runProcessNilaiAkhir();
+    // return (new \App\Services\School\Curriculum\NilaiAkhirService)->setIdSiswa(1)->setIdSemester(13)->generate();
+    //
+    //
+    //
+    abort(503);
 });

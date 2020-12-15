@@ -256,7 +256,7 @@ class PresensiManagement
     private function presensiStoreValidator($request)
     {
         return Validator::make($request, [
-            'catatan' => 'nullable|string|regex:/^[a-zA-Z0-9_,.\s]+$/',
+            'catatan' => 'nullable|string|regex:/^[a-zA-Z0-9-,.\s]+$/',
             'kegiatanid' => 'required|string|numeric',
             'presensidata' => 'required|string'
         ]);

@@ -12,6 +12,6 @@ class NilaiAkhirSeeder extends Seeder
      */
     public function run()
     {
-        (new NilaiAkhirCreatorService(Cur_getActiveIDSemesterNow()))->result();
+        NilaiAkhirCreatorService::runProcessNilaiAkhir();
     }
 }
