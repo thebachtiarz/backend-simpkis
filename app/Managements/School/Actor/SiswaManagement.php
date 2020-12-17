@@ -45,11 +45,18 @@ class SiswaManagement
                 try {
                     Excel::import(new SiswaImport, $request->file('file'));
                     return response()->json(successResponse('Berhasil menambahkan data siswa'), 200);
-                } catch (\Exception $th) {
-                    return response()->json(dataResponse(['code' => $th->getCode()], 'error', 'Gagal menambahkan siswa, error: coba periksa kelas'), 202);
+                } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+                    $failures = $e->failures();
+                    $fail = [];
+                    foreach ($failures as $failure) {
+                        $row = $failure->row();
+                        $col = $failure->attribute();
+                        $fail[] = '[baris:' . $row . ', kolom:' . $col . ']';
+                    }
+                    return response()->json(errorResponse('Terdapat kesalahan pada input data: ' . join(", ", $fail)), 202);
                 }
             } catch (\Throwable $th) {
-                return response()->json(dataResponse(['code' => $th->getCode()], 'error', 'Format file bermasalah, harap periksa sesuai dengan ketentuan yang telah disediakan'), 202);
+                return response()->json(errorResponse('Format file bermasalah, harap periksa sesuai dengan ketentuan yang telah disediakan'), 202);
             }
         }
         return _throwErrorResponse();

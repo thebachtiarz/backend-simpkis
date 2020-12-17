@@ -28,11 +28,13 @@ class NilaiAkhirCreatorService
     // private
     private static function runService()
     {
+        Atv_cacheFlush();
         self::$newNilaiAkhirGroupId = self::getNewNilaiAkhirId();
         self::$kelas = self::getActiveKelas();
-        $delete = self::deleteNilaiAkhirSmtNowIfAny();
+        self::deleteNilaiAkhirSmtNowIfAny();
         self::processCountingNilaiAkhir();
         self::saveResultNilaiAkhir();
+        Atv_cacheFlush();
     }
 
     private static function deleteNilaiAkhirSmtNowIfAny()

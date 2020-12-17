@@ -4,11 +4,13 @@ namespace App\Imports\Siswa;
 
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-// use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Concerns\WithValidation;
 use App\Models\School\Actor\Siswa;
+use Maatwebsite\Excel\Concerns\Importable;
 
-class SiswaImport implements ToModel, WithHeadingRow/*, WithValidation*/
+class SiswaImport implements ToModel, WithHeadingRow, WithValidation
 {
+    use Importable;
     /**
      * @param array $row
      *
@@ -26,9 +28,9 @@ class SiswaImport implements ToModel, WithHeadingRow/*, WithValidation*/
     public function rules(): array
     {
         return [
-            '0' => 'required|string|numeric|digits_between:10,15',
-            '1' => 'required|string|regex:/^[a-zA-Z_,.\s]+$/',
-            '2' => 'required|string|numeric'
+            'nisn' => 'required|numeric|digits_between:10,15',
+            'nama' => 'required|string|regex:/^[a-zA-Z_,.\s]+$/',
+            'id_kelas' => 'required|numeric'
         ];
     }
 

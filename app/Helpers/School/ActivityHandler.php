@@ -4,16 +4,28 @@
  * use libraries
  */
 
-use App\Models\School\Activity\Kegiatan;
-use App\Models\School\Activity\NilaiTambahan;
-use App\Models\School\Activity\Presensi;
-use App\Models\School\Activity\PresensiGroup;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * use models
  */
 
+use App\Models\School\Activity\Kegiatan;
+use App\Models\School\Activity\NilaiTambahan;
+use App\Models\School\Activity\Presensi;
+use App\Models\School\Activity\PresensiGroup;
+
 /** */
+
+/**
+ * removing entire cache
+ *
+ * @return void
+ */
+function Atv_cacheFlush(): void
+{
+    Cache::flush();
+}
 
 /**
  * ! get repository kegiatan all
@@ -23,7 +35,7 @@ use App\Models\School\Activity\PresensiGroup;
  */
 function Atv_getRepoKegiatanAll(): object
 {
-    return cache()->remember('repo-kegiatan-all', (60 * 60 * 2/* 2 hours */), function () {
+    return Cache::remember('repo-kegiatan-all', (60 * 60 * 2/* 2 hours */), function () {
         return Kegiatan::all()->map->kegiatanResourceMap();
     });
 }
@@ -36,7 +48,7 @@ function Atv_getRepoKegiatanAll(): object
  */
 function Atv_getRepoKegiatanPresensi(): object
 {
-    return cache()->remember('repo-kegiatan-presensi', (60 * 60 * 2/* 2 hours */), function () {
+    return Cache::remember('repo-kegiatan-presensi', (60 * 60 * 2/* 2 hours */), function () {
         return Kegiatan::getKegiatanPresensi()->get()->map->kegiatanResourceMap();
     });
 }
@@ -49,7 +61,7 @@ function Atv_getRepoKegiatanPresensi(): object
  */
 function Atv_getRepoKegiatanTambahan(): object
 {
-    return cache()->remember('repo-kegiatan-tambahan', (60 * 60 * 2/* 2 hours */), function () {
+    return Cache::remember('repo-kegiatan-tambahan', (60 * 60 * 2/* 2 hours */), function () {
         return Kegiatan::getKegiatanTambahan()->get()->map->kegiatanResourceMap();
     });
 }
@@ -65,7 +77,7 @@ function Atv_getKegiatanResource(): array
     $data = Atv_getRepoKegiatanAll();
     $result = [];
     foreach ($data as $key => $value) $result[$value['id']] = $value['nilai'];
-    return cache()->remember('res-kegiatan', (60 * 60 * 2/* 2 hours */), function () use ($result) {
+    return Cache::remember('res-kegiatan', (60 * 60 * 2/* 2 hours */), function () use ($result) {
         return $result;
     });
 }
@@ -81,7 +93,7 @@ function Atv_getKegiatanPresensiResource(): array
     $data = Atv_getRepoKegiatanPresensi();
     $result = [];
     foreach ($data as $key => $value) $result[$value['id']] = $value['nilai'];
-    return cache()->remember('res-kegiatan-presensi', (60 * 60 * 2/* 2 hours */), function () use ($result) {
+    return Cache::remember('res-kegiatan-presensi', (60 * 60 * 2/* 2 hours */), function () use ($result) {
         return $result;
     });
 }
@@ -97,7 +109,7 @@ function Atv_getKegiatanTambahanResource(): array
     $data = Atv_getRepoKegiatanTambahan();
     $result = [];
     foreach ($data as $key => $value) $result[$value['id']] = $value['nilai'];
-    return cache()->remember('res-kegiatan-tambahan', (60 * 60 * 2/* 2 hours */), function () use ($result) {
+    return Cache::remember('res-kegiatan-tambahan', (60 * 60 * 2/* 2 hours */), function () use ($result) {
         return $result;
     });
 }
@@ -118,7 +130,7 @@ function Atv_getPresensiAvgNilai(): array
             'avg' => $resPresensi[$i]['nilai_avg']
         ];
     }
-    return cache()->remember('res-kegiatan-presensi-avg-nilai', (60 * 60 * 2/* 2 hours */), function () use ($arrPresensiNilai) {
+    return Cache::remember('res-kegiatan-presensi-avg-nilai', (60 * 60 * 2/* 2 hours */), function () use ($arrPresensiNilai) {
         return $arrPresensiNilai;
     });
 }
@@ -135,7 +147,7 @@ function Atv_getPresensiResource($id_semester): array
     $data = Presensi::getPresensiResource($id_semester)->get()->map->presensiResourceMap();
     $result = [];
     foreach ($data as $key => $value) $result[$value['id_siswa']][] = $value;
-    return cache()->remember('res-presensi', (60 * 60 * 2/* 2 hours */), function () use ($result) {
+    return Cache::remember('res-presensi', (60 * 60 * 2/* 2 hours */), function () use ($result) {
         return $result;
     });
 }
@@ -152,7 +164,7 @@ function Atv_getNilaiTambahanResource($id_semester): array
     $data = NilaiTambahan::getNilaiTambahanResource($id_semester)->get()->map->nilaitambahanResourceMap();
     $result = [];
     foreach ($data as $key => $value) $result[$value['id_siswa']][] = $value;
-    return cache()->remember('res-nilaitambahan', (60 * 60 * 2/* 2 hours */), function () use ($result) {
+    return Cache::remember('res-nilaitambahan', (60 * 60 * 2/* 2 hours */), function () use ($result) {
         return $result;
     });
 }
