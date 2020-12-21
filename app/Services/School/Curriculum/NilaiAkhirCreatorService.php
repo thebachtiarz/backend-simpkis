@@ -6,31 +6,33 @@ use App\Models\School\Curriculum\Kelas;
 use App\Models\School\Curriculum\NilaiAkhirGroup;
 use App\Models\School\Curriculum\NilaiAkhir;
 use App\Services\School\Curriculum\NilaiAkhirService;
+use ReflectionClass;
 
 class NilaiAkhirCreatorService
 {
-    protected static $id_semester;
-    protected static $newNilaiAkhirGroupId;
-    protected static $kelas;
-    protected static $finalNilaiAkhirGroup = [];
-    protected static $finalNilaiAkhir = [];
-    protected static $responseResult;
-    protected static $wasUpdated = false;
+    protected static int $idSemester;
 
-    // public
+    private static int $newNilaiAkhirGroupId;
+    private static object $kelasData;
+    private static array $finalNilaiAkhirGroup = [];
+    private static array $finalNilaiAkhir = [];
+    private static array $responseResult;
+    private static bool $wasUpdated = false;
+
+    // ? Public Method
     public static function runProcessNilaiAkhir()
     {
-        self::$id_semester = Cur_getActiveIDSemesterNow();
+        self::$idSemester = Cur_getActiveIDSemesterNow();
         self::runService();
-        return self::$responseResult;
+        return static::$responseResult;
     }
 
-    // private
+    // ? Private Method
     private static function runService()
     {
         Atv_cacheFlush();
-        self::$newNilaiAkhirGroupId = self::getNewNilaiAkhirId();
-        self::$kelas = self::getActiveKelas();
+        self::getNewNilaiAkhirId();
+        self::getActiveKelas();
         self::deleteNilaiAkhirSmtNowIfAny();
         self::processCountingNilaiAkhir();
         self::saveResultNilaiAkhir();
@@ -51,31 +53,32 @@ class NilaiAkhirCreatorService
 
     private static function getNewNilaiAkhirId()
     {
-        return (int) (NilaiAkhirGroup::count() ? NilaiAkhirGroup::getLastNilaiAkhir()->first('id')->id : 0) + 1;
+        self::$newNilaiAkhirGroupId = (int) (NilaiAkhirGroup::count() ? NilaiAkhirGroup::getLastNilaiAkhir()->first('id')->id : 0) + 1;
     }
 
     private static function getActiveKelas()
     {
-        return Kelas::getActiveKelas();
+        self::$kelasData = Kelas::getActiveKelas();
     }
 
+    // ?! Process Core
     private static function processCountingNilaiAkhir()
     {
-        for ($i = 0; $i < self::$kelas->count(); $i++) {
-            $setKelas = self::$kelas->get()[$i];
+        for ($i = 0; $i < self::$kelasData->count(); $i++) {
+            $setKelas = self::$kelasData->get()[$i];
             self::$finalNilaiAkhirGroup[] = [
-                'id_semester' => self::$id_semester,
+                'id_semester' => static::$idSemester,
                 'id_kelas' => $setKelas->id,
-                'catatan' => 'Presensi Semester: ' . Cur_getSemesterNameByID(self::$id_semester) . ', Kelas: ' . Cur_getKelasNameByID($setKelas->id) . ', Tanggal: ' . Carbon_HumanFullDateTimeNow(),
+                'catatan' => 'Presensi Semester: ' . Cur_getSemesterNameByID(static::$idSemester) . ', Kelas: ' . Cur_getKelasNameByID($setKelas->id) . ', Tanggal: ' . Carbon_HumanFullDateTimeNow(),
                 'created_at' => Carbon_DBtimeNow(),
                 'updated_at' => Carbon_DBtimeNow()
             ];
             for ($j = 0; $j < count($setKelas->siswa); $j++) {
                 $setSiswa = $setKelas->siswa[$j];
-                $getNilai = (new NilaiAkhirService)->setIdSiswa($setSiswa->id)->setIdSemester(self::$id_semester)->generate();
+                $getNilai = NilaiAkhirService::setIdSiswa($setSiswa->id)->setIdSemester(static::$idSemester)->generate();
                 self::$finalNilaiAkhir[] = [
-                    'id_nilai' => self::$newNilaiAkhirGroupId,
-                    'id_semester' => self::$id_semester,
+                    'id_nilai' => static::$newNilaiAkhirGroupId,
+                    'id_semester' => static::$idSemester,
                     'id_siswa' => $setSiswa->id,
                     'nilai_akhir' => Cur_setFormatNilaiAkhir($getNilai['totalNilai'], $getNilai['stringNilai']),
                     'created_at' => Carbon_DBtimeNow(),
@@ -86,18 +89,32 @@ class NilaiAkhirCreatorService
         }
     }
 
+    // ?! Saving into database
     private static function saveResultNilaiAkhir()
     {
         try {
-            if ((!count(self::$finalNilaiAkhirGroup)) || (!count(self::$finalNilaiAkhir)))
+            if ((!count(static::$finalNilaiAkhirGroup)) || (!count(static::$finalNilaiAkhir)))
                 throw new \Exception('Tidak ada nilai akhir yang diproses', 404);
-            foreach (array_chunk(self::$finalNilaiAkhirGroup, 10000) as $partNilaiAkhirGroup)
+            foreach (array_chunk(static::$finalNilaiAkhirGroup, 10000) as $partNilaiAkhirGroup)
                 NilaiAkhirGroup::insert($partNilaiAkhirGroup);
-            foreach (array_chunk(self::$finalNilaiAkhir, 10000) as $partNilaiAkhir)
+            foreach (array_chunk(static::$finalNilaiAkhir, 10000) as $partNilaiAkhir)
                 NilaiAkhir::insert($partNilaiAkhir);
-            self::$responseResult = successResponse('Berhasil ' . (self::$wasUpdated ? 'memperbarui' : 'memproses') . ' nilai akhir');
+            self::$responseResult = successResponse('Berhasil ' . (static::$wasUpdated ? 'memperbarui' : 'memproses') . ' nilai akhir');
         } catch (\Throwable $th) {
             self::$responseResult = dataResponse(['code' => $th->getCode(), 'message' => $th->getMessage()], 'error', 'Gagal memproses nilai akhir');
         }
+    }
+
+    // ? Setter Module
+    /**
+     * Set the value of idSemester
+     *
+     * @return  self
+     */
+    public static function setIdSemester($idSemester)
+    {
+        self::$idSemester = $idSemester;
+
+        return new self;
     }
 }

@@ -6,107 +6,118 @@ use App\Models\School\Actor\Siswa;
 
 class NilaiAkhirService
 {
-    protected $id_siswa, $id_semester;
-    protected $data_siswa, $data_presensi, $data_nilaitambahan, $data_kegiatan;
-    protected $stateNilaiPresensi, $stateNilaiTambahan = 0;
-    protected $totalNilaiAkhir, $stringNilaiAkhir;
+    protected static int $idSiswa;
+    protected static int $idSemester;
 
-    public function __construct()
+    private static object $dataSiswa;
+    private static array $dataPresensi;
+    private static object $dataNilaiTambahan;
+    private static array $dataKegiatan;
+
+    private static int $stateNilaiPresensi = 0;
+    private static int $stateNilaiTambahan = 0;
+    private static array $benchOfNilaiAkhir;
+    private static string $totalNilaiAkhir;
+    private static string $stringNilaiAkhir;
+
+    private static bool $status = false;
+    private static array $errorMessage;
+
+    // ? Public Method
+    // generate for get result
+    public static function generate()
     {
-        $this->id_semester = Cur_getActiveIDSemesterNow();
+        self::runService();
+        if (static::$status) {
+            return self::getResult();
+        } else {
+            return self::$errorMessage;
+        }
     }
 
-    // public
-    public function generate()
+    // ? Private Method
+    // run process for get nilai akhir siswa
+    private static function runService()
     {
-        $this->runService();
-        return $this->getResult();
+        try {
+            self::getSiswa();
+            self::getPresensi();
+            self::getNilaiTambahan();
+            self::getKegiatan();
+            self::getNilaiPresensiBenchmark();
+            self::sumNilaiPresensi();
+            self::sumNilaiTambahan();
+            self::setTotalNilaiAkhir();
+            self::setStringNilaiAkhir();
+            self::$status = true;
+        } catch (\Throwable $th) {
+            self::$errorMessage = ['code' => $th->getCode(), 'message' => $th->getMessage()];
+            self::$status = false;
+        }
+        self::resetIncrementValues();
     }
 
-    # private
-    private function runService()
-    {
-        $this->data_siswa = $this->getSiswa($this->id_siswa);
-        $this->data_presensi = $this->getPresensi();
-        $this->data_nilaitambahan = $this->getNilaiTambahan();
-        $this->data_kegiatan = $this->getKegiatan();
-        $this->presensi_avg_nilai = $this->generateAverageNilai();
-        $this->sumNilaiPresensi();
-        $this->sumNilaiTambahan();
-        $this->totalNilaiAkhir = $this->setTotalNilaiAkhir();
-        $this->stringNilaiAkhir = $this->setStringNilaiAkhir();
-    }
-
-    private function getResult()
+    // result of process is stored into array
+    private static function getResult()
     {
         return [
-            'id_siswa' => $this->id_siswa,
-            'presensi' => strval($this->stateNilaiPresensi),
-            'tambahan' => strval($this->stateNilaiTambahan),
-            'totalNilai' => strval($this->totalNilaiAkhir),
-            'stringNilai' => $this->stringNilaiAkhir
+            'id_siswa' => static::$idSiswa,
+            'presensi' => strval(static::$stateNilaiPresensi),
+            'tambahan' => strval(static::$stateNilaiTambahan),
+            'totalNilai' => strval(static::$totalNilaiAkhir),
+            'stringNilai' => static::$stringNilaiAkhir
         ];
     }
 
-    private function getSiswa($id_siswa)
+    // get siswa data by id siswa
+    private static function getSiswa()
     {
-        return Siswa::find($id_siswa);
+        self::$dataSiswa = Siswa::find(static::$idSiswa);
     }
 
-    private function getPresensi()
+    // get presensi siswa by id siswa
+    private static function getPresensi()
     {
-        $presensi = $this->data_siswa->presensi->where('id_semester', $this->id_semester);
+        $presensi = static::$dataSiswa->presensi->where('id_semester', static::$idSemester);
         $data = [];
         foreach ($presensi as $key => $value) if ($value->presensigroup->approve == '7') $data[] = $value;
-        return $data;
+        self::$dataPresensi = $data;
     }
 
-    private function getNilaiTambahan()
+    // get nilai tambahan siswa by id siswa
+    private static function getNilaiTambahan()
     {
-        return $this->data_siswa->nilaitambahan->where('id_semester', $this->id_semester);
+        self::$dataNilaiTambahan = static::$dataSiswa->nilaitambahan->where('id_semester', static::$idSemester);
     }
 
-    private function getKegiatan()
+    // get kegiatan data for get matched nilai presensi
+    private static function getKegiatan()
     {
-        return Atv_getKegiatanResource();
+        self::$dataKegiatan = Atv_getKegiatanResource();
     }
 
-    private function sumNilaiPresensi()
+    // ! Process core
+    // sum nilai presensi
+    private static function sumNilaiPresensi()
     {
-        if (count($this->data_presensi))
-            for ($i = 0; $i < count($this->data_presensi); $i++)
-                $this->stateNilaiPresensi += in_array($this->data_presensi[$i]->nilai, array_keys($this->data_kegiatan[$this->data_presensi[$i]->presensigroup->id_kegiatan])) ?
-                    $this->data_kegiatan[$this->data_presensi[$i]->presensigroup->id_kegiatan][$this->data_presensi[$i]->nilai] : 0;
+        if (count(static::$dataPresensi))
+            for ($i = 0; $i < count(static::$dataPresensi); $i++)
+                self::$stateNilaiPresensi += in_array(static::$dataPresensi[$i]->nilai, array_keys(static::$dataKegiatan[static::$dataPresensi[$i]->presensigroup->id_kegiatan])) ?
+                    static::$dataKegiatan[static::$dataPresensi[$i]->presensigroup->id_kegiatan][static::$dataPresensi[$i]->nilai] : 0;
     }
 
-    private function sumNilaiTambahan()
+    // sum nilai tambahan
+    private static function sumNilaiTambahan()
     {
-        if (count($this->data_nilaitambahan))
-            for ($i = 0; $i < count($this->data_nilaitambahan); $i++)
-                $this->stateNilaiTambahan += in_array($this->data_nilaitambahan[$i]->nilai, array_keys($this->data_kegiatan[$this->data_nilaitambahan[$i]->id_kegiatan])) ?
-                    $this->data_kegiatan[$this->data_nilaitambahan[$i]->id_kegiatan][$this->data_nilaitambahan[$i]->nilai] : 0;
+        if (count(static::$dataNilaiTambahan))
+            for ($i = 0; $i < count(static::$dataNilaiTambahan); $i++)
+                self::$stateNilaiTambahan += in_array(static::$dataNilaiTambahan[$i]->nilai, array_keys(static::$dataKegiatan[static::$dataNilaiTambahan[$i]->id_kegiatan])) ?
+                    static::$dataKegiatan[static::$dataNilaiTambahan[$i]->id_kegiatan][static::$dataNilaiTambahan[$i]->nilai] : 0;
     }
 
-    private function setTotalNilaiAkhir()
-    {
-        $process = ($this->stateNilaiPresensi * 0.7) + ($this->stateNilaiTambahan * 0.3);
-        $result = $process > 0 ? $process : 0;
-        return strval(round($result, 2));
-    }
-
-    private function setStringNilaiAkhir()
-    {
-        if ($this->totalNilaiAkhir == 0) return 'E';
-        elseif ($this->totalNilaiAkhir < $this->presensi_avg_nilai['D']) return 'D';
-        elseif ($this->totalNilaiAkhir < $this->presensi_avg_nilai['D+']) return 'D+';
-        elseif ($this->totalNilaiAkhir < $this->presensi_avg_nilai['C']) return 'C';
-        elseif ($this->totalNilaiAkhir < $this->presensi_avg_nilai['C+']) return 'C+';
-        elseif ($this->totalNilaiAkhir < $this->presensi_avg_nilai['B']) return 'B';
-        elseif ($this->totalNilaiAkhir < $this->presensi_avg_nilai['B+']) return 'B+';
-        else return 'A';
-    }
-
-    private function generateAverageNilai()
+    // create the nilai akhir category by average nilai presensi (stored from kegiatan->nilai_avg) based from this siswa
+    // every siswa can be different based from his count of presensi and nilai tambahan data
+    private static function getNilaiPresensiBenchmark()
     {
         $resPresensiAvgNilai = Atv_getPresensiAvgNilai();
         $dataPresensiStaticAvg = 0;
@@ -114,7 +125,7 @@ class NilaiAkhirService
         $dataPresensiStaticString = [];
         //
         foreach ($resPresensiAvgNilai as $key => $value) {
-            $dataPresensiStaticAvg += ($value['avg'] * count(collect($this->data_presensi)->where('presensigroup.id_kegiatan', $value['id'])));
+            $dataPresensiStaticAvg += ($value['avg'] * count(collect(static::$dataPresensi)->where('presensigroup.id_kegiatan', $value['id'])));
         }
         $seventyPercentPresensiAvg = ($dataPresensiStaticAvg * 0.7);
         //
@@ -123,29 +134,65 @@ class NilaiAkhirService
                 $resPresensiStaticString[$i - 1] => strval(round(($seventyPercentPresensiAvg / count($resPresensiStaticString) * $i), 2))
             ];
         }
-        return Arr_collapse($dataPresensiStaticString);
+        self::$benchOfNilaiAkhir = Arr_collapse($dataPresensiStaticString);
     }
 
+    // create nilai akhir detail in float
+    private static function setTotalNilaiAkhir()
+    {
+        $process = (static::$stateNilaiPresensi * 0.7) + (static::$stateNilaiTambahan * 0.3);
+        self::$totalNilaiAkhir = $process > 0 ? strval(round($process, 2)) : 0;
+    }
+
+    // create nilai akhir result into string
+    private static function setStringNilaiAkhir()
+    {
+        $resultString = '';
+
+        if (static::$totalNilaiAkhir == 0) $resultString = 'E';
+        elseif (static::$totalNilaiAkhir < static::$benchOfNilaiAkhir['D']) $resultString = 'D';
+        elseif (static::$totalNilaiAkhir < static::$benchOfNilaiAkhir['D+']) $resultString = 'D+';
+        elseif (static::$totalNilaiAkhir < static::$benchOfNilaiAkhir['C']) $resultString = 'C';
+        elseif (static::$totalNilaiAkhir < static::$benchOfNilaiAkhir['C+']) $resultString = 'C+';
+        elseif (static::$totalNilaiAkhir < static::$benchOfNilaiAkhir['B']) $resultString = 'B';
+        elseif (static::$totalNilaiAkhir < static::$benchOfNilaiAkhir['B+']) $resultString = 'B+';
+        else $resultString = 'A';
+
+        self::$stringNilaiAkhir = $resultString;
+    }
+
+    // ?! Reset attributes with having increment value for process
+    // running at last process
+    private static function resetIncrementValues()
+    {
+        self::$stateNilaiPresensi = 0;
+        self::$stateNilaiTambahan = 0;
+    }
+
+    // ? Setter Module
+
     /**
-     * Set the value of id_siswa
+     * Set the value of idSiswa
      *
      * @return  self
      */
-    public function setIdSiswa($id_siswa)
+    public static function setIdSiswa($idSiswa)
     {
-        $this->id_siswa = $id_siswa;
-        return $this;
+        self::$idSiswa = $idSiswa;
+
+        return new self;
     }
 
     /**
-     * Set the value of id_semester
+     * Set the value of idSemester
      *
      * @return  self
      */
-    public function setIdSemester($id_semester)
+    public static function setIdSemester($idSemester)
     {
-        $this->id_semester = $id_semester;
-        return $this;
+        self::$idSemester = $idSemester;
+
+        return new self;
     }
 }
 
