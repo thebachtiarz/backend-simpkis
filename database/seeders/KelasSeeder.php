@@ -1,5 +1,7 @@
 <?php
 
+namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 use App\Models\School\Curriculum\Kelas;
 use App\Models\School\Curriculum\KelasGroup;

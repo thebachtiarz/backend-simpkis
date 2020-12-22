@@ -1,5 +1,7 @@
 <?php
 
+namespace Database\Seeders;
+
 use App\Models\School\Activity\Kegiatan;
 use Illuminate\Database\Seeder;
 

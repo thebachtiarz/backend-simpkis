@@ -44,7 +44,7 @@ class Kegiatan extends Model
     {
         return [
             'id' => $this->id,
-            'nilai' => $this->getNilai($this->nilai, 0),
+            'nilai' => $this->getNilai($this->nilai, false),
             'akses' => $this->akses
         ];
     }
@@ -53,15 +53,15 @@ class Kegiatan extends Model
     {
         return [
             'id' => $this->id,
-            'nilai' => $this->getNilaiEachKegiatan($this->nilai, 0),
+            'nilai' => $this->getNilaiEachKegiatan($this->nilai),
             'nilai_avg' => $this->nilai_avg
         ];
     }
 
     # private
-    private function getNilai($data, $auth = 1)
+    private function getNilai($data, bool $auth = true)
     {
-        $getAuth = (bool) $auth ? User_checkStatus() : 'ketuakelas';
+        $getAuth = $auth ? User_checkStatus() : 'ketuakelas';
         $getNilai = Arr_unserialize($data);
         $result = [];
         if ((is_array($getNilai)) && (count($getNilai) > 0)) {

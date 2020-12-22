@@ -2,10 +2,13 @@
 
 namespace App\Models\School\Activity;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Presensi extends Model
 {
+    use HasFactory;
+
     protected $fillable = ['id_presensi', 'id_semester', 'id_siswa', 'nilai'];
 
     # map

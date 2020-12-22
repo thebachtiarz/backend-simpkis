@@ -1,5 +1,7 @@
 <?php
 
+namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 use Faker\Generator as Faker;
 use App\Models\School\Actor\Siswa;
