@@ -67,11 +67,15 @@ class KegiatanManagement
                 $updateNilai = [];
                 $currentNilai = [];
                 $newNilai = [];
+
                 foreach ($getReq as $key => $value) {
-                    if (is_numeric($key)) $newNilai[] = [Str_random(6) => $value];
-                    else $currentNilai[] = [$key => $value];
+                    if (isset($value['name']) && isset($value['poin'])) {
+                        if (is_numeric($value['code'])) $newNilai[] = [Str_random(6) => ['name' => $value['name'], 'poin' => $value['poin']]];
+                        else $currentNilai[] = [$value['code'] => ['name' => $value['name'], 'poin' => $value['poin']]];
+                    }
                 }
                 $updateNilai = array_merge($currentNilai, $newNilai);
+
                 Kegiatan::updateKegiatan($id, $request, $updateNilai);
                 return response()->json(successResponse('Berhasil memperbarui kegiatan'), 201);
             }
