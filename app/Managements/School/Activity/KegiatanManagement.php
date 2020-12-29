@@ -34,7 +34,7 @@ class KegiatanManagement
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
             $getAvailableKegiatan = Kegiatan::getAvailableKegiatan($request->nama);
             if (!$getAvailableKegiatan->count()) {
-                $dataRequest = Arr_unserialize($request->nilai);
+                $dataRequest = json_decode($request->nilai, true);
                 $newNilai = [];
                 foreach ($dataRequest as $key => $value) $newNilai[] = [Str_random(6) => $value];
                 Kegiatan::createNewKegiatan($request, $newNilai);
@@ -63,7 +63,7 @@ class KegiatanManagement
             if ($validator->fails()) return response()->json(errorResponse($validator->errors()), 202);
             $getKegiatan = Kegiatan::find($id);
             if ((bool) $getKegiatan) {
-                $getReq = Arr_unserialize($request->nilai);
+                $getReq = json_decode($request->nilai, true);
                 $updateNilai = [];
                 $currentNilai = [];
                 $newNilai = [];

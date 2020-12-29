@@ -104,9 +104,9 @@ class PresensiManagement
                 } else $approve = '7';
                 $getKegiatan = $getKegiatan->kegiatanCollectMap();
                 $kodeKegiatan = Arr_pluck($getKegiatan['nilai'], 'code');
-                $getDataPresensi = (new Presensi)->getNilai($request->presensidata); // unserialize
+                $getDataPresensi = json_decode($request->presensidata, true);
                 $newPresensi = [];
-                $newPresensiGroup = PresensiGroup::create(['id_kegiatan' => $request->kegiatanid, 'id_user' => Auth::user()->id, 'catatan' => $request->catatan, 'approve' => $approve]);
+                $setPresensi = PresensiGroup::create(['id_kegiatan' => $request->kegiatanid, 'id_user' => Auth::user()->id, 'catatan' => $request->catatan, 'approve' => $approve]);
                 /**
                  * melakukan penyaringan (filter)
                  * apakah poin nilai yang dilakukan pada presensi
@@ -114,7 +114,7 @@ class PresensiManagement
                  */
                 foreach ($getDataPresensi as $key => $value)
                     if (in_array($value['nilai'], $kodeKegiatan)) $newPresensi[] = ['id_semester' => strval(Cur_getActiveIDSemesterNow()), 'id_siswa' => $value['id_siswa'], 'nilai' => $value['nilai']];
-                if (count($newPresensi)) PresensiGroup::find($newPresensiGroup->id)->presensi()->createMany($newPresensi);
+                if (count($newPresensi)) $setPresensi->presensi()->createMany($newPresensi);
                 return response()->json(successResponse('Berhasil melakukan presensi'), 201);
             }
             return response()->json(errorResponse('Kegiatan tidak ditemukan'), 202);
@@ -158,7 +158,7 @@ class PresensiManagement
                 if ($request->_update == 'groupupdate') {
                     $getPresensiGroup = PresensiGroup::find($id);
                     if ((bool) $getPresensiGroup) {
-                        $presensiUpdate = Arr_unserialize($request->presensidata);
+                        $presensiUpdate = json_decode($request->presensidata, true);
                         $presensiOrigin = $getPresensiGroup->presensi;
                         $getUpdatedPresensi = [];
                         $getDeletedPresensi = [];
