@@ -28,11 +28,8 @@ class NilaiAkhirService
     public static function generate()
     {
         self::runService();
-        if (static::$status) {
-            return self::getResult();
-        } else {
-            return self::$errorMessage;
-        }
+
+        return static::$status ? self::getResult() : self::$errorMessage;
     }
 
     // ? Private Method
@@ -53,8 +50,9 @@ class NilaiAkhirService
         } catch (\Throwable $th) {
             self::$errorMessage = ['code' => $th->getCode(), 'message' => $th->getMessage()];
             self::$status = false;
+        } finally {
+            self::resetIncrementValues();
         }
-        self::resetIncrementValues();
     }
 
     // result of process is stored into array
