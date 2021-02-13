@@ -14,3 +14,4 @@ npm-debug.log
 yarn-error.log
 access.log
 error.log
+laravel_schedule.log
