@@ -21,9 +21,9 @@ class DatabaseSeeder extends Seeder
             KetuaKelasSeeder::class,
             SemesterSeeder::class,
             KegiatanSeeder::class,
-            NilaiTambahanSeeder::class,
-            PresensiSeeder::class,
-            NilaiAkhirSeeder::class,
+            // NilaiTambahanSeeder::class,
+            // PresensiSeeder::class,
+            // NilaiAkhirSeeder::class,
         ]);
     }
 }

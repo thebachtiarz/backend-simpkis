@@ -41,7 +41,7 @@ class AppRefresh extends Command
     public function handle()
     {
         try {
-            $artisan = ['php artisan down', 'view:clear', 'config:clear', 'cache:clear', 'dumpautoload', 'php artisan up'];
+            $artisan = ['php artisan down', 'view:clear', 'config:clear', 'cache:clear', 'php artisan up'];
 
             Log::channel('maintenance')->info('Maintenance server daily, started...');
 
